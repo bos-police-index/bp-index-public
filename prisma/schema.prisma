@@ -1,0 +1,497 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+  binarytargets   = ["native"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model alpha_listing {
+  alpha_listing_id Int       @id @default(autoincrement())
+  employee_id      Int?
+  is_active        Boolean?
+  employee         employee? @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model bpd_customer {
+  bpd_customer_id      Int             @id @default(autoincrement())
+  customer_no          Int?
+  customer_seq         Int?
+  bpd_customer_no      Int?
+  customer_name        String?         @db.VarChar
+  customer_address1    String?         @db.VarChar
+  customer_address2    String?         @db.VarChar
+  customer_address3    String?         @db.VarChar
+  customer_city        String?         @db.VarChar
+  customer_state       String?         @db.VarChar
+  customer_zip         Int?
+  customer_taxpayer_id Int?
+  detail_record        detail_record[]
+}
+
+model crime_incident {
+  arrest_id             Int               @id @default(autoincrement())
+  incident_no           Int               @unique
+  offense_code          Int?
+  offense_code_group    String?           @db.VarChar
+  offense_desc          String?           @db.VarChar
+  offense_desc_detailed String?           @db.VarChar
+  incident_district     String?           @db.VarChar
+  reporting_area        Int?
+  shooting              String?           @db.VarChar
+  incident_date         DateTime?         @db.Timestamp(6)
+  year                  Int?
+  month                 Int?
+  day_of_week           String?           @db.VarChar
+  hour                  Int?
+  ucr_part              Int?
+  street_name           String?           @db.VarChar
+  latitude              Int?
+  longitude             Int?
+  location_coord        String?           @db.VarChar
+  detail_record         detail_record[]
+  shooting_report       shooting_report[]
+}
+
+model department {
+  department_id    Int                @id @default(autoincrement())
+  police_dept_name String?            @db.VarChar
+  city_dept_name   String?            @db.VarChar
+  employee         employee[]
+  police_financial police_financial[]
+  post_certified   post_certified[]
+  post_decertified post_decertified[]
+}
+
+model detail_record {
+  detail_record_id                                                       Int             @id @default(autoincrement())
+  row_id                                                                 Int
+  tracking_no                                                            Int?
+  employee_id                                                            Int?
+  customer_id                                                            Int?
+  incident_no                                                            Int?
+  contract_no                                                            Int?
+  street_no                                                              Int?
+  street_id                                                              Int?
+  street_name                                                            String?         @db.VarChar
+  cross_street_no                                                        Int?
+  cross_street_name                                                      String?         @db.VarChar
+  location_desc                                                          String?         @db.VarChar
+  detail_start                                                           DateTime?       @db.Timestamp(6)
+  detail_end                                                             DateTime?       @db.Timestamp(6)
+  hours_worked                                                           Int?
+  detail_type                                                            String?         @db.VarChar
+  state_funded                                                           String?         @db.Bit(1)
+  detail_rank                                                            Int?
+  no_show_flag                                                           Boolean?
+  license_premise_flag                                                   Boolean?
+  admin_fee_flag                                                         Boolean?
+  prepaid_flag                                                           Boolean?
+  request_rank                                                           Boolean?
+  admin_fee_rate                                                         Int?
+  rate_change_authorization_employee_id                                  Int?
+  detail_clerk_employee_id                                               Int?
+  pay_hours                                                              Int?
+  pay_amount                                                             Float?
+  pay_trc_code                                                           String?         @db.VarChar
+  detail_pay_rate                                                        Float?
+  record_created_date                                                    DateTime?       @db.Timestamp(6)
+  record_created_by                                                      Int?
+  record_updated_date                                                    DateTime?       @db.Timestamp(6)
+  record_updated_by                                                      Int?
+  bpd_customer                                                           bpd_customer?   @relation(fields: [customer_id], references: [bpd_customer_id], onDelete: NoAction, onUpdate: NoAction)
+  employee_detail_record_detail_clerk_employee_idToemployee              employee?       @relation("detail_record_detail_clerk_employee_idToemployee", fields: [detail_clerk_employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+  employee_detail_record_employee_idToemployee                           employee?       @relation("detail_record_employee_idToemployee", fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+  crime_incident                                                         crime_incident? @relation(fields: [incident_no], references: [incident_no], onDelete: NoAction, onUpdate: NoAction)
+  employee_detail_record_rate_change_authorization_employee_idToemployee employee?       @relation("detail_record_rate_change_authorization_employee_idToemployee", fields: [rate_change_authorization_employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model employee {
+  employee_id                                                                 Int                  @id @default(autoincrement())
+  employee_no                                                                 Int?
+  dept_id                                                                     Int?
+  last_name                                                                   String?              @db.VarChar
+  first_name                                                                  String?              @db.VarChar
+  name_mi                                                                     String?              @db.VarChar
+  name_prefix                                                                 String?              @db.VarChar
+  name_suffix                                                                 String?              @db.VarChar
+  sex                                                                         String?              @db.VarChar
+  ethnicity                                                                   String?              @db.VarChar
+  officer_photo                                                               Bytes?
+  postal_code                                                                 Int?
+  badge_no                                                                    Int?
+  rank_id                                                                     Int?
+  rank_as_of                                                                  DateTime?            @db.Timestamp(6)
+  org_id                                                                      Int?
+  district_worked                                                             Int?
+  union_code                                                                  String?              @db.VarChar
+  alpha_listing                                                               alpha_listing[]
+  detail_record_detail_record_detail_clerk_employee_idToemployee              detail_record[]      @relation("detail_record_detail_clerk_employee_idToemployee")
+  detail_record_detail_record_employee_idToemployee                           detail_record[]      @relation("detail_record_employee_idToemployee")
+  detail_record_detail_record_rate_change_authorization_employee_idToemployee detail_record[]      @relation("detail_record_rate_change_authorization_employee_idToemployee")
+  department                                                                  department?          @relation(fields: [dept_id], references: [department_id], onDelete: NoAction, onUpdate: NoAction)
+  organization                                                                organization?        @relation(fields: [org_id], references: [organization_id], onDelete: NoAction, onUpdate: NoAction)
+  rank                                                                        rank?                @relation(fields: [rank_id], references: [rank_id], onDelete: NoAction, onUpdate: NoAction)
+  fio_record                                                                  fio_record[]
+  officer_misconduct                                                          officer_misconduct[]
+  parking_ticket                                                              parking_ticket[]
+  personnel_roaster                                                           personnel_roaster[]
+  police_financial                                                            police_financial[]
+  police_overtime                                                             police_overtime[]
+  post_certified                                                              post_certified[]
+  post_decertified                                                            post_decertified[]
+}
+
+model fio_record {
+  fio_record_id    Int       @id @default(autoincrement())
+  field_contact_no String?   @db.VarChar
+  contact_date     DateTime? @db.Timestamp(6)
+  contact_officer  String?   @db.VarChar
+  supervisor_no    Int?
+  supervisor_name  String?   @db.VarChar
+  street_name      String?   @db.VarChar
+  city             String?   @db.VarChar
+  state            String?   @db.VarChar
+  zip_code         Int?
+  stop_duration    Int?
+  circumstance     String?   @db.VarChar
+  basis            String?   @db.VarChar
+  vehicle_year     Int?
+  vehicle_state    String?   @db.VarChar
+  vehicle_model    String?   @db.VarChar
+  vehicle_color    String?   @db.VarChar
+  vehicle_style    String?   @db.VarChar
+  vehicle_type     String?   @db.VarChar
+  key_situation    String?   @db.VarChar
+  contact_reason   String?
+  weather          String?   @db.VarChar
+  employee_id      Int?
+  employee         employee? @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "fio_record_fk")
+}
+
+model forfeiture_data {
+  forfeiture_data_id Int       @id @default(autoincrement())
+  url                String?   @db.VarChar
+  case_number        String    @db.VarChar
+  court_name         String?   @db.VarChar
+  date               DateTime? @db.Timestamp(6)
+  amount             Float?
+  motor_vehicle      String?   @db.VarChar
+  case_incident      String?
+}
+
+model officer_misconduct {
+  officer_misconduct_id Int       @id @default(autoincrement())
+  column1               Int?
+  ia_no                 String    @db.VarChar
+  incident_type         String?   @db.VarChar
+  received_date         DateTime? @db.Timestamp(6)
+  employee_id           Int?
+  allegation            String?
+  disposition           String?
+  completed_date        DateTime? @db.Timestamp(6)
+  title_rank_snap       String?   @db.VarChar
+  employee              employee? @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model organization {
+  organization_id Int        @id @default(autoincrement())
+  org_code        Int?
+  org_desc        String?    @db.VarChar
+  employee        employee[]
+}
+
+model overtime_category {
+  ot_category_id   Int               @id @default(autoincrement())
+  ot_category      String?           @db.VarChar
+  ot_category_code String?           @db.VarChar
+  police_overtime  police_overtime[]
+}
+
+model parking_ticket {
+  parking_ticket_id Int       @id @default(autoincrement())
+  row_id            Int?
+  tracking_no       Int?
+  employee_id       Int?
+  employee          employee? @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model police_financial {
+  police_financial_id Int         @id @default(autoincrement())
+  employee_id         Int?
+  city_dept_id        Int?
+  title               String?     @db.VarChar
+  regular_pay         Float?
+  retro_pay           Float?
+  other_pay           Float?
+  ot_pay              Float?
+  injured_pay         Float?
+  detail_pay          Float?
+  quinn_pay           Float?
+  total_pay           Float?
+  year                Int?
+  department          department? @relation(fields: [city_dept_id], references: [department_id], onDelete: NoAction, onUpdate: NoAction)
+  employee            employee?   @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model police_overtime {
+  police_overtime_id   Int                @id @default(autoincrement())
+  employee_id          Int
+  full_name            String?            @db.VarChar
+  last_name            String?            @db.VarChar
+  first_name           String?            @db.VarChar
+  middle_initial       String?            @db.VarChar
+  rank_title_abbrev    String?            @db.VarChar
+  assigned_code        Int?
+  assigned_desc        String?            @db.VarChar
+  charged_code         String?            @db.VarChar
+  charged_desc         String?            @db.VarChar
+  ot_date              DateTime?          @db.Timestamp(6)
+  ot_code              String?            @db.VarChar
+  ot_desc              String?            @db.VarChar
+  ot_start_time        String?            @db.VarChar
+  ot_start             DateTime?          @db.Timestamp(6)
+  ot_end_time          String?            @db.VarChar
+  ot_end               DateTime?          @db.Timestamp(6)
+  hours_worked         Int?
+  ot_hours             Int?
+  overtime_category_id Int?
+  employee             employee           @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+  overtime_category    overtime_category? @relation(fields: [overtime_category_id], references: [ot_category_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model post_certified {
+  post_certified_id         Int         @id @default(autoincrement())
+  employee_id               Int?
+  rank_id                   Int?
+  police_dept_id            Int?
+  certified_no              String?     @db.VarChar
+  certified_outcome         String?     @db.VarChar
+  certified_expiration_date DateTime?   @db.Timestamp(6)
+  employee                  employee?   @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+  department                department? @relation(fields: [police_dept_id], references: [department_id], onDelete: NoAction, onUpdate: NoAction)
+  rank                      rank?       @relation(fields: [rank_id], references: [rank_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model post_decertified {
+  post_decertified_id Int         @id @default(autoincrement())
+  employee_id         Int?
+  rank_id             Int?
+  police_dept_id      Int?
+  employee            employee?   @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction)
+  department          department? @relation(fields: [police_dept_id], references: [department_id], onDelete: NoAction, onUpdate: NoAction)
+  rank                rank?       @relation(fields: [rank_id], references: [rank_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model rank {
+  rank_id           Int                @id @default(autoincrement())
+  rank_id_no        Int?
+  rank_title_full   String?            @db.VarChar
+  rank_title_abbrev String?            @db.VarChar
+  rank_name         String?            @db.VarChar(50)
+  rank_abbr         String?            @db.VarChar(50)
+  employee          employee[]
+  post_certified    post_certified[]
+  post_decertified  post_decertified[]
+}
+
+model shooting_report {
+  shooting_report_id     Int             @id @default(autoincrement())
+  incident_no            Int?
+  shooting_date          DateTime?       @db.Timestamp(6)
+  shooting_district      String?         @db.VarChar
+  shooting_type_v2       String?         @db.VarChar
+  victim_gender          String?         @db.VarChar
+  victim_race            String?         @db.VarChar
+  victim_ethnicity_nibrs String?         @db.VarChar
+  is_multi_victim        Boolean?
+  crime_incident         crime_incident? @relation(fields: [incident_no], references: [incident_no], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model boston_ia_case_details {
+  boston_ia_case_details          Int                @default(autoincrement())
+  ia_allegation_type_id           Int
+  ia_action_type_id               Int
+  ia_finding_type_id              Int
+  boston_ia_case_overview_id      Int
+  allegation_count_amount         Int?
+  allegation_internal_or_external String?            @db.VarChar
+  ia_action_severity              String?            @db.VarChar
+  allegation_internal_external    String?            @db.VarChar(50)
+  ia_allegation_type              ia_allegation_type @relation(fields: [ia_allegation_type_id], references: [ia_allegation_type_id], onDelete: NoAction, onUpdate: NoAction, map: "boston_ia_case_details_fk")
+  ia_action_type                  ia_action_type     @relation(fields: [ia_action_type_id], references: [ia_action_type_id], onDelete: NoAction, onUpdate: NoAction, map: "boston_ia_case_details_fk_1")
+  ia_finding_type                 ia_finding_type    @relation(fields: [ia_finding_type_id], references: [ia_finding_type_id], onDelete: NoAction, onUpdate: NoAction, map: "boston_ia_case_details_fk_2")
+
+  @@ignore
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model boston_ia_case_overview {
+  boston_ia_case_overview_id Int                @id(map: "boston_ia_case_overview_pk") @default(autoincrement())
+  bpd_ia_record_id           Int
+  bpd_ia_no                  Int
+  post_ia_full_id            Int
+  post_ia_no                 Int
+  involved_officers          Int?
+  ia_allegation_type_id      Int
+  allegation_count_amount    Int?
+  ia_action_type_id          Int
+  ia_action_severity         String?            @db.VarChar
+  ia_finding_type_id         Int
+  involved_officer           Int?
+  bpd_ia_record              bpd_ia_record      @relation(fields: [bpd_ia_record_id], references: [bpd_ia_record_id], onDelete: NoAction, onUpdate: NoAction, map: "boston_ia_case_overview_fk")
+  post_ia_full               post_ia_full       @relation(fields: [post_ia_full_id], references: [post_ia_full_id], onDelete: NoAction, onUpdate: NoAction, map: "boston_ia_case_overview_fk_1")
+  ia_action_type             ia_action_type     @relation(fields: [ia_action_type_id], references: [ia_action_type_id], onDelete: NoAction, onUpdate: NoAction, map: "boston_ia_case_overview_fk_2")
+  ia_allegation_type         ia_allegation_type @relation(fields: [ia_allegation_type_id], references: [ia_allegation_type_id], onDelete: NoAction, onUpdate: NoAction, map: "boston_ia_case_overview_fk_3")
+  ia_finding_type            ia_finding_type    @relation(fields: [ia_finding_type_id], references: [ia_finding_type_id], onDelete: NoAction, onUpdate: NoAction, map: "boston_ia_case_overview_fk_4")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model boston_police_ia {
+  bpd_ia_record_id                     Int?
+  bpd_ia_no                            String? @db.VarChar(50)
+  incident_type                        String? @db.VarChar(50)
+  received_date                        String? @db.VarChar(50)
+  rank_id                              String? @db.VarChar(50)
+  first_name                           String? @db.VarChar(50)
+  last_name                            String? @db.VarChar(50)
+  employee_id                          Int?
+  ia_id_no                             Int?
+  allegation_type                      String? @db.VarChar(128)
+  ia_allegation_finding                String? @db.VarChar(512)
+  ia_finding_date                      String? @db.VarChar(50)
+  disciplinary_action                  String? @db.VarChar(50)
+  post_ia_no                           Int?
+  ia_incident_date                     String? @db.VarChar(50)
+  mptc_user_id                         String? @db.VarChar(50)
+  post_certification                   String? @db.VarChar(50)
+  department_id                        String? @db.VarChar(50)
+  reporting_agency                     String? @db.VarChar(50)
+  criminal_charge                      String? @db.VarChar(50)
+  criminal_charge_level                String? @db.VarChar(50)
+  misconduct_charge_level              String? @db.VarChar(50)
+  misconduct_type                      String? @db.VarChar(50)
+  misconduct_subtype                   String? @db.VarChar(50)
+  misconduct_details                   String? @db.VarChar(50)
+  post_ia_full_allegation_finding      String? @db.VarChar(50)
+  post_ia_full_disciplinary_action     String? @db.VarChar(50)
+  reason_disciplinary_not_administered String? @db.VarChar(50)
+
+  @@ignore
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model bpd_ia_record {
+  bpd_ia_record_id        Int                       @id(map: "bpd_ia_record_pk") @default(autoincrement())
+  bpd_ia_no               String?                   @db.VarChar
+  incident_type           String?                   @db.VarChar
+  received_date           String?                   @db.VarChar
+  rank_id                 String?                   @db.VarChar
+  first_name              String?                   @db.VarChar(50)
+  last_name               String?                   @db.VarChar(50)
+  employee_id             Int?
+  ia_id_no                Int?
+  allegation_type         String?                   @db.VarChar
+  ia_allegation_finding   String?                   @db.VarChar
+  ia_finding_date         String?                   @db.VarChar(50)
+  disciplinary_action     String?                   @db.VarChar
+  boston_ia_case_overview boston_ia_case_overview[]
+
+  @@index([bpd_ia_no])
+}
+
+model ia_action_type {
+  ia_action_type_id       Int                       @id(map: "ia_action_type_pk") @default(autoincrement())
+  ia_action_display_name  String?                   @db.VarChar
+  boston_ia_case_details  boston_ia_case_details[]  @ignore
+  boston_ia_case_overview boston_ia_case_overview[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ia_allegation_type {
+  ia_allegation_type_id   Int                       @id(map: "ia_allegation_type_pk") @default(autoincrement())
+  allegation_display_name String?                   @db.VarChar
+  boston_ia_case_details  boston_ia_case_details[]  @ignore
+  boston_ia_case_overview boston_ia_case_overview[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ia_finding_type {
+  ia_finding_type_id      Int                       @id(map: "ia_finding_type_pk") @default(autoincrement())
+  finding_display_name    String?                   @db.VarChar
+  boston_ia_case_details  boston_ia_case_details[]  @ignore
+  boston_ia_case_overview boston_ia_case_overview[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model personnel_roaster {
+  personnel_rooster_id  Int       @id(map: "personnel_rooster_pkey") @default(autoincrement())
+  employee_id           Int?
+  employee_record       Int?
+  eff_date              DateTime? @db.Timestamp(6)
+  start_date            DateTime? @db.Timestamp(6)
+  prof_exp_date         DateTime? @db.Timestamp(6)
+  rehire_date           DateTime? @db.Timestamp(6)
+  service_date          DateTime? @db.Timestamp(6)
+  return_date           DateTime? @db.Timestamp(6)
+  reports_to            Int?
+  job_code              Int?
+  position              Int?
+  pay_status            String?   @db.VarChar
+  action                String?   @db.VarChar
+  action_date           DateTime? @db.Timestamp(6)
+  reason                String?   @db.VarChar
+  location              Int?
+  is_regular            Boolean?
+  is_full               String?   @db.VarChar
+  officer_cd            Int?
+  payroll_pay_group     String?   @db.VarChar
+  absence_pay_group     Int?
+  type                  String?   @db.VarChar
+  standard_hours_weekly Int?
+  eeo_class             String?   @db.VarChar
+  sal_plan              String?   @db.VarChar
+  grade_no              Int?
+  grade_date            DateTime? @db.Timestamp(6)
+  step_no               Int?
+  step_date             DateTime? @db.Timestamp(6)
+  comp_freq             String?   @db.VarChar
+  comp_rate             Float?
+  change_amt            Int?
+  pct                   Int?
+  annual_rate           Float?
+  monthly_rate          Float?
+  hourly_rate           Float?
+  employee              employee? @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "personnel_rooster_employee_id_fkey")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model post_ia_full {
+  post_ia_no                           Int
+  police_dept_ia_no                    String                    @db.VarChar
+  ia_incident_date                     DateTime?                 @db.Timestamp(6)
+  mptc_user_id                         String?                   @db.VarChar
+  employee_id                          String?                   @default(dbgenerated("nextval('fa23_bpi_data.post_ia_full_employee_id_seq'::regclass)")) @db.VarChar
+  post_certification                   String?                   @db.VarChar
+  department_id                        String?                   @db.VarChar
+  reporting_agency                     String?                   @db.VarChar
+  criminal_charge                      String?                   @db.VarChar
+  criminal_charge_level                String?                   @db.VarChar
+  misconduct_charge_level              String?                   @db.VarChar
+  misconduct_type                      String?                   @db.VarChar
+  misconduct_subtype                   String?                   @db.VarChar
+  misconduct_details                   String?                   @db.VarChar
+  ia_allegation_finding                String?                   @db.VarChar
+  disciplinary_action                  String?                   @db.VarChar
+  reason_disciplinary_not_administered String?                   @db.VarChar
+  post_ia_full_id                      Int                       @id(map: "post_ia_full_pk") @default(autoincrement())
+  boston_ia_case_overview              boston_ia_case_overview[]
+
+  @@index([department_id])
+  @@index([police_dept_ia_no])
+}

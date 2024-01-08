@@ -1,0 +1,33 @@
+-- CreateTable
+CREATE TABLE "fio_contact_stop" (
+    "id" SERIAL NOT NULL,
+    "supervisor" TEXT,
+    "fc_num" INTEGER NOT NULL,
+    "contact_officer_name" TEXT,
+    "supervisor_name" TEXT,
+    "city" TEXT,
+    "stop_duration" TEXT,
+    "zip" TEXT,
+    "basis" TEXT,
+    "summonsissued" BOOLEAN,
+    "vehicle_color" TEXT,
+    "vehicle_make" TEXT,
+    "state" TEXT,
+    "vehicle_state" TEXT,
+    "vehicle_year" INTEGER,
+    "circumstance" TEXT,
+    "contact_officer" TEXT,
+    "vehicle_style" TEXT,
+    "searchvehicle" BOOLEAN NOT NULL,
+    "vehicle_type" TEXT,
+    "vehicle_model" TEXT,
+    "contact_date" TIMESTAMP(3) NOT NULL,
+    "street" TEXT,
+    "key_situations" TEXT,
+    "weather" TEXT,
+    "narrative" TEXT,
+    "fc_involved_frisk_or_search" BOOLEAN,
+    "year" INTEGER,
+
+    CONSTRAINT "fio_contact_stop_pkey" PRIMARY KEY ("id")
+);
