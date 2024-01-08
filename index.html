@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+            color: #003399; /* Ford Blue */
+            font-family: 'Pacifico', cursive;
+        }
+
+        .animated-text {
+            animation: text-grow 3s ease-in-out forwards;
+            font-size: 0;
+        }
+
+        @keyframes text-grow {
+            0% { font-size: 0; }
+            100% { font-size: 72px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-text">Super Website!!!</div>
+</body>
+</html>
