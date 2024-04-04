@@ -8,6 +8,7 @@
     "export": "next export"
   },
   "dependencies": {
+    "@apollo/client": "^3.9.10",
     "@emotion/cache": "^11.10.5",
     "@emotion/react": "^11.10.8",
     "@emotion/server": "^11.10.0",
@@ -35,6 +36,7 @@
     "embla-carousel-react": "^7.0.0",
     "env-cmd": "^10.1.0",
     "fuse.js": "^7.0.0",
+    "graphql": "^16.8.1",
     "js-cookie": "^3.0.1",
     "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.0",
