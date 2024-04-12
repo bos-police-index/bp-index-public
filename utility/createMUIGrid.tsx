@@ -256,7 +256,7 @@ const detail_record_columns = () => {
 			width: 100,
 		},
 		{
-			field: "trackingNo",
+			field: "tracking_no",
 			headerName: "Tracking #",
 			type: "number",
 			valueFormatter: (params) => {
@@ -265,7 +265,7 @@ const detail_record_columns = () => {
 			width: 150,
 		},
 		{
-			field: "customerId",
+			field: "customer_id",
 			headerName: "Customer ID",
 			type: "number",
 			valueFormatter: (params) => {
@@ -274,7 +274,7 @@ const detail_record_columns = () => {
 			width: 150,
 		},
 		{
-			field: "incidentNo",
+			field: "incident_no",
 			headerName: "Incident #",
 			type: "number",
 			valueFormatter: (params) => {
@@ -283,7 +283,7 @@ const detail_record_columns = () => {
 			width: 150,
 		},
 		{
-			field: "contractNo",
+			field: "contract_no",
 			headerName: "Contract #",
 			type: "number",
 			valueFormatter: (params) => {
@@ -292,7 +292,7 @@ const detail_record_columns = () => {
 			width: 150,
 		},
 		{
-			field: "streetNo",
+			field: "street_no",
 			headerName: "Street #",
 			type: "number",
 			valueFormatter: (params) => {
@@ -301,7 +301,7 @@ const detail_record_columns = () => {
 			width: 150,
 		},
 		{
-			field: "streetName",
+			field: "street_name",
 			headerName: "Street Name",
 			type: "string",
 			valueFormatter: (params) => {
@@ -310,7 +310,7 @@ const detail_record_columns = () => {
 			width: 150,
 		},
 		{
-			field: "crossStreetNo",
+			field: "cross_street_no",
 			headerName: "Cross Street #",
 			type: "number",
 			valueFormatter: (params) => {
@@ -319,7 +319,7 @@ const detail_record_columns = () => {
 			width: 170,
 		},
 		{
-			field: "crossStreetName",
+			field: "cross_street_name",
 			headerName: "Cross Street Name",
 			type: "string",
 			valueFormatter: (params) => {
@@ -328,7 +328,7 @@ const detail_record_columns = () => {
 			width: 200,
 		},
 		{
-			field: "locationDesc",
+			field: "location_desc",
 			headerName: "Location Description",
 			type: "string",
 			valueFormatter: (params) => {
@@ -337,21 +337,21 @@ const detail_record_columns = () => {
 			width: 250,
 		},
 		{
-			field: "detailStart",
+			field: "detail_start",
 			headerName: "Detail Start",
 			type: "date",
 			valueFormatter: formatDate,
 			width: 200,
 		},
 		{
-			field: "detailEnd",
+			field: "detail_end",
 			headerName: "Detail End",
 			type: "date",
 			valueFormatter: formatDate,
 			width: 200,
 		},
 		{
-			field: "hoursWorked",
+			field: "hours_worked",
 			headerName: "Hours Worked",
 			type: "number",
 			valueFormatter: (params) => {
@@ -361,7 +361,7 @@ const detail_record_columns = () => {
 			width: 170,
 		},
 		{
-			field: "detailType",
+			field: "detail_type",
 			headerName: "Detail Type",
 			type: "string",
 			valueFormatter: (params) => {
@@ -371,7 +371,7 @@ const detail_record_columns = () => {
 			width: 150,
 		},
 		{
-			field: "stateFunded",
+			field: "state_funded",
 			headerName: "State Funded",
 			type: "boolean",
 			valueFormatter: (params) => {
@@ -380,7 +380,7 @@ const detail_record_columns = () => {
 			width: 160,
 		},
 		{
-			field: "detailRank",
+			field: "detail_rank",
 			headerName: "Detail Rank",
 			type: "string",
 			valueFormatter: (params) => {
@@ -390,7 +390,7 @@ const detail_record_columns = () => {
 			width: 150,
 		},
 		{
-			field: "noShowFlag",
+			field: "no_show_flag",
 			headerName: "No Show Flag",
 			type: "boolean",
 			valueFormatter: (params) => {
@@ -399,7 +399,7 @@ const detail_record_columns = () => {
 			width: 170,
 		},
 		{
-			field: "licensePremiseFlag",
+			field: "license_premise_flag",
 			headerName: "License Premise Flag",
 			type: "boolean",
 			valueFormatter: (params) => {
@@ -408,7 +408,7 @@ const detail_record_columns = () => {
 			width: 250,
 		},
 		{
-			field: "adminFeeFlag",
+			field: "admin_fee_flag",
 			headerName: "Admin Fee Flag",
 			type: "boolean",
 			valueFormatter: (params) => {
@@ -417,7 +417,7 @@ const detail_record_columns = () => {
 			width: 200,
 		},
 		{
-			field: "prepaidFlag",
+			field: "prepaid_flag",
 			headerName: "Prepaid Flag",
 			type: "boolean",
 			valueFormatter: (params) => {
@@ -426,7 +426,7 @@ const detail_record_columns = () => {
 			width: 170,
 		},
 		{
-			field: "requestRank",
+			field: "request_rank",
 			headerName: "Request Rank",
 			type: "string",
 			valueFormatter: (params) => {
@@ -435,7 +435,7 @@ const detail_record_columns = () => {
 			width: 170,
 		},
 		{
-			field: "adminFeeRate",
+			field: "admin_fee_rate",
 			headerName: "Admin Fee Rate",
 			type: "number",
 			valueFormatter: (params) => {
@@ -444,7 +444,7 @@ const detail_record_columns = () => {
 			width: 170,
 		},
 		{
-			field: "rateChangeAuthorizationEmployeeId",
+			field: "rate_change_authorization_employee_id",
 			headerName: "Rate Change Authorization Employee ID",
 			type: "number",
 			valueFormatter: (params) => {
@@ -453,7 +453,7 @@ const detail_record_columns = () => {
 			width: 330,
 		},
 		{
-			field: "detailClerkEmployeeId",
+			field: "detail_clerk_employee_id",
 			headerName: "Detail Clerk Employee ID",
 			type: "number",
 			valueFormatter: (params) => {
@@ -462,7 +462,7 @@ const detail_record_columns = () => {
 			width: 250,
 		},
 		{
-			field: "payHours",
+			field: "pay_hours",
 			headerName: "Pay Hours",
 			type: "number",
 			valueFormatter: (params) => {
@@ -472,7 +472,7 @@ const detail_record_columns = () => {
 			width: 150,
 		},
 		{
-			field: "payAmount",
+			field: "pay_amount",
 			headerName: "Pay Amount",
 			type: "number",
 			valueFormatter: (params) => {
@@ -482,7 +482,7 @@ const detail_record_columns = () => {
 			width: 150,
 		},
 		{
-			field: "payTrcCode",
+			field: "pay_trc_code",
 			headerName: "Pay TRC Code",
 			type: "string",
 			valueFormatter: (params) => {
@@ -492,7 +492,7 @@ const detail_record_columns = () => {
 			width: 170,
 		},
 		{
-			field: "detailPayRate",
+			field: "detail_pay_rate",
 			headerName: "Detail Pay Rate",
 			type: "number",
 			valueFormatter: (params) => {
@@ -501,14 +501,14 @@ const detail_record_columns = () => {
 			width: 170,
 		},
 		{
-			field: "recordCreatedDate",
+			field: "record_created_date",
 			headerName: "Record Created Date",
 			type: "date",
 			valueFormatter: formatDate,
 			width: 220,
 		},
 		{
-			field: "recordCreatedBy",
+			field: "record_created_by",
 			headerName: "Record Created By",
 			type: "string",
 			valueFormatter: (params) => {
@@ -517,14 +517,14 @@ const detail_record_columns = () => {
 			width: 200,
 		},
 		{
-			field: "recordUpdatedDate",
+			field: "record_updated_date",
 			headerName: "Record Updated Date",
 			type: "date",
 			valueFormatter: formatDate,
 			width: 220,
 		},
 		{
-			field: "recordUpdatedBy",
+			field: "record_updated_by",
 			headerName: "Record Updated By",
 			type: "string",
 			valueFormatter: (params) => {

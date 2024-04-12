@@ -1,183 +1,67 @@
-import { FunctionComponentElement, useEffect, useState } from "react";
+import { FunctionComponentElement } from "react";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { useRouter } from "next/router";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import SearchBar from "@components/SearchBar";
+import prisma from "lib/prisma";
 import Link from "next/link";
 import { styled } from "@mui/material";
 import Fuse from "fuse.js";
-import { gql } from '@apollo/client';
-import apolloClient from '../../lib/apollo-client';
 
-// Temporary solution until the rank data in the API is fixed
-const rankDict = {
-	"16": "NA",
-	"17": "Patrol Officer",
-	"18": "Sergeant Detective",
-	"19": "Detective",
-	"20": "Civilian",
-	"21": "Lieutenant Detective",
-	"22": "Depsup",
-	"23": "Sergeant",
-	"24": "Police Officer",
-	"25": "Lieutenant",
-	"26": "Captain",
-	"27": "Lieutenant",
-	"28": "Superintendent",
-	"29": "Civil Contractor",
-	"30": "Sergeant",
-	"31": "Civilian",
-	"32": "Deputy",
-	"33": "Commissioner"
-  }
+export const getServerSideProps: GetServerSideProps = async (context) => {
+	const keyword = context.params?.keyword as string;
 
-export default function SearchResult(): FunctionComponentElement<{}> {
-	const router = useRouter();
-	const { keyword } = router.query;
-	const [searchResData, setSearchResData] = useState<Array<any>>([])
-	const [loading, setLoading] = useState<boolean>(true)
-	const employeeDataQuery = gql`
-	query MyQuery {
-		allEmployeeFromFa23Data(orderBy: EMPLOYEE_NO_ASC){
-			edges {
-			node {
-				firstName
-				lastName
-				nameMi
-				employeeId
-				employeeNo
-				namePrefix
-				nameSuffix
-				badgeNo
-				postalCode
-				rankId
-				orgId
-			}
-			}
-		}
-		}
-	`;
-	const orgDataQuery = gql`query MyQuery {
-		allOrganizationFromFa23Data {
-		  edges {
-			node {
-			  organizationId
-			  orgCode
-			  orgDesc
-			}
-		  }
-		}
-	  }
-	`;
-	const iaDataQuery = gql`query MyQuery {
-		allEmployeeIaLinkeds {
-		  edges {
-			node {
-				employeeNo
-			}
-		  }
-		}
-	  }
-	`;
 	const fuseOptions = {
-		keys: ["employeeId", "employeeNo", "firstName", "lastName", "nameMi", "namePrefix", "nameSuffix", "badgeNo"],
+		keys: ["employee_id", "first_name", "last_name", "postal_code", "name_mi", "name_prefix", "name_suffix", "badge_no"],
 		threshold: 1,
 		includeScore: true,
 	};
+	const model = await prisma.employee.findMany({
+		select: {
+			employee_id: true,
+			first_name: true,
+			postal_code: true,
+			last_name: true,
+			name_mi: true,
+			name_prefix: true,
+			name_suffix: true,
+			badge_no: true,
+		},
+	});
+	const fuse = new Fuse(model, fuseOptions);
 
-	useEffect(() => {
-		const getData = async () => {
-			try {
-				const empData: any = await apolloClient.query({query: employeeDataQuery });
-				const orgData: any = await apolloClient.query({query: orgDataQuery});
-				const iaData: any = await apolloClient.query({query: iaDataQuery});
-				let orgs = {};
-				let iaCounts = {};
-				orgData.data.allOrganizationFromFa23Data.edges.map((edge) => {
-					const node = edge.node;
-					orgs[node.orgCode] = node.orgDesc;
-				})
-				iaData.data.allEmployeeIaLinkeds.edges.map((edge) => {
-					if (iaCounts[edge.node.employeeNo]) {
-						iaCounts[edge.node.employeeNo] += 1;
-					} else {
-						iaCounts[edge.node.employeeNo] = 1;
-					}
-				})
-				let emp_nos = new Set([]);
-				let i = 0;
-				// Combines duplicate records in employee table, selecting non null values across rows
-				const model = empData.data.allEmployeeFromFa23Data.edges.reduce((acc, record) => {
-					const node = record.node;
-					if (emp_nos.has(node.employeeNo)) {
-						acc[i-1] = {
-							firstName: acc[i-1].firstName || node.firstName,
-							lastName: acc[i-1].lastName || node.lastName,
-							nameMi: acc[i-1].nameMi || node.nameMi,
-							employeeId: acc[i-1].employeeId || node.employeeId,
-							employeeNo: acc[i-1].employeeNo || node.employeeNo,
-							namePrefix: acc[i-1].namePrefix || node.namePrefix,
-							nameSuffix: acc[i-1].nameSuffix || node.nameSuffix,
-							badgeNo: acc[i-1].badgeNo || node.badgeNo,
-							rankId: acc[i-1].rankId || node.rankId,
-							orgId: acc[i-1].orgId || node.orgId
-							// postalCode: acc[i-1].postalCode || node.postalCode
-						}
-					} else {
-						acc.push({
-							firstName: node.firstName,
-							lastName: node.lastName,
-							nameMi: node.nameMi,
-							employeeId: node.employeeId,
-							employeeNo: node.employeeNo,
-							namePrefix: node.namePrefix,
-							nameSuffix: node.nameSuffix,
-							badgeNo: node.badgeNo,
-							rankId: node.rankId,
-							orgId: node.orgId
-							// postalCode: node.postalCode
-						});
-						emp_nos.add(node.employeeNo);
-						i += 1;
-					}
-					return acc;
-				}, []);
-		
-				const fuse = new Fuse(model, fuseOptions);
-				const searchRes = fuse.search(keyword as string);
-				
-				if (searchRes.length && searchRes.length > 0) {
-					setSearchResData(searchRes.map((item: any) => {
-						let fullName = item.item.namePrefix ? item.item.namePrefix + " " : "";
-						fullName += item.item.firstName + " ";
-						fullName += item.item.nameMi ? item.item.nameMi + " " : "";
-						fullName += item.item.lastName + " ";
-						fullName += item.item.nameSuffix ? item.item.nameSuffix : "";
+	const searchRes = fuse.search(keyword);
 
-						return {
-								id: item.item.employeeId,
-								employee_no: item.item.employeeNo,
-								name: fullName,
-								postal: item.item.postalCode,
-								// title: "Police Officer",
-								badge_no: item.item.badgeNo,
-								rank: item.item.rankId ? rankDict[item.item.rankId] : null,
-								org: item.item.orgId ? orgs[item.item.orgId] : null,
-								ia_no: iaCounts[item.item.employeeNo] || 0
-							}
-					}));
-				}
-			} finally {
-				setLoading(false);
-			}
-		}
-		if (keyword) {
-			getData();
-		}
-	}, [keyword])
+	let searchResData = [];
+
+	if (searchRes.length && searchRes.length > 0) {
+		searchResData = searchRes.map((item) => {
+			let fullName = item.item.name_prefix ? item.item.name_prefix + " " : "";
+			fullName += item.item.first_name + " ";
+			fullName += item.item.name_mi ? item.item.name_mi + " " : "";
+			fullName += item.item.last_name + " ";
+			fullName += item.item.name_suffix ? item.item.name_suffix : "";
+
+			return {
+				id: item.item.employee_id,
+				employee_id: item.item.employee_id,
+				name: fullName,
+				postal: item.item.postal_code,
+				title: "Police Officer",
+				badge_no: item.item.badge_no,
+			};
+		});
+	}
+
+	return {
+		props: { searchResData, keyword },
+	};
+};
+
+export default function SearchResult({ searchResData, keyword }: InferGetServerSidePropsType<typeof getServerSideProps>): FunctionComponentElement<{}> {
 	const cols: GridColDef[] = [
 		{
-			field: "employee_no",
-			headerName: "Employee No.",
+			field: "employee_id",
+			headerName: "Employee ID",
 			type: "number",
 			valueFormatter: (params) => {
 				return params.value;
@@ -186,14 +70,14 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 		{
 			field: "name",
 			headerName: "Full Name",
-			width: 200,
+			width: 250,
 			type: "string",
 			renderCell: (params) => {
 				return (
 					<Link
 						href={{
 							pathname: "/profile/[employee_id]",
-							query: { employee_id: params.row.employee_no, keyword: keyword },
+							query: { employee_id: params.row.employee_id, keyword: keyword },
 						}}
 						className="link hover:text-blue-500"
 					>
@@ -205,37 +89,19 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 		{
 			field: "badge_no",
 			headerName: "Badge No.",
-			width: 100,
+			width: 150,
 			type: "string",
 		},
-		// {
-		// 	field: "postal",
-		// 	headerName: "Zip Code",
-		// 	type: "string",
-		// },
-		// {
-		// 	field: "title",
-		// 	headerName: "Title",
-		// 	width: 150,
-		// 	type: "string",
-		// },
 		{
-			field: "rank",
-			headerName: "Rank",
-			width: 150,
-			type: "number",
+			field: "postal",
+			headerName: "Zip Code",
+			type: "string",
 		},
 		{
-			field: "org",
-			headerName: "Org",
+			field: "title",
+			headerName: "Title",
 			width: 250,
 			type: "string",
-		},
-		{
-			field: "ia_no",
-			headerName: "No. of IA",
-			width: 100,
-			type: "number",
 		},
 	];
 
@@ -305,9 +171,8 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 					autoHeight
 					slots={{
 						toolbar: GridToolbar,
-						noRowsOverlay: () => noRowsOverlay(keyword as string),
+						noRowsOverlay: () => noRowsOverlay(keyword),
 					}}
-					loading={loading}
 				/>
 			</section>
 		</>

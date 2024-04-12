@@ -1,10 +1,11 @@
 import React, { FunctionComponentElement, useEffect, useState } from "react";
 import SearchBar from "@components/SearchBar";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import prisma from "lib/prisma";
 import ScreenOverlay from "@components/ScreenOverlay";
 import { getMUIGrid } from "@utility/createMUIGrid";
-import apolloClient from "@lib/apollo-client";
-import { gql } from "@apollo/client";
-import { useRouter } from "next/router";
+import { Prisma } from "@prisma/client";
+import { extractID } from "@utility/utility";
 interface Table {
 	title: string;
 	tables: DataTables;
@@ -14,293 +15,192 @@ interface DataTables {
 	filteredTable: FunctionComponentElement<{}> | null;
 }
 
-export const getData = async (keyword: string, employee_no: string) => { 
+async function getTable(table_name: string, filter: { name: string; value: string }) {
+	const data: object[] = await prisma.$queryRaw(Prisma.sql([`SELECT * FROM ${table_name} WHERE ${filter.name} = ${filter.value}`]));
+	let dataArr = [];
 
-	if (parseInt(employee_no) > 2147483647 || parseInt(employee_no) < 0 || isNaN(parseInt(employee_no))) {
+	if (data.length && data.length > 0) {
+		dataArr = data.map((row) => {
+			return extractID(row, table_name);
+		});
+	}
+	return dataArr;
+}
+export const getServerSideProps: GetServerSideProps = async (context) => {
+	const employee_id = context.params?.employee_id as string;
+
+	if (parseInt(employee_id) > 2147483647 || parseInt(employee_id) < 0 || isNaN(parseInt(employee_id))) {
 		return {
 			notFound: true,
 		};
 	}
-	// Fetch all employee entries corresponding to employee number
-	const intEmployeeNo = parseInt(employee_no);
-	const employeeDataQuery = gql`query MyQuery {
-		allEmployeeFromFa23Data(condition: {employeeNo: ${intEmployeeNo}}) {
-		  edges {
-			node {
-			  employeeId
-			  employeeNo
-			  deptId
-			  lastName
-			  firstName
-			  nameMi
-			  namePrefix
-			  nameSuffix
-			  sex
-			  ethnicity
-			  officerPhoto
-			  postalCode
-			  badgeNo
-			  rankId
-			  rankAsOf
-			  orgId
-			  districtWorked
-			  unionCode
-			}
-		  }
-		}
-	  }`
-	const employeeResponse: any = await apolloClient.query({query: employeeDataQuery})
-	const employeeData = employeeResponse.data.allEmployeeFromFa23Data.edges
-	// if not found, return 404s
+
+	const intEmployeeId = parseInt(employee_id);
+
+	const employeeData = await prisma.employee.findUnique({
+		where: {
+			employee_id: intEmployeeId,
+		},
+		select: {
+			employee_id: true,
+			first_name: true,
+			last_name: true,
+			name_mi: true,
+			name_prefix: true,
+			name_suffix: true,
+			dept_id: true,
+			postal_code: true,
+			sex: true,
+		},
+	});
+
+	// if not found, return 404
 	if (!employeeData) {
 		return {
 			notFound: true,
 		};
 	}
-	// Collapse data from all entries into one 
-	let cleanEmployeeData = employeeData[0].node;
-	let employee_ids = [];
-	employeeData.slice(0).map((entry: any) => {
-		const node = entry.node;
-		employee_ids.push(node.employeeId)
-		cleanEmployeeData = {
-			employeeNo: cleanEmployeeData.employeeNo,
-			deptId: cleanEmployeeData.deptId || node.deptId,
-			lastName: cleanEmployeeData.lastName || node.lastName,
-			firstName: cleanEmployeeData.firstName || node.firstName,
-			nameMi: cleanEmployeeData.nameMi || node.nameMi,
-			namePrefix: cleanEmployeeData.namePrefix || node.namePrefix,
-			nameSuffix: cleanEmployeeData.nameSuffix || node.nameSuffix,
-			sex: cleanEmployeeData.sex || node.sex,
-			ethnicity: cleanEmployeeData.ethnicity || node.ethnicity,
-			officerPhoto: cleanEmployeeData.officerPhoto || node.officerPhoto,
-			postalCode: cleanEmployeeData.postalCode || node.postalCode,
-			badgeNo: cleanEmployeeData.badgeNo || node.badgeNo,
-			rankId: cleanEmployeeData.rankId || node.rankId,
-			rankAsOf: cleanEmployeeData.rankAsOf || node.rankAsOf,
-			orgId: cleanEmployeeData.orgId || node.orgId,
-			districtWorked: cleanEmployeeData.districtWorked || node.districtWorked,
-			unionCode: cleanEmployeeData.unionCode || node.unionCode
-		}
+
+	const departmentData = await prisma.department.findUnique({
+		where: {
+			department_id: employeeData.dept_id,
+		},
+		select: {
+			police_dept_name: true,
+			city_dept_name: true,
+		},
 	});
-	const departmentDataQuery = gql`query MyQuery {
-		departmentByDepartmentId(departmentId: ${cleanEmployeeData.deptId || 100000}) {
-		  policeDeptName
-		  cityDeptName
-		}
-	  }
-	  `
-	const departmentData = await apolloClient.query({query: departmentDataQuery})
+
 	const rank_id = 9;
-	const rankDataQuery = gql`query MyQuery {
-		rankByRankId(rankId: ${rank_id}) {
-		  rankIdNo
-		  rankTitleFull
-		  rankTitleAbbrev
-		  rankName
-		  rankAbbr
-		}
-	  }	  
-	  `
-	const rankData = await apolloClient.query({query: rankDataQuery})
+	const rankData = await prisma.rank.findUnique({
+		where: {
+			rank_id: rank_id,
+		},
+		select: {
+			rank_title_full: true,
+		},
+	});
 
 	let officerData = {
-		employee_no: cleanEmployeeData.employeeNo,
+		employee_id: intEmployeeId,
 		name: "",
-		title: rankData.data.rankByRankId ? rankData.data.rankByRankId.rankTitleFull : "",
-		police_dept_name: departmentData.data.departmentByDepartmentId ? departmentData.data.departmentByDepartmentId.policeDeptName : "",
-		city_dept_name: departmentData.data.departmentByDepartmentId ? departmentData.data.departmentByDepartmentId.cityDeptName : "",
-		postal: cleanEmployeeData.postalCode,
-		sex: cleanEmployeeData.sex,
+		title: rankData.rank_title_full,
+		police_dept_name: departmentData.police_dept_name,
+		city_dept_name: departmentData.city_dept_name,
+		postal: employeeData.postal_code,
+		sex: employeeData.sex,
 		ia_num: 0,
 	};
-	console.log(officerData)
+
 	let fullName = "";
-	fullName += cleanEmployeeData.namePrefix ? cleanEmployeeData.namePrefix + " " : "";
-	fullName += cleanEmployeeData.firstName + " ";
-	fullName += cleanEmployeeData.nameMi ? cleanEmployeeData.nameMi + " " : "";
-	fullName += cleanEmployeeData.lastName + " ";
-	fullName += cleanEmployeeData.nameSuffix ? cleanEmployeeData.nameSuffix : "";
+	fullName += employeeData.name_prefix ? employeeData.name_prefix + " " : "";
+	fullName += employeeData.first_name + " ";
+	fullName += employeeData.name_mi ? employeeData.name_mi + " " : "";
+	fullName += employeeData.last_name + " ";
+	fullName += employeeData.name_suffix ? employeeData.name_suffix : "";
 	officerData.name = fullName;
 
-	let detail_record_rows = []
-	let officer_IA_rows = []
-	let police_financial_rows = []
-	for (let id of employee_ids) {
-		const detail_record_query = gql`query MyQuery {
-			allDetailRecordFromFa23Data(condition: {employeeId: ${id}}) {
-			  edges {
-				node {
-				  detailRecordId
-				  rowId
-				  trackingNo
-				  employeeId
-				  customerId
-				  incidentNo
-				  contractNo
-				  streetNo
-				  streetId
-				  streetName
-				  crossStreetNo
-				  crossStreetName
-				  locationDesc
-				  detailStart
-				  detailEnd
-				  hoursWorked
-				  detailType
-				  stateFunded
-				  detailRank
-				  noShowFlag
-				  licensePremiseFlag
-				  adminFeeFlag
-				  prepaidFlag
-				  requestRank
-				  adminFeeRate
-				  rateChangeAuthorizationEmployeeId
-				  detailClerkEmployeeId
-				  payHours
-				  payAmount
-				  payTrcCode
-				  detailPayRate
-				  recordCreatedDate
-				  recordCreatedBy
-				  recordUpdatedDate
-				  recordUpdatedBy
-				  fbkPayDate
-				}
-			  }
-			}
-		  }`;
-		const police_financial_query = gql`query MyQuery {
-			allPoliceFinancialFromFa23Data(condition: {employeeId: "${id}"}) {
-			  edges {
-				node {
-				  policeFinancialId
-				  employeeId
-				  cityDeptId
-				  title
-				  regularPay
-				  retroPay
-				  otherPay
-				  otPay
-				  injuredPay
-				  detailPay
-				  quinnPay
-				  totalPay
-				  year
-				  zipCode
-				}
-			  }
-			}
-		  }`;
-		const detail_response = await apolloClient.query({query: detail_record_query});
-		const financial_response = await apolloClient.query({query: police_financial_query});
-		detail_record_rows = detail_record_rows.concat(detail_response.data.allDetailRecordFromFa23Data.edges.map((edge: any) => {const { ["rowId"]: id, ...rest } = edge.node; return {id, ...rest}}))
-		police_financial_rows = police_financial_rows.concat(financial_response.data.allPoliceFinancialFromFa23Data.edges.map((edge: any) => {const { ["policeFinancialId"]: id, ...rest } = edge.node; return {id, ...rest}}))
+	const table_pk = {};
+	Prisma.dmmf.datamodel.models.forEach((model) => {
+		table_pk[model.name] = model.fields[0].name;
+	});
+
+	const alpha_listing_rows = await getTable("alpha_listing", { name: "employee_id", value: employee_id });
+	const detail_record_rows = await getTable("detail_record", { name: "employee_id", value: employee_id });
+	const officer_misconduct_rows = await getTable("officer_misconduct", { name: "employee_id", value: employee_id });
+	const personnel_roaster_rows = await getTable("personnel_roaster", { name: "employee_id", value: employee_id });
+	const police_financial_rows = await getTable("police_financial", { name: "employee_id", value: employee_id });
+	const police_overtime_rows = await getTable("police_overtime", { name: "employee_id", value: employee_id });
+	const post_decertified_rows = await getTable("post_decertified", { name: "employee_id", value: employee_id });
+	const post_certified_rows = await getTable("post_certified", { name: "employee_id", value: employee_id });
+	const fio_record_rows = await getTable("fio_record", { name: "employee_id", value: employee_id });
+	const parking_ticket_rows = await getTable("parking_ticket", { name: "employee_id", value: employee_id });
+
+	let crime_incident_rows = [];
+
+	for (let detail_record_row of detail_record_rows) {
+		const ia_no = detail_record_row.incident_no;
+
+		const crime_incidents = await getTable("crime_incident", { name: "incident_no", value: ia_no });
+
+		crime_incident_rows = crime_incident_rows.concat(crime_incidents);
 	}
-			
-	
-	
-	// // const alpha_listing_rows = await getTable("alpha_listing", { name: "employee_id", value: employee_id });
-	// const detail_record_rows = await getTable("allDetailRecordFromFa23Data", { name: "employeeId", values: employee_ids });
-	// const officer_misconduct_rows = await getTable("officer_misconduct", { name: "employee_id", value: employee_id });
-	// // const personnel_roaster_rows = await getTable("personnel_roaster", { name: "employee_id", value: employee_id });
-	// const police_financial_rows = await getTable("police_financial", { name: "employee_id", value: employee_id });
-	// // const police_overtime_rows = await getTable("police_overtime", { name: "employee_id", value: employee_id });
-	// // const post_decertified_rows = await getTable("post_decertified", { name: "employee_id", value: employee_id });
-	// // const post_certified_rows = await getTable("post_certified", { name: "employee_id", value: employee_id });
-	// // const fio_record_rows = await getTable("fio_record", { name: "employee_id", value: employee_id });
-	// // const parking_ticket_rows = await getTable("parking_ticket", { name: "employee_id", value: employee_id });
 
-	// // let crime_incident_rows = [];
-
-	// for (let detail_record_row of detail_record_rows) {
-	// 	const ia_no = detail_record_row.incident_no;
-
-	// 	const crime_incidents = await getTable("crime_incident", { name: "incident_no", value: ia_no });
-
-	// 	crime_incident_rows = crime_incident_rows.concat(crime_incidents);
-	// }
-
-	// officerData.ia_num = officer_misconduct_rows.length;
+	officerData.ia_num = officer_misconduct_rows.length;
 
 	return {
 		props: {
 			officerData: officerData,
 			tables: [
-				// {
-				// 	title: "Alpha Listing",
-				// 	tableName: "alpha_listing",
-				// 	rows: alpha_listing_rows,
-				// },
+				{
+					title: "Alpha Listing",
+					tableName: "alpha_listing",
+					rows: alpha_listing_rows,
+				},
 				{
 					title: "Detail Record",
 					tableName: "detail_record",
 					rows: detail_record_rows,
 				},
-				// {
-				// 	title: "Officer Misconduct",
-				// 	tableName: "officer_misconduct",
-				// 	rows: officer_misconduct_rows,
-				// },
-				// {
-				// 	title: "Personnel Roaster",
-				// 	tableName: "personnel_roaster",
-				// 	rows: personnel_roaster_rows,
-				// },
+				{
+					title: "Officer Misconduct",
+					tableName: "officer_misconduct",
+					rows: officer_misconduct_rows,
+				},
+				{
+					title: "Personnel Roaster",
+					tableName: "personnel_roaster",
+					rows: personnel_roaster_rows,
+				},
 				{
 					title: "Police Financial",
 					tableName: "police_financial",
 					rows: police_financial_rows,
 				},
-				// {
-				// 	title: "Police Overtime",
-				// 	tableName: "police_overtime",
-				// 	rows: police_overtime_rows,
-				// },
-				// {
-				// 	title: "Post Decertified",
-				// 	tableName: "post_decertified",
-				// 	rows: post_decertified_rows,
-				// },
-				// {
-				// 	title: "Post Certified",
-				// 	tableName: "post_certified",
-				// 	rows: post_certified_rows,
-				// },
-				// {
-				// 	title: "FIO Record",
-				// 	tableName: "fio_record",
-				// 	rows: fio_record_rows,
-				// },
-				// {
-				// 	title: "Parking Ticket",
-				// 	tableName: "parking_ticket",
-				// 	rows: parking_ticket_rows,
-				// },
-				// {
-				// 	title: "Crime Incident",
-				// 	tableName: "crime_incident",
-				// 	rows: crime_incident_rows,
-				// },
+				{
+					title: "Police Overtime",
+					tableName: "police_overtime",
+					rows: police_overtime_rows,
+				},
+				{
+					title: "Post Decertified",
+					tableName: "post_decertified",
+					rows: post_decertified_rows,
+				},
+				{
+					title: "Post Certified",
+					tableName: "post_certified",
+					rows: post_certified_rows,
+				},
+				{
+					title: "FIO Record",
+					tableName: "fio_record",
+					rows: fio_record_rows,
+				},
+				{
+					title: "Parking Ticket",
+					tableName: "parking_ticket",
+					rows: parking_ticket_rows,
+				},
+				{
+					title: "Crime Incident",
+					tableName: "crime_incident",
+					rows: crime_incident_rows,
+				},
 			],
 		},
 	};
 };
-
-export default function OfficerProfile(): FunctionComponentElement<{}> {
-	const router = useRouter();
-	const { employee_id, keyword } = router.query;
+export default function OfficerProfile(props: InferGetServerSidePropsType<typeof getServerSideProps>): FunctionComponentElement<{}> {
 	const [currentOverlay, setCurrentOverlay] = useState({ table: null, title: null });
 	const [tablesArr, setTablesArr] = useState<Table[]>([]);
-	const [officerData, setOfficerData] = useState<any>();
 	const [tableFilters] = useState({
 		alpha_listing: {
 			includesOnly: [],
 			excludes: [],
 		},
 		detail_record: {
-			includesOnly: ["trackingNo", "customerId", "incidentNo", "contract", "contractNo", "detailStart", "detailEnd"],
+			includesOnly: ["tracking_no", "customer_id", "incident_no", "contract", "contract_no", "detail_start", "detail_end"],
 			excludes: [],
 		},
 		officer_misconduct: {
@@ -340,56 +240,49 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 			excludes: [],
 		},
 	});
-	
+
 	useEffect(() => {
-		const fetchData = async () => {
-			const {  props } = await getData(keyword as string, employee_id as string);
-			console.log(props)
-			let tablesArr: Table[] = [];
-			for (let table of props.tables) {
-				let rows = table.rows;
-				let tableTitle = table.title;
-				let tableName = table.tableName;
-				let tableEntry = {
-					title: tableTitle,
-					tables: getMUIGrid(tableName, rows, props.officerData.name, tableFilters[tableName].includesOnly, tableFilters[tableName].excludes) as DataTables,
-				};
-				
-				tablesArr.push(tableEntry);
-			}
-			setOfficerData(props.officerData);
-			setTablesArr(tablesArr);
+		let tablesArr: Table[] = [];
+
+		for (let table of props.tables) {
+			let rows = table.rows;
+			let tableTitle = table.title;
+			let tableName = table.tableName;
+			let tableEntry = {
+				title: tableTitle,
+				tables: getMUIGrid(tableName, rows, props.officerData.name, tableFilters[tableName].includesOnly, tableFilters[tableName].excludes) as DataTables,
+			};
+
+			tablesArr.push(tableEntry);
 		}
-		if (keyword && employee_id) {
-			fetchData();
-		}
-	}, [employee_id, keyword]);
-	
+
+		setTablesArr(tablesArr);
+	}, []);
 	return (
-		officerData && <>
-			<SearchBar title="Officer Profile" officerName={officerData.name} />
+		<>
+			<SearchBar title="Officer Profile" officerName={props.officerData.name} />
 			<section>
 				<div className={"hero min-w-screen px-52 mt-16"}>
 					<div className={"flex gap-16 w-full h-80"}>
 						<div className={"grow bg-white/[.75] rounded-xl px-12 py-8 flex gap-[.4rem] flex-col"}>
-							<p className={"text-3xl font-bold"}>{officerData.name}</p>
+							<p className={"text-3xl font-bold"}>{props.officerData.name}</p>
 							<p className={"text-lg mt-4"}>
-								<strong>Title :</strong> {officerData.title}
+								<strong>Title :</strong> {props.officerData.title}
 							</p>
 							<p className={"text-lg"}>
-								<strong>Employee ID :</strong> {officerData.employee_no}
+								<strong>Employee ID :</strong> {props.officerData.employee_id}
 							</p>
 							<p className={"text-lg"}>
-								<strong>Police Department :</strong> {officerData.police_dept_name}
+								<strong>Police Department :</strong> {props.officerData.police_dept_name}
 							</p>
 							<p className={"text-lg"}>
-								<strong>City Department :</strong> {officerData.city_dept_name}
+								<strong>City Department :</strong> {props.officerData.city_dept_name}
 							</p>
 							<p className={"text-lg"}>
-								<strong>Postal :</strong> {officerData.postal}
+								<strong>Postal :</strong> {props.officerData.postal}
 							</p>
 							<p className={"text-lg"}>
-								<strong>Number of IA:</strong> {officerData.ia_num}
+								<strong>Number of IA:</strong> {props.officerData.ia_num}
 							</p>
 						</div>
 						<div className="avatar bg-white/[.75] p-8 rounded-xl h-full">
@@ -426,7 +319,4 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 			<ScreenOverlay title={currentOverlay.title} children={currentOverlay.table} />
 		</>
 	);
-	return (
-		<></>
-	)
 }
