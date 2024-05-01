@@ -1,179 +1,35 @@
 import { FunctionComponentElement, useEffect, useState } from "react";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
+import { styled } from "@mui/material";
 import { useRouter } from "next/router";
 import SearchBar from "@components/SearchBar";
 import Link from "next/link";
-import { styled } from "@mui/material";
-import Fuse from "fuse.js";
-import { gql } from '@apollo/client';
-import apolloClient from '../../lib/apollo-client';
-
-// Temporary solution until the rank data in the API is fixed
-const rankDict = {
-	"16": "NA",
-	"17": "Patrol Officer",
-	"18": "Sergeant Detective",
-	"19": "Detective",
-	"20": "Civilian",
-	"21": "Lieutenant Detective",
-	"22": "Depsup",
-	"23": "Sergeant",
-	"24": "Police Officer",
-	"25": "Lieutenant",
-	"26": "Captain",
-	"27": "Lieutenant",
-	"28": "Superintendent",
-	"29": "Civil Contractor",
-	"30": "Sergeant",
-	"31": "Civilian",
-	"32": "Deputy",
-	"33": "Commissioner"
-  }
+import { fetchData } from "@utility/dataUtils";
 
 export default function SearchResult(): FunctionComponentElement<{}> {
 	const router = useRouter();
 	const { keyword } = router.query;
-	const [searchResData, setSearchResData] = useState<Array<any>>([])
-	const [loading, setLoading] = useState<boolean>(true)
-	const employeeDataQuery = gql`
-	query MyQuery {
-		allEmployeeFromFa23Data(orderBy: EMPLOYEE_NO_ASC){
-			edges {
-			node {
-				firstName
-				lastName
-				nameMi
-				employeeId
-				employeeNo
-				namePrefix
-				nameSuffix
-				badgeNo
-				postalCode
-				rankId
-				orgId
-			}
-			}
-		}
-		}
-	`;
-	const orgDataQuery = gql`query MyQuery {
-		allOrganizationFromFa23Data {
-		  edges {
-			node {
-			  organizationId
-			  orgCode
-			  orgDesc
-			}
-		  }
-		}
-	  }
-	`;
-	const iaDataQuery = gql`query MyQuery {
-		allEmployeeIaLinkeds {
-		  edges {
-			node {
-				employeeNo
-			}
-		  }
-		}
-	  }
-	`;
-	const fuseOptions = {
-		keys: ["employeeId", "employeeNo", "firstName", "lastName", "nameMi", "namePrefix", "nameSuffix", "badgeNo"],
-		threshold: 1,
-		includeScore: true,
-	};
+	const [searchResData, setSearchResData] = useState<Array<any>>([]);
+	const [loading, setLoading] = useState<boolean>(true);
 
+	// fetchData returns a promise that resolves to an array of objects representing rows in the table
 	useEffect(() => {
-		const getData = async () => {
-			try {
-				const empData: any = await apolloClient.query({query: employeeDataQuery });
-				const orgData: any = await apolloClient.query({query: orgDataQuery});
-				const iaData: any = await apolloClient.query({query: iaDataQuery});
-				let orgs = {};
-				let iaCounts = {};
-				orgData.data.allOrganizationFromFa23Data.edges.map((edge) => {
-					const node = edge.node;
-					orgs[node.orgCode] = node.orgDesc;
-				})
-				iaData.data.allEmployeeIaLinkeds.edges.map((edge) => {
-					if (iaCounts[edge.node.employeeNo]) {
-						iaCounts[edge.node.employeeNo] += 1;
-					} else {
-						iaCounts[edge.node.employeeNo] = 1;
-					}
-				})
-				let emp_nos = new Set([]);
-				let i = 0;
-				// Combines duplicate records in employee table, selecting non null values across rows
-				const model = empData.data.allEmployeeFromFa23Data.edges.reduce((acc, record) => {
-					const node = record.node;
-					if (emp_nos.has(node.employeeNo)) {
-						acc[i-1] = {
-							firstName: acc[i-1].firstName || node.firstName,
-							lastName: acc[i-1].lastName || node.lastName,
-							nameMi: acc[i-1].nameMi || node.nameMi,
-							employeeId: acc[i-1].employeeId || node.employeeId,
-							employeeNo: acc[i-1].employeeNo || node.employeeNo,
-							namePrefix: acc[i-1].namePrefix || node.namePrefix,
-							nameSuffix: acc[i-1].nameSuffix || node.nameSuffix,
-							badgeNo: acc[i-1].badgeNo || node.badgeNo,
-							rankId: acc[i-1].rankId || node.rankId,
-							orgId: acc[i-1].orgId || node.orgId
-							// postalCode: acc[i-1].postalCode || node.postalCode
-						}
-					} else {
-						acc.push({
-							firstName: node.firstName,
-							lastName: node.lastName,
-							nameMi: node.nameMi,
-							employeeId: node.employeeId,
-							employeeNo: node.employeeNo,
-							namePrefix: node.namePrefix,
-							nameSuffix: node.nameSuffix,
-							badgeNo: node.badgeNo,
-							rankId: node.rankId,
-							orgId: node.orgId
-							// postalCode: node.postalCode
-						});
-						emp_nos.add(node.employeeNo);
-						i += 1;
-					}
-					return acc;
-				}, []);
-		
-				const fuse = new Fuse(model, fuseOptions);
-				const searchRes = fuse.search(keyword as string);
-				
-				if (searchRes.length && searchRes.length > 0) {
-					setSearchResData(searchRes.map((item: any) => {
-						let fullName = item.item.namePrefix ? item.item.namePrefix + " " : "";
-						fullName += item.item.firstName + " ";
-						fullName += item.item.nameMi ? item.item.nameMi + " " : "";
-						fullName += item.item.lastName + " ";
-						fullName += item.item.nameSuffix ? item.item.nameSuffix : "";
-
-						return {
-								id: item.item.employeeId,
-								employee_no: item.item.employeeNo,
-								name: fullName,
-								postal: item.item.postalCode,
-								// title: "Police Officer",
-								badge_no: item.item.badgeNo,
-								rank: item.item.rankId ? rankDict[item.item.rankId] : null,
-								org: item.item.orgId ? orgs[item.item.orgId] : null,
-								ia_no: iaCounts[item.item.employeeNo] || 0
-							}
-					}));
-				}
-			} finally {
-				setLoading(false);
-			}
-		}
 		if (keyword) {
-			getData();
+			setLoading(true);
+			fetchData({ keyword: keyword as string | string[] })
+				.then((data) => {
+					setSearchResData(data);
+				})
+				.catch((error) => {
+					console.error("Failed to fetch data", error);
+					// TODO - Handle error state here
+				})
+				.finally(() => {
+					setLoading(false);
+				});
 		}
-	}, [keyword])
+	}, [keyword]);
+
 	const cols: GridColDef[] = [
 		{
 			field: "employee_no",
@@ -208,11 +64,14 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 			width: 100,
 			type: "string",
 		},
-		// {
-		// 	field: "postal",
-		// 	headerName: "Zip Code",
-		// 	type: "string",
-		// },
+		{
+			field: "zipCode",
+			headerName: "Zip Code",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value ? "0" + params.value : null;
+			}
+		},
 		// {
 		// 	field: "title",
 		// 	headerName: "Title",
@@ -237,7 +96,52 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 			width: 100,
 			type: "number",
 		},
+		{
+			field: "totalPay",
+			headerName: "2021 Total Pay",
+			width: 130,
+			type: "number",
+		},
+		{
+			field: "injuredPay",
+			headerName: "Injured Pay",
+			width: 130,
+			type: "number",
+		},
+		{
+			field: "otPay",
+			headerName: "OT Pay",
+			width: 130,
+			type: "number",
+		},
+		{
+			field: "otherPay",
+			headerName: "Other Pay",
+			width: 130,
+			type: "number",
+		},
+		{
+			field: "quinnPay",
+			headerName: "Quinn Pay",
+			width: 130,
+			type: "number",
+		},
+		{
+			field: "regularPay",
+			headerName: "Regular Pay",
+			width: 130,
+			type: "number",
+		},
+		{
+			field: "retroPay",
+			headerName: "Retro Pay",
+			width: 130,
+			type: "number",
+		},
+
 	];
+
+	
 
 	const StyledGridOverlay = styled("div")(() => ({
 		display: "flex",
