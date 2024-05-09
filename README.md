@@ -23,9 +23,14 @@ https://vercel.com/guides/nextjs-prisma-postgres
 When you reach step 2 in the tutorial where it asks you for a database url, talk to the professor and ask for the database url.
 Note that, if you try to run the repo locally, you will realize that you need to create a dummy .env file on the root of the directory because github hides the database url for the public to see. Meaning you would need to create a .env file and include the url every time.
 
+## Transitioning from Prisma to GraphQL
+
+Currently, we are in the process of moving from Prisma to querying using GraphQL. Some parts of the application still use Prisma, but they should be converted to use GraphQL.
+
 # .env
 
 DATABASE_URL = "URL"
+NEXT_PUBLIC_API_URL="URL"
 
 Step 3
 The tutorial shows you how to create a schema in your database. In other words, you would need to create columns and define data types.
