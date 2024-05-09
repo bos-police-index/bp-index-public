@@ -234,7 +234,7 @@ export default function Home() {
 				</div>
 			</section>
 			<FadeIn>
-				<section className="w-full pt-16 pb-16">
+				<section className="w-full pb-16">
 					<DataGrid
 						columns={cols}
 						rows={searchResData}
