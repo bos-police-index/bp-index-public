@@ -68,7 +68,7 @@ export default function Home() {
 					<Link
 						href={{
 							pathname: "/profile/[employee_id]",
-							query: { employee_id: params.row.employee_no, keyword: keyword },
+							query: { employee_id: params.row.employee_no, keyword: params.row.name },
 						}}
 						className="link hover:text-blue-500"
 					>
