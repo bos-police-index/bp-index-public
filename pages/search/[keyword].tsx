@@ -270,6 +270,7 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 			{/* Table */}
 			<section className="w-full pt-16 pb-16">
 				<DataGrid
+				density="compact"
 					columns={cols}
 					rows={searchResData}
 					className="max-w-5xl mx-auto min-h-[300px] bg-white"

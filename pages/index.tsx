@@ -239,6 +239,7 @@ export default function Home() {
 			<FadeIn>
 				<section className="w-full pb-16">
 					<DataGrid
+					 density="compact"
 						columns={cols}
 						rows={searchResData}
 						className="max-w-5xl mx-auto min-h-[300px] bg-white"
