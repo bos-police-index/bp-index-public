@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { styled, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { fetchData } from "@utility/dataUtils";
+import backgroundImage from '../public/fist-bg.webp'
 
 export default function Home() {
 	const [keyword, setKeyword] = useState<string>("");
@@ -53,7 +54,7 @@ export default function Home() {
 				return params.value;
 			},
 			renderHeader: (params) => (
-				<Tooltip title="Description Here">
+				<Tooltip title="A unique identifier assigned to each police officer">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
@@ -77,7 +78,7 @@ export default function Home() {
 				);
 			},
 			renderHeader: (params) => (
-				<Tooltip title="Description Here">
+				<Tooltip title="The full name of the police officer">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
@@ -88,7 +89,7 @@ export default function Home() {
 			width: 200,
 			type: "string",
 			renderHeader: (params) => (
-				<Tooltip title="Description Here">
+				<Tooltip title="The badge number assigned to the police officer; used for identification">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
@@ -98,7 +99,7 @@ export default function Home() {
 		// 	headerName: "Zip Code",
 		// 	type: "string",
 		// 	renderHeader: (params) => (
-		// 		<Tooltip title="Description Here">
+		// 		<Tooltip title="The postal code associated with the officer’s pay data">
 		// 			<span>{params.colDef.headerName}</span>
 		// 		</Tooltip>
 		// 	),
@@ -109,7 +110,7 @@ export default function Home() {
 		// 	width: 150,
 		// 	type: "string",
 		// 	renderHeader: (params) => (
-		// 		<Tooltip title="Description Here">
+		// 		<Tooltip title="The job title or rank of the police officer">
 		// 			<span>{params.colDef.headerName}</span>
 		// 		</Tooltip>
 		// 	),
@@ -120,7 +121,7 @@ export default function Home() {
 			width: 150,
 			type: "string",
 			renderHeader: (params) => (
-				<Tooltip title="Description Here">
+				<Tooltip title="The job title or rank of the police officer">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
@@ -131,7 +132,7 @@ export default function Home() {
 			width: 250,
 			type: "string",
 			renderHeader: (params) => (
-				<Tooltip title="Description Here">
+				<Tooltip title="The department or unit within the Boston Police Department where the officer works">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
@@ -142,7 +143,7 @@ export default function Home() {
 			width: 100,
 			type: "string",
 			renderHeader: (params) => (
-				<Tooltip title="Description Here">
+				<Tooltip title="The number of Internal Affairs complaints linked to the officer">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
@@ -201,38 +202,40 @@ export default function Home() {
 
 	return (
 		<div>
-			<section className="hero py-14">
-				<div className="hero-content text-center pb-10 px-0 min-w-full">
-					<div className="flex flex-col items-start gap-10 w-full pt-16 max-w-5xl mx-auto relative">
-						<h1 className="text-9xl font-bold text-white text-left break-words">Boston Police Index</h1>
-						<p className="text-3xl text-white mt-[-3.5em] ml-[15em] text-left">
-							The Boston Police Index is a resource to bring transparency to the activities of law enforcers in our communities. We wish to be a resource for journalists, policy makers, residents, workers, and students of the City of Boston. All information here is data from public
-							sources and public records requests.
-						</p>
-						<div className="mt-2 relative w-full">
-							<div className="flex items-center w-full bg-white join-item rounded-3xl">
-								<div className="pl-8">
-									<svg fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="transform scale-x-[-1] h-6 w-6">
-										<path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-									</svg>
-								</div>
-								<input
-									type="text"
-									placeholder="Search by Employee ID, Name, Department, Title, Postal Code"
-									className="input w-full h-12 bg-white join-item rounded-3xl pl-8 pe-20 placeholder:text-gray text-2xl focus:outline-none"
-									onChange={(e) => setKeyword(e.target.value)}
-									onKeyDown={(e) => {
-										if (e.key === "Enter") {
-											e.preventDefault();
-											handleSearch();
-										}
-									}}
-								/>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
+    <div style={{backgroundImage: `url(${backgroundImage.src})`, backgroundPosition: '0rem 0rem', backgroundSize: "contain", paddingBottom: '3rem', marginBottom: '1.5rem'}}>
+        <section className="hero py-0">
+            <div className="hero-content text-center pb-10 px-0 min-w-full">
+                <div className="flex flex-col items-start gap-10 w-full pt-4 max-w-5xl mx-auto relative">
+                    <h1 className="text-8xl font-bold text-white text-left break-words">Boston Police <br/>Index</h1>
+                    <p className="text-2xl text-white mt-[-3.5em] ml-[15em] text-left">
+                        The Boston Police Index is a resource to bring transparency to the activities of law enforcers in our communities. We wish to be a resource for journalists, policy makers, residents, workers, and students of the City of Boston. All information here is data from public
+                        sources and public records requests.
+                    </p>
+                    <div className="mt-2 relative w-full">
+                        <div className="flex items-center w-full bg-white join-item rounded-3xl">
+                            <div className="pl-8">
+                                <svg fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="transform scale-x-[-1] h-6 w-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                </svg>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Search by Employee ID, Name, Department, Title, Postal Code"
+                                className="input w-full h-12 bg-white join-item rounded-3xl pl-8 pe-20 placeholder:text-gray text-2xl focus:outline-none"
+                                onChange={(e) => setKeyword(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.preventDefault();
+                                        handleSearch();
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
 			<FadeIn>
 				<section className="w-full pb-16">
 					<DataGrid
@@ -248,6 +251,7 @@ export default function Home() {
 							toolbar: GridToolbar,
 							noRowsOverlay: () => noRowsOverlay(keyword as string),
 						}}
+						style={{minWidth: "80%"}}
 						loading={loading}
 					/>
 				</section>

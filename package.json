@@ -49,7 +49,7 @@
     "next": "^13.4.7",
     "next-connect": "^0.13.0",
     "next-superjson-plugin": "^0.5.8",
-    "nextjs-routes": "^2.0.0",
+    "nextjs-routes": "^2.1.0",
     "nprogress": "^0.2.0",
     "papaparse": "^5.4.1",
     "pg": "^8.10.0",
@@ -72,6 +72,7 @@
   },
   "devDependencies": {
     "@graphql-codegen/cli": "5.0.2",
+    "@graphql-codegen/client-preset": "4.2.5",
     "@tanstack/react-query": "^4.32.0",
     "@types/json2csv": "^5.0.6",
     "@types/nprogress": "^0.2.3",
@@ -84,8 +85,7 @@
     "prisma": "^4.16.2",
     "raw-loader": "^4.0.2",
     "tailwindcss": "^3.3.3",
-    "typescript": "4.9.5",
-    "@graphql-codegen/client-preset": "4.2.5"
+    "typescript": "4.9.5"
   },
   "prettier": {
     "useTabs": true,

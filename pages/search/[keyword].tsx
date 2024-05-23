@@ -1,6 +1,6 @@
 import { FunctionComponentElement, useEffect, useState } from "react";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { styled } from "@mui/material";
+import { Tooltip, styled } from "@mui/material";
 import { useRouter } from "next/router";
 import SearchBar from "@components/SearchBar";
 import Link from "next/link";
@@ -38,6 +38,11 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 			valueFormatter: (params) => {
 				return params.value;
 			},
+			renderHeader: (params) => (
+				<Tooltip title="A unique identifier assigned to each police officer">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
 		{
 			field: "name",
@@ -57,12 +62,22 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 					</Link>
 				);
 			},
+			renderHeader: (params) => (
+				<Tooltip title="The full name of the police officer">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
 		{
 			field: "badge_no",
 			headerName: "Badge No.",
 			width: 100,
 			type: "string",
+			renderHeader: (params) => (
+				<Tooltip title="The badge number assigned to the police officer, used for identification">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
 		{
 			field: "zipCode",
@@ -70,7 +85,12 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value ? "0" + params.value : null;
-			}
+			},
+			renderHeader: (params) => (
+				<Tooltip title="The postal code associated with the officer’s pay data">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
 		// {
 		// 	field: "title",
@@ -83,61 +103,112 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 			headerName: "Rank",
 			width: 150,
 			type: "number",
+			renderHeader: (params) => (
+				<Tooltip title="The job title or rank of the police officer">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
 		{
 			field: "org",
 			headerName: "Org",
 			width: 250,
 			type: "string",
+			renderHeader: (params) => (
+				<Tooltip title="The department or unit within the Boston Police Department where the officer works">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
 		{
 			field: "ia_no",
 			headerName: "No. of IA",
 			width: 100,
 			type: "number",
+			renderHeader: (params) => (
+				<Tooltip title="The number of Internal Affairs complaints linked to the officer">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
 		{
 			field: "totalPay",
 			headerName: "2021 Total Pay",
 			width: 130,
 			type: "number",
+			renderHeader: (params) => (
+				<Tooltip title="The total gross earnings of the police officer for the specified period">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
 		{
 			field: "injuredPay",
 			headerName: "Injured Pay",
 			width: 130,
 			type: "number",
+			renderHeader: (params) => (
+				<Tooltip title="Earnings received while on injury leave">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
 		{
 			field: "otPay",
 			headerName: "OT Pay",
 			width: 130,
 			type: "number",
+			renderHeader: (params) => (
+				<Tooltip title="Earnings from overtime work">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
 		{
 			field: "otherPay",
 			headerName: "Other Pay",
 			width: 130,
 			type: "number",
+			renderHeader: (params) => (
+				<Tooltip title="Other types of earnings not classified elsewhere">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
 		{
 			field: "quinnPay",
 			headerName: "Quinn Pay",
 			width: 130,
 			type: "number",
+			renderHeader: (params) => (
+				<Tooltip title="Earnings from the Quinn Bill educational incentive program">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
 		{
 			field: "regularPay",
 			headerName: "Regular Pay",
 			width: 130,
 			type: "number",
+			renderHeader: (params) => (
+				<Tooltip title="Regular salary or wages">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
 		{
 			field: "retroPay",
 			headerName: "Retro Pay",
 			width: 130,
 			type: "number",
+			renderHeader: (params) => (
+				<Tooltip title="Retroactive pay adjustments">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
 		},
+		
 
 	];
 
@@ -212,6 +283,7 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 						noRowsOverlay: () => noRowsOverlay(keyword as string),
 					}}
 					loading={loading}
+					style={{minWidth: "80%"}}
 				/>
 			</section>
 		</>
