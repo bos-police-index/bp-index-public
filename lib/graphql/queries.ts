@@ -62,6 +62,7 @@ export const GET_FINANCIAL_DATA = gql`
 				quinnPay
 				regularPay
 				retroPay
+				detailPay
 				}
 			}
 		}
