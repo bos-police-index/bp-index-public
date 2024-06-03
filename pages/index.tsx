@@ -7,6 +7,7 @@ import { styled, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { fetchData } from "@utility/dataUtils";
 import backgroundImage from '../public/fist-in-air.jpeg'
+import properCaseName from "@utility/properNameCasing";
 
 export default function Home() {
 	const [keyword, setKeyword] = useState<string>("");
@@ -66,6 +67,7 @@ export default function Home() {
 			width: 200,
 			type: "string",
 			renderCell: (params) => {
+				const properCasedName = properCaseName(params.row.name);
 				return (
 					<Link
 						href={{
@@ -74,7 +76,7 @@ export default function Home() {
 						}}
 						className="link hover:text-blue-500"
 					>
-						{params.row.name}
+						{properCasedName}
 					</Link>
 				);
 			},
@@ -85,7 +87,6 @@ export default function Home() {
 			),
 		},
 
-		
 		{
 			field: "badge_no",
 			headerName: "Badge No.*",
@@ -94,18 +95,13 @@ export default function Home() {
 			renderCell: (params) => {
 				const { row } = params;
 				const badgeText = row.badge_no === "Unknown Badge" ? (row.rank === "Civilian" ? "Not Applicable" : "Unknown") : row.badge_no;
-				return (
-					<span style={badgeText === "Not Applicable" || badgeText === "Unknown" ? { fontSize: "0.75em" } : {}}>
-					  {badgeText}
-					</span>
-				  );
+				return <span style={badgeText === "Not Applicable" || badgeText === "Unknown" ? { fontSize: "0.75em" } : {}}>{badgeText}</span>;
 			},
 			renderHeader: (params) => (
 				<Tooltip title="The badge number assigned to the police officer; used for identification">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
-			
 		},
 		{
 			field: "rank",
@@ -134,35 +130,34 @@ export default function Home() {
 		//BLOCKER: data in raw form
 
 		//TO DO: Add Gender
-		//BLOCKER: data in raw form 
+		//BLOCKER: data in raw form
 		{
 			field: "ia_no",
 			headerName: "No. of IA",
 			width: 100,
 			type: "string",
-			renderCell: (params =>{
-				const {row} = params
-				return `${row.ia_no.toLocaleString()}`
-			}),
+			renderCell: (params) => {
+				const { row } = params;
+				return `${row.ia_no.toLocaleString()}`;
+			},
 			renderHeader: (params) => (
 				<Tooltip title="The cumulative number of Internal Affairs complaints linked to the officer">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
 		},
-		
+
 		{
 			field: "totalPay",
 			headerName: "Total Pay",
 			width: 150,
 			type: "string",
-			renderCell: (params) =>{
-				const {row} = params;
-				if(row.totalPay != null || undefined){
-					return `$${row.totalPay.toLocaleString()}`
-					
+			renderCell: (params) => {
+				const { row } = params;
+				if (row.totalPay != null || undefined) {
+					return `$${row.totalPay.toLocaleString()}`;
 				}
-				return ``
+				return ``;
 			},
 			renderHeader: (params) => (
 				<Tooltip title="The total gross earnings of the police officer for the specified period">
@@ -170,7 +165,6 @@ export default function Home() {
 				</Tooltip>
 			),
 		},
-		
 
 		//TO DO: Add Arrests
 		//BLOCKER: data hasn't been found
@@ -186,13 +180,12 @@ export default function Home() {
 			headerName: "Overtime Pay",
 			width: 150,
 			type: "string",
-			renderCell: (params) =>{
-				const {row} = params;
-				if(row.otPay != null || undefined){
-					return `$${row.otPay.toLocaleString()}`
-					
+			renderCell: (params) => {
+				const { row } = params;
+				if (row.otPay != null || undefined) {
+					return `$${row.otPay.toLocaleString()}`;
 				}
-				return ``
+				return ``;
 			},
 			renderHeader: (params) => (
 				<Tooltip title="Earnings from overtime work">
@@ -200,20 +193,18 @@ export default function Home() {
 				</Tooltip>
 			),
 		},
-		
 
 		{
 			field: "detailPay",
 			headerName: "Detail Pay",
 			width: 150,
 			type: "string",
-			renderCell: (params) =>{
-				const {row} = params;
-				if(row.detailPay != null || undefined){
-					return `$${row.detailPay.toLocaleString()}`
-					
+			renderCell: (params) => {
+				const { row } = params;
+				if (row.detailPay != null || undefined) {
+					return `$${row.detailPay.toLocaleString()}`;
 				}
-				return ``
+				return ``;
 			},
 			renderHeader: (params) => (
 				<Tooltip title="Earnings from detailed assignments or special duties">
@@ -227,13 +218,12 @@ export default function Home() {
 			headerName: "Other Pay",
 			width: 150,
 			type: "string",
-			renderCell: (params) =>{
-				const {row} = params;
-				if(row.otherPay != null || undefined){
-					return `$${row.otherPay.toLocaleString()}`
-					
+			renderCell: (params) => {
+				const { row } = params;
+				if (row.otherPay != null || undefined) {
+					return `$${row.otherPay.toLocaleString()}`;
 				}
-				return ``
+				return ``;
 			},
 			renderHeader: (params) => (
 				<Tooltip title="Other types of earnings not classified elsewhere">
@@ -241,7 +231,6 @@ export default function Home() {
 				</Tooltip>
 			),
 		},
-		
 
 		//TO DO: Add Parking Tickets
 		// BLOCKER: data in raw form only
@@ -302,52 +291,55 @@ export default function Home() {
 
 	return (
 		<div>
-   <div
-			className="bg-cover bg-center"
-			style={{
-				backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)), url(${backgroundImage.src})`,
-				width: '100%',
-				paddingBottom: '3rem',
-				marginBottom: '1.5rem'
-			}}
-		>
-        <section className="hero py-0">
-            <div className="hero-content text-center pb-10 px-0 min-w-full">
-                <div className="flex flex-col items-start gap-10 w-full pt-4 max-w-5xl mx-auto relative">
-                    <h1 className="text-8xl font-bold text-white text-left break-words">Boston Police <br/>Index</h1>
-                    <p className="text-2xl text-white mt-[-3.5em] ml-[15em] text-left">
-                        The Boston Police Index is a resource to bring transparency to the activities of law enforcers in our communities. We wish to be a resource for journalists, policy makers, residents, workers, and students of the City of Boston. All information here is data from public
-                        sources and public records requests.
-                    </p>
-                    <div className="mt-2 relative w-full">
-                        <div className="flex items-center w-full bg-white join-item rounded-3xl">
-                            <div className="pl-8">
-                                <svg fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="transform scale-x-[-1] h-6 w-6">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                                </svg>
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Search by Employee ID, Name, Department, Title, Postal Code"
-                                className="input w-full h-12 bg-white join-item rounded-3xl pl-8 pe-20 placeholder:text-gray text-2xl focus:outline-none"
-                                onChange={(e) => setKeyword(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                        e.preventDefault();
-                                        handleSearch();
-                                    }
-                                }}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
+			<div
+				className="bg-cover bg-center"
+				style={{
+					backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${backgroundImage.src})`,
+					width: "100%",
+					paddingBottom: "3rem",
+					marginBottom: "1.5rem",
+				}}
+			>
+				<section className="hero py-0">
+					<div className="hero-content text-center pb-10 px-0 min-w-full">
+						<div className="flex flex-col items-start gap-10 w-full pt-4 max-w-5xl mx-auto relative">
+							<h1 className="text-8xl font-bold text-white text-left ml-[-0.75em] break-words">
+								Boston <br />
+								Police Index
+							</h1>
+							<p style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)" }} className="text-2xl text-white mt-[-8.5em] ml-[23em] mr-[-4em] text-left mx-auto">
+								The Boston Police Index is a resource to bring transparency to the activities of law enforcers in our communities. We wish to be a resource for journalists, policy makers, residents, workers, and students of the City of Boston. All information here is data from public
+								sources and public records requests.
+							</p>
+							<div className="mt-2 relative w-full">
+								<div className="flex items-center w-full bg-white join-item rounded-3xl">
+									<div className="pl-8">
+										<svg fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="transform scale-x-[-1] h-6 w-6">
+											<path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+										</svg>
+									</div>
+									<input
+										type="text"
+										placeholder="Search by Employee ID, Name, Department, Title, Postal Code"
+										className="input w-full h-12 bg-white join-item rounded-3xl pl-8 pe-20 placeholder:text-gray text-2xl focus:outline-none"
+										onChange={(e) => setKeyword(e.target.value)}
+										onKeyDown={(e) => {
+											if (e.key === "Enter") {
+												e.preventDefault();
+												handleSearch();
+											}
+										}}
+									/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+			</div>
 			<FadeIn>
 				<section className="w-full pb-16">
 					<DataGrid
-					 density="compact"
+						density="compact"
 						columns={cols}
 						rows={searchResData}
 						className="max-w-5xl mx-auto min-h-[300px] bg-white"
@@ -355,8 +347,9 @@ export default function Home() {
 							pagination: { paginationModel: { pageSize: 10 } },
 							columns: {
 								columnVisibilityModel: {
-								  employee_no: false,
-								},}
+									employee_no: false,
+								},
+							},
 						}}
 						pageSizeOptions={[5, 10, 15, 20]}
 						autoHeight
@@ -364,14 +357,12 @@ export default function Home() {
 							toolbar: GridToolbar,
 							noRowsOverlay: () => noRowsOverlay(keyword as string),
 						}}
-						style={{minWidth: "80%"}}
+						style={{ minWidth: "80%" }}
 						loading={loading}
 					/>
 				</section>
 			</FadeIn>
-			<p className="text-xs text-white mt-[-3.5em] text-center mx-auto w-full max-w-[70em]">
-    * Not Applicable in Badge No. is due to Civilians not having one. Unknown means there is missing data for this officer's badge.
-</p>
-	</div>
+			<p className="text-xs text-white mt-[-3.5em] text-center mx-auto w-full max-w-[70em]">* Not Applicable in Badge No. is due to Civilians not having one. Unknown means there is missing data for this officer's badge.</p>
+		</div>
 	);
 }

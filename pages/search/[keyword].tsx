@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import SearchBar from "@components/SearchBar";
 import Link from "next/link";
 import { fetchData } from "@utility/dataUtils";
+import properCaseName from "@utility/properNameCasing";
 
 export default function SearchResult(): FunctionComponentElement<{}> {
 	const router = useRouter();
@@ -31,10 +32,12 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 	}, [keyword]);
 
 	const cols: GridColDef[] = [
+		//Deemed not important (so hidden by default)
 		{
 			field: "employee_no",
 			headerName: "Employee No.",
-			type: "number",
+			width: 100,
+			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
 			},
@@ -50,15 +53,16 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 			width: 200,
 			type: "string",
 			renderCell: (params) => {
+				const properCasedName = properCaseName(params.row.name);
 				return (
 					<Link
 						href={{
 							pathname: "/profile/[employee_id]",
-							query: { employee_id: params.row.employee_no, keyword: keyword },
+							query: { employee_id: params.row.employee_no, keyword: params.row.name },
 						}}
 						className="link hover:text-blue-500"
 					>
-						{params.row.name}
+						{properCasedName}
 					</Link>
 				);
 			},
@@ -68,41 +72,28 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 				</Tooltip>
 			),
 		},
+
 		{
 			field: "badge_no",
-			headerName: "Badge No.",
-			width: 100,
+			headerName: "Badge No.*",
+			width: 200,
 			type: "string",
-			renderHeader: (params) => (
-				<Tooltip title="The badge number assigned to the police officer, used for identification">
-					<span className="font-semibold">{params.colDef.headerName}</span>
-				</Tooltip>
-			),
-		},
-		{
-			field: "zipCode",
-			headerName: "Zip Code",
-			type: "string",
-			valueFormatter: (params) => {
-				return params.value ? "0" + params.value : null;
+			renderCell: (params) => {
+				const { row } = params;
+				const badgeText = row.badge_no === "Unknown Badge" ? (row.rank === "Civilian" ? "Not Applicable" : "Unknown") : row.badge_no;
+				return <span style={badgeText === "Not Applicable" || badgeText === "Unknown" ? { fontSize: "0.75em" } : {}}>{badgeText}</span>;
 			},
 			renderHeader: (params) => (
-				<Tooltip title="The postal code associated with the officer’s pay data">
+				<Tooltip title="The badge number assigned to the police officer; used for identification">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
 		},
-		// {
-		// 	field: "title",
-		// 	headerName: "Title",
-		// 	width: 150,
-		// 	type: "string",
-		// },
 		{
 			field: "rank",
 			headerName: "Rank",
 			width: 150,
-			type: "number",
+			type: "string",
 			renderHeader: (params) => (
 				<Tooltip title="The job title or rank of the police officer">
 					<span className="font-semibold">{params.colDef.headerName}</span>
@@ -120,99 +111,119 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 				</Tooltip>
 			),
 		},
+
+		//TO DO: Add Race
+		//BLOCKER: data in raw form
+
+		//TO DO: Add Gender
+		//BLOCKER: data in raw form
 		{
 			field: "ia_no",
 			headerName: "No. of IA",
 			width: 100,
-			type: "number",
+			type: "string",
+			renderCell: (params) => {
+				const { row } = params;
+				return `${row.ia_no.toLocaleString()}`;
+			},
 			renderHeader: (params) => (
-				<Tooltip title="The number of Internal Affairs complaints linked to the officer">
+				<Tooltip title="The cumulative number of Internal Affairs complaints linked to the officer">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
 		},
+
 		{
 			field: "totalPay",
-			headerName: "2021 Total Pay",
-			width: 130,
-			type: "number",
+			headerName: "Total Pay",
+			width: 150,
+			type: "string",
+			renderCell: (params) => {
+				const { row } = params;
+				if (row.totalPay != null || undefined) {
+					return `$${row.totalPay.toLocaleString()}`;
+				}
+				return ``;
+			},
 			renderHeader: (params) => (
 				<Tooltip title="The total gross earnings of the police officer for the specified period">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
 		},
-		{
-			field: "injuredPay",
-			headerName: "Injured Pay",
-			width: 130,
-			type: "number",
-			renderHeader: (params) => (
-				<Tooltip title="Earnings received while on injury leave">
-					<span className="font-semibold">{params.colDef.headerName}</span>
-				</Tooltip>
-			),
-		},
+
+		//TO DO: Add Arrests
+		//BLOCKER: data hasn't been found
+
+		//TO DO: Add FOI
+		// BLOCKER: data not in database
+
+		//TO DO: Add News
+		// BLOCKER: data hasn't been found
+
 		{
 			field: "otPay",
-			headerName: "OT Pay",
-			width: 130,
-			type: "number",
+			headerName: "Overtime Pay",
+			width: 150,
+			type: "string",
+			renderCell: (params) => {
+				const { row } = params;
+				if (row.otPay != null || undefined) {
+					return `$${row.otPay.toLocaleString()}`;
+				}
+				return ``;
+			},
 			renderHeader: (params) => (
 				<Tooltip title="Earnings from overtime work">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
 		},
+
+		{
+			field: "detailPay",
+			headerName: "Detail Pay",
+			width: 150,
+			type: "string",
+			renderCell: (params) => {
+				const { row } = params;
+				if (row.detailPay != null || undefined) {
+					return `$${row.detailPay.toLocaleString()}`;
+				}
+				return ``;
+			},
+			renderHeader: (params) => (
+				<Tooltip title="Earnings from detailed assignments or special duties">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		},
+
 		{
 			field: "otherPay",
 			headerName: "Other Pay",
-			width: 130,
-			type: "number",
+			width: 150,
+			type: "string",
+			renderCell: (params) => {
+				const { row } = params;
+				if (row.otherPay != null || undefined) {
+					return `$${row.otherPay.toLocaleString()}`;
+				}
+				return ``;
+			},
 			renderHeader: (params) => (
 				<Tooltip title="Other types of earnings not classified elsewhere">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
 		},
-		{
-			field: "quinnPay",
-			headerName: "Quinn Pay",
-			width: 130,
-			type: "number",
-			renderHeader: (params) => (
-				<Tooltip title="Earnings from the Quinn Bill educational incentive program">
-					<span className="font-semibold">{params.colDef.headerName}</span>
-				</Tooltip>
-			),
-		},
-		{
-			field: "regularPay",
-			headerName: "Regular Pay",
-			width: 130,
-			type: "number",
-			renderHeader: (params) => (
-				<Tooltip title="Regular salary or wages">
-					<span className="font-semibold">{params.colDef.headerName}</span>
-				</Tooltip>
-			),
-		},
-		{
-			field: "retroPay",
-			headerName: "Retro Pay",
-			width: 130,
-			type: "number",
-			renderHeader: (params) => (
-				<Tooltip title="Retroactive pay adjustments">
-					<span className="font-semibold">{params.colDef.headerName}</span>
-				</Tooltip>
-			),
-		},
-		
 
+		//TO DO: Add Parking Tickets
+		// BLOCKER: data in raw form only
+
+		//TO DO: Add Shooting Report
+		// BLOCKER: data doesn't exist
 	];
-
-	
 
 	const StyledGridOverlay = styled("div")(() => ({
 		display: "flex",
@@ -270,12 +281,17 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 			{/* Table */}
 			<section className="w-full pt-16 pb-16">
 				<DataGrid
-				density="compact"
+					density="compact"
 					columns={cols}
 					rows={searchResData}
 					className="max-w-5xl mx-auto min-h-[300px] bg-white"
 					initialState={{
 						pagination: { paginationModel: { pageSize: 10 } },
+						columns: {
+							columnVisibilityModel: {
+								employee_no: false,
+							},
+						},
 					}}
 					pageSizeOptions={[5, 10, 15, 20]}
 					autoHeight
@@ -284,9 +300,10 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 						noRowsOverlay: () => noRowsOverlay(keyword as string),
 					}}
 					loading={loading}
-					style={{minWidth: "80%"}}
+					style={{ minWidth: "80%" }}
 				/>
 			</section>
+			<p className="text-xs text-white mt-[-3.5em] text-center mx-auto w-full max-w-[70em]">* Not Applicable in Badge No. is due to Civilians not having one. Unknown means there is missing data for this officer's badge.</p>
 		</>
 	);
 }
