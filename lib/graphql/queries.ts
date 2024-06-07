@@ -39,10 +39,9 @@ export const GET_ORG_DATA = gql`
 export const GET_IA_DATA = gql`
 	query MyQuery {
 		allEmployeeIaLinkeds {
-			edges {
-				node {
-					employeeNo
-				}
+			nodes {
+				employeeNo
+				bpdIaNo
 			}
 		}
 	}

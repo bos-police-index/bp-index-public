@@ -5,6 +5,7 @@ import { getMUIGrid } from "@utility/createMUIGrid";
 import apolloClient from "@lib/apollo-client";
 import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
+import { Button } from "antd";
 interface Table {
 	title: string;
 	tables: DataTables;
@@ -14,14 +15,15 @@ interface DataTables {
 	filteredTable: FunctionComponentElement<{}> | null;
 }
 
-export const getData = async (keyword: string, employee_no: string) => { 
-
+export const getData = async (keyword: string, employee_no: string) => {
 	if (parseInt(employee_no) > 2147483647 || parseInt(employee_no) < 0 || isNaN(parseInt(employee_no))) {
 		return {
 			notFound: true,
 		};
 	}
 	// Fetch all employee entries corresponding to employee number
+	// NULL FIELDS: deptId, namePrefix, nameSuffix, sex, ethnicity, officerPhoto, postalCode, badgeNo,
+	//		 rankId, rankAsOf, orgId, districtWorked, unionCode
 	const intEmployeeNo = parseInt(employee_no);
 	const employeeDataQuery = gql`query MyQuery {
 		allEmployeeFromFa23Data(condition: {employeeNo: ${intEmployeeNo}}) {
@@ -33,7 +35,7 @@ export const getData = async (keyword: string, employee_no: string) => {
 			  lastName
 			  firstName
 			  nameMi
-			  namePrefix
+			  namePrefix 
 			  nameSuffix
 			  sex
 			  ethnicity
@@ -48,21 +50,21 @@ export const getData = async (keyword: string, employee_no: string) => {
 			}
 		  }
 		}
-	  }`
-	const employeeResponse: any = await apolloClient.query({query: employeeDataQuery})
-	const employeeData = employeeResponse.data.allEmployeeFromFa23Data.edges
+	  }`;
+	const employeeResponse: any = await apolloClient.query({ query: employeeDataQuery });
+	const employeeData = employeeResponse.data.allEmployeeFromFa23Data.edges;
 	// if not found, return 404s
 	if (!employeeData) {
 		return {
 			notFound: true,
 		};
 	}
-	// Collapse data from all entries into one 
+	// Collapse data from all entries into one
 	let cleanEmployeeData = employeeData[0].node;
 	let employee_ids = [];
 	employeeData.slice(0).map((entry: any) => {
 		const node = entry.node;
-		employee_ids.push(node.employeeId)
+		employee_ids.push(node.employeeId);
 		cleanEmployeeData = {
 			employeeNo: cleanEmployeeData.employeeNo,
 			deptId: cleanEmployeeData.deptId || node.deptId,
@@ -80,18 +82,23 @@ export const getData = async (keyword: string, employee_no: string) => {
 			rankAsOf: cleanEmployeeData.rankAsOf || node.rankAsOf,
 			orgId: cleanEmployeeData.orgId || node.orgId,
 			districtWorked: cleanEmployeeData.districtWorked || node.districtWorked,
-			unionCode: cleanEmployeeData.unionCode || node.unionCode
-		}
+			unionCode: cleanEmployeeData.unionCode || node.unionCode,
+		};
 	});
+	//NULL FIELDS: policeDeptName, cityDeptName
+	//BECAUES deptId is null
 	const departmentDataQuery = gql`query MyQuery {
 		departmentByDepartmentId(departmentId: ${cleanEmployeeData.deptId || 100000}) {
 		  policeDeptName
 		  cityDeptName
 		}
 	  }
-	  `
-	const departmentData = await apolloClient.query({query: departmentDataQuery})
+	  `;
+	const departmentData = await apolloClient.query({ query: departmentDataQuery });
 	const rank_id = 9;
+
+	//NULL FIELDS: rankIdNo, rankTitleFull, rankTitleAbbrev, rankName ,rankAbbr
+	//BECAUES rankId is null
 	const rankDataQuery = gql`query MyQuery {
 		rankByRankId(rankId: ${rank_id}) {
 		  rankIdNo
@@ -101,8 +108,8 @@ export const getData = async (keyword: string, employee_no: string) => {
 		  rankAbbr
 		}
 	  }	  
-	  `
-	const rankData = await apolloClient.query({query: rankDataQuery})
+	  `;
+	const rankData = await apolloClient.query({ query: rankDataQuery });
 
 	let officerData = {
 		employee_no: cleanEmployeeData.employeeNo,
@@ -113,8 +120,9 @@ export const getData = async (keyword: string, employee_no: string) => {
 		postal: cleanEmployeeData.postalCode,
 		sex: cleanEmployeeData.sex,
 		ia_num: 0,
+		detail_num: 0,
 	};
-	console.log(officerData)
+	console.log(officerData);
 	let fullName = "";
 	fullName += cleanEmployeeData.namePrefix ? cleanEmployeeData.namePrefix + " " : "";
 	fullName += cleanEmployeeData.firstName + " ";
@@ -123,9 +131,9 @@ export const getData = async (keyword: string, employee_no: string) => {
 	fullName += cleanEmployeeData.nameSuffix ? cleanEmployeeData.nameSuffix : "";
 	officerData.name = fullName;
 
-	let detail_record_rows = []
-	let officer_IA_rows = []
-	let police_financial_rows = []
+	let detail_record_rows = [];
+	let officer_IA_rows = [];
+	let police_financial_rows = [];
 	for (let id of employee_ids) {
 		const detail_record_query = gql`query MyQuery {
 			allDetailRecordFromFa23Data(condition: {employeeId: ${id}}) {
@@ -193,14 +201,56 @@ export const getData = async (keyword: string, employee_no: string) => {
 			  }
 			}
 		  }`;
-		const detail_response = await apolloClient.query({query: detail_record_query});
-		const financial_response = await apolloClient.query({query: police_financial_query});
-		detail_record_rows = detail_record_rows.concat(detail_response.data.allDetailRecordFromFa23Data.edges.map((edge: any) => {const { ["rowId"]: id, ...rest } = edge.node; return {id, ...rest}}))
-		police_financial_rows = police_financial_rows.concat(financial_response.data.allPoliceFinancialFromFa23Data.edges.map((edge: any) => {const { ["policeFinancialId"]: id, ...rest } = edge.node; return {id, ...rest}}))
+		const all_employee_ia_linkeds_query = gql`query MyQuery {
+			allEmployeeIaLinkeds(condition: {employeeNo: ${cleanEmployeeData.employeeNo}}) {
+			  edges {
+				node {
+				  bpdIaRecordId
+				  bpdIaNo
+				  receivedDate
+				}
+			  }
+			}
+		  }`;
+		const employee_ia_response = await apolloClient.query({ query: all_employee_ia_linkeds_query });
+		const detail_response = await apolloClient.query({ query: detail_record_query });
+		const financial_response = await apolloClient.query({ query: police_financial_query });
+		detail_record_rows = detail_record_rows.concat(
+			detail_response.data.allDetailRecordFromFa23Data.edges.map((edge: any) => {
+				const { ["rowId"]: id, ...rest } = edge.node;
+				return { id, ...rest };
+			}),
+		);
+		police_financial_rows = police_financial_rows.concat(
+			financial_response.data.allPoliceFinancialFromFa23Data.edges.map((edge: any) => {
+				const { ["policeFinancialId"]: id, ...rest } = edge.node;
+				return { id, ...rest };
+			}),
+		);
+		const uniqueBpdIaNos = new Set();
+
+		// Filter the data to remove duplicates based on bpdIaNo
+		const filteredEmployeeIaData = employee_ia_response.data.allEmployeeIaLinkeds.edges.filter((edge) => {
+			const { bpdIaNo } = edge.node;
+
+			if (!uniqueBpdIaNos.has(`${bpdIaNo}`)) {
+				uniqueBpdIaNos.add(`${bpdIaNo}`);
+				return true;
+			}
+			return false;
+		});
+
+		const newOfficerIaRows = filteredEmployeeIaData.map((edge) => {
+			const { bpdIaRecordId: id, ...rest } = edge.node;
+			return { id, ...rest };
+		});
+
+		officer_IA_rows = newOfficerIaRows;
+
+		officerData.ia_num = uniqueBpdIaNos.size;
+		officerData.detail_num = detail_record_rows.length;
 	}
-			
-	
-	
+
 	// // const alpha_listing_rows = await getTable("alpha_listing", { name: "employee_id", value: employee_id });
 	// const detail_record_rows = await getTable("allDetailRecordFromFa23Data", { name: "employeeId", values: employee_ids });
 	// const officer_misconduct_rows = await getTable("officer_misconduct", { name: "employee_id", value: employee_id });
@@ -238,11 +288,11 @@ export const getData = async (keyword: string, employee_no: string) => {
 					tableName: "detail_record",
 					rows: detail_record_rows,
 				},
-				// {
-				// 	title: "Officer Misconduct",
-				// 	tableName: "officer_misconduct",
-				// 	rows: officer_misconduct_rows,
-				// },
+				{
+					title: "Officer IA",
+					tableName: "officer_ia",
+					rows: officer_IA_rows,
+				},
 				// {
 				// 	title: "Personnel Roaster",
 				// 	tableName: "personnel_roaster",
@@ -303,9 +353,9 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 			includesOnly: ["trackingNo", "customerId", "incidentNo", "contract", "contractNo", "detailStart", "detailEnd"],
 			excludes: [],
 		},
-		officer_misconduct: {
-			includesOnly: [],
-			excludes: ["received_date"],
+		officer_ia: {
+			includesOnly: ["bpdIaRecordId", "bpdIaNo", "receivedDate"],
+			excludes: [],
 		},
 		personnel_roaster: {
 			includesOnly: ["position", "location", "employee_record", "eff_date", "reason"],
@@ -340,11 +390,11 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 			excludes: [],
 		},
 	});
-	
+
 	useEffect(() => {
 		const fetchData = async () => {
-			const {  props } = await getData(keyword as string, employee_id as string);
-			console.log(props)
+			const { props } = await getData(keyword as string, employee_id as string);
+			console.log(props);
 			let tablesArr: Table[] = [];
 			for (let table of props.tables) {
 				let rows = table.rows;
@@ -354,79 +404,143 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 					title: tableTitle,
 					tables: getMUIGrid(tableName, rows, props.officerData.name, tableFilters[tableName].includesOnly, tableFilters[tableName].excludes) as DataTables,
 				};
-				
+
 				tablesArr.push(tableEntry);
 			}
 			setOfficerData(props.officerData);
 			setTablesArr(tablesArr);
-		}
+		};
 		if (keyword && employee_id) {
 			fetchData();
 		}
 	}, [employee_id, keyword]);
-	
+
 	return (
-		officerData && <>
-			<SearchBar title="Officer Profile" officerName={officerData.name} />
-			<section>
-				<div className={"hero min-w-screen px-52 mt-16"}>
-					<div className={"flex gap-16 w-full h-80"}>
-						<div className={"grow bg-white/[.75] rounded-xl px-12 py-8 flex gap-[.4rem] flex-col"}>
-							<p className={"text-3xl font-bold"}>{officerData.name}</p>
-							<p className={"text-lg mt-4"}>
-								<strong>Title :</strong> {officerData.title}
+		officerData && (
+			<>
+				officerData && (
+				<>
+					<section style={{ width: "100vw", backgroundColor: "white", paddingBottom: "2rem", position: "relative" }}>
+						<div className="title" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#032752" }}>
+							<p className={"absolute text-4xl font-bold underline"} style={{ top: "3rem" }}>
+								{officerData.name}
 							</p>
-							<p className={"text-lg"}>
-								<strong>Employee ID :</strong> {officerData.employee_no}
-							</p>
-							<p className={"text-lg"}>
-								<strong>Police Department :</strong> {officerData.police_dept_name}
-							</p>
-							<p className={"text-lg"}>
-								<strong>City Department :</strong> {officerData.city_dept_name}
-							</p>
-							<p className={"text-lg"}>
-								<strong>Postal :</strong> {officerData.postal}
-							</p>
-							<p className={"text-lg"}>
-								<strong>Number of IA:</strong> {officerData.ia_num}
-							</p>
+							<SearchBar title="Officer Profile" officerName={officerData.name} />
 						</div>
-						<div className="avatar bg-white/[.75] p-8 rounded-xl h-full">
-							<div className="w-5/6 mx-auto">
+						<div className="sections" style={{ display: "flex", justifyContent: "center" }}>
+							<div className="image" style={{ width: "20%", backgroundColor: "grey", display: "flex", alignItems: "center", justifyContent: "center", margin: "2em 5em" }}>
 								<img src={"../officer_icon.png"} alt={"Officer Icon"} />
 							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-			{tablesArr.map((table) => {
-				return (
-					<section className={"min-w-screen px-52 flex flex-col gap-16 py-16"} key={table.title}>
-						<div className={"bg-white/[.75] rounded-2xl px-10 py-8"}>
-							<div className={"flex justify-between items-center flex-row"}>
-								<h2 className={"text-3xl font-bold underline "}>{table.title}</h2>
-								<button
-									onClick={() => {
-										setCurrentOverlay({ table: table.tables.fullTable, title: table.title });
-										document.getElementById("screen-overlay").classList.add("flex");
-										document.getElementById("screen-overlay").classList.remove("hidden");
-									}}
-									className={"bg-primary text-white font-urbanist rounded-lg p-2 w-32 flex items-center justify-center active:scale-[.95] shadow-xl transition-button duration-300 hover:bg-primary-hover"}
-								>
-									See All
-								</button>
-							</div>
 
-							<div className={"mt-6"}>{table.tables.filteredTable}</div>
+							<div className="overview" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "30%", margin: "2em 5em" }}>
+								<p style={{ color: "#032752" }} className="text-2xl ">
+									Overview
+								</p>
+								<p className={"text-med mt-3"}>
+									<strong>Employee ID:</strong> {officerData.employee_no}
+								</p>
+								<p className={"text-med"}>
+									<strong>Title:</strong> {officerData.title}
+								</p>
+								<p className={"text-med"}>
+									<strong>Police Department:</strong> {officerData.police_dept_name}
+								</p>
+								<p className={"text-med"}>
+									<strong>City Department:</strong> {officerData.city_dept_name}
+								</p>
+								<p className={"text-med"}>
+									<strong>Number of IA:</strong> {officerData.ia_num}
+								</p>
+								<p className={"text-med"}>
+									<strong>Postal:</strong> {officerData.postal} {/*missing this}*/}
+								</p>
+								<p className={"text-med"}>
+									<strong>Sex:</strong> {officerData.sex} {/*missing this}*/}
+								</p>
+								<p className={"text-med"}>
+									<strong>Race:</strong> {officerData.ethnicity} {/*missing this}*/}
+								</p>
+							</div>
+							<div className="table-of-contents" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "30%", margin: "2em 5em", height: "20%" }}>
+								<p style={{ color: "#032752" }} className="text-2xl ">
+									Table of Contents
+								</p>
+								<div className={"text-med mt-3"}>
+									<strong style={{}}>Detail Record:</strong>
+									<p
+										style={{ display: "inline-block", textIndent: "0.2em", textDecoration: "underline", cursor: "pointer" }}
+										onClick={() => {
+											document.getElementById("detail-record").scrollIntoView({ behavior: "smooth" });
+										}}
+									>
+										{officerData.detail_num}
+									</p>
+								</div>
+
+								<div className={"text-med"}>
+									<strong style={{ cursor: "pointer" }}>Officer IA:</strong>
+									<p
+										style={{ display: "inline-block", textIndent: "0.2em", textDecoration: "underline", cursor: "pointer" }}
+										onClick={() => {
+											document.getElementById("officer-ia").scrollIntoView({ behavior: "smooth" });
+										}}
+									>
+										{officerData.ia_num}
+									</p>
+								</div>
+								<p className={"text-med"}>
+									<strong
+										style={{ cursor: "pointer", textDecoration: "underline" }}
+										onClick={() => {
+											document.getElementById("police-financial").scrollIntoView({ behavior: "smooth" });
+										}}
+									>
+										Police Financial
+									</strong>
+								</p>
+								{/*missing tables}*/}
+								<p className={"text-med"}>
+									<strong style={{ cursor: "pointer" }}>Earnings:</strong> {officerData.total_pay} {/*missing this}*/} {/*missing table}*/}
+								</p>
+								<p className={"text-med"}>
+									<strong style={{ cursor: "pointer" }}>FIO:</strong> {officerData.fio_record} {/*missing this}*/} {/*missing table}*/}
+								</p>
+								<p className={"text-med"}>
+									<strong style={{ cursor: "pointer" }}>Traffic Tickets:</strong> {officerData.traffic_no} {/*missing this}*/} {/*missing table}*/}
+								</p>
+							</div>
 						</div>
 					</section>
+				</>
 				);
-			})}
-			<ScreenOverlay title={currentOverlay.title} children={currentOverlay.table} />
-		</>
+				{tablesArr.map((table) => {
+					return (
+						<section className={"min-w-screen px-52 flex flex-col gap-0 py-8"} key={table.title} id={table.title.replace(/\s+/g, "-").toLowerCase()}>
+							<div className={" rounded-2xl px-10 py-8"}>
+								<div className={"flex justify-between items-center flex-row"}>
+									<h2 className={"text-2xl  text-white"}>{table.title}</h2>
+									<Button
+										type="primary"
+										shape="round"
+										onClick={() => {
+											setCurrentOverlay({ table: table.tables.fullTable, title: table.title });
+											document.getElementById("screen-overlay").classList.add("flex");
+											document.getElementById("screen-overlay").classList.remove("hidden");
+										}}
+										className={"bg-primary text-white font-urbanist p-2 w-32 flex items-center justify-center active:scale-[.95] shadow-xl transition-button duration-300 hover:bg-primary-hover"}
+									>
+										See All
+									</Button>
+								</div>
+
+								<div className={"mt-6"}>{table.tables.filteredTable}</div>
+							</div>
+						</section>
+					);
+				})}
+				<ScreenOverlay title={currentOverlay.title} children={currentOverlay.table} />
+			</>
+		)
 	);
-	return (
-		<></>
-	)
+	return <></>;
 }

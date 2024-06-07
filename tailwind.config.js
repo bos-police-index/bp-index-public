@@ -17,6 +17,7 @@ module.exports = {
 			colors: {
 				"primary-hover": "#083b9e",
 				primary: "#0949C6",
+				'darkText': "#032752"
 			},
 			spacing: {
 				68: "17rem",

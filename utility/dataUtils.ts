@@ -24,6 +24,7 @@ interface OrganizationNode {
 
 interface IALinkedNode {
 	employeeNo: string;
+	bpdIaNo: string;
 }
 
 interface EmployeeData {
@@ -40,7 +41,7 @@ interface OrganizationData {
 
 interface IAData {
 	allEmployeeIaLinkeds: {
-		edges: { node: IALinkedNode }[];
+		nodes: IALinkedNode[];
 	};
 }
 
@@ -123,18 +124,34 @@ async function fetchOrganizationData(): Promise<Map<string, string>> {
 }
 
 // Fetch IA Data from the API
-async function fetchIAData(): Promise<Map<string, number>> {
+export async function fetchIAData(): Promise<Map<string, number>> {
 	const { data } = await apolloClient.query<IAData>({ query: GET_IA_DATA });
-	const iaCounts = new Map<string, number>();
 
-	for (const { node } of data.allEmployeeIaLinkeds.edges) {
-		if (iaCounts.has(node.employeeNo)) {
-			iaCounts.set(node.employeeNo, iaCounts.get(node.employeeNo) + 1);
-		} else {
-			iaCounts.set(node.employeeNo, 1);
+	//to prevent counting duplicates
+	const seenBpdIaNos = new Set();
+
+	const iaCounts = new Map<string, number>();
+	if (data && data.allEmployeeIaLinkeds && data.allEmployeeIaLinkeds.nodes) {
+		console.log("data exists", data);
+	} else {
+		console.error("IA DATA MISSING", data.allEmployeeIaLinkeds.nodes);
+	}
+	console.log(data.allEmployeeIaLinkeds.nodes);
+	for (const i in data.allEmployeeIaLinkeds.nodes) {
+		const node = data.allEmployeeIaLinkeds.nodes[i];
+		if (node.employeeNo && node.bpdIaNo && !seenBpdIaNos.has(node.bpdIaNo)) {
+			console.log(node.bpdIaNo, "not in", seenBpdIaNos);
+			if (iaCounts.has(node.employeeNo)) {
+				iaCounts.set(node.employeeNo, iaCounts.get(node.employeeNo) + 1);
+			} else {
+				iaCounts.set(node.employeeNo, 1);
+			}
+			seenBpdIaNos.add(node.bpdIaNo);
 		}
 	}
 
+	console.log("iaCounts:", iaCounts);
+	console.log("seenBpdIaNos:", seenBpdIaNos);
 	return iaCounts;
 }
 

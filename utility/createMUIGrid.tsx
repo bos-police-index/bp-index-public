@@ -594,6 +594,39 @@ const officer_misconduct_columns = () => {
 
 	return cols;
 };
+//new for ia
+const officer_ia_columns = () => {
+	const cols: GridColDef[] = [
+		{
+			field: "id",
+			hideable: true,
+			headerName: "ID",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+		},
+		{
+			field: "bpdIaNo",
+			headerName: "IA Number",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 250,
+		},
+		{
+			field: "receivedDate",
+			headerName: "Received Date",
+			type: "date",
+			valueFormatter: formatDateShort,
+			width: 200,
+		},
+	];
+
+	return cols;
+};
 const parking_ticket_columns = () => {
 	const cols: GridColDef[] = [
 		{
@@ -2113,7 +2146,8 @@ const functionMapping = {
 	overtime_category: overtime_category_columns(),
 	rank: rank_columns(),
 	shooting_report: shooting_report_columns(),
-	officer_misconduct: officer_misconduct_columns(),
+	// officer_misconduct: officer_misconduct_columns(),
+	officer_ia: officer_ia_columns(),
 	parking_ticket: parking_ticket_columns(),
 	personnel_roaster: personnel_roaster_columns(),
 	police_financial: police_financial_columns(),
