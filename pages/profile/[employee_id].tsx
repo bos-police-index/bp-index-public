@@ -82,9 +82,11 @@ export const getData = async (keyword: string, employee_no: string) => {
 			rankAsOf: cleanEmployeeData.rankAsOf || node.rankAsOf,
 			orgId: cleanEmployeeData.orgId || node.orgId,
 			districtWorked: cleanEmployeeData.districtWorked || node.districtWorked,
-			unionCode: cleanEmployeeData.unionCode || node.unionCode,
-		};
+			unionCode: cleanEmployeeData.unionCode || node.unionCode,,
+		};;
 	});
+	//NULL FIELDS: policeDeptName, cityDeptName
+	//BECAUSE deptId is null
 	//NULL FIELDS: policeDeptName, cityDeptName
 	//BECAUES deptId is null
 	const departmentDataQuery = gql`query MyQuery {
@@ -96,6 +98,9 @@ export const getData = async (keyword: string, employee_no: string) => {
 	  `;
 	const departmentData = await apolloClient.query({ query: departmentDataQuery });
 	const rank_id = 9;
+
+	//NULL FIELDS: rankIdNo, rankTitleFull, rankTitleAbbrev, rankName ,rankAbbr
+	//BECAUSE rankId is null
 
 	//NULL FIELDS: rankIdNo, rankTitleFull, rankTitleAbbrev, rankName ,rankAbbr
 	//BECAUES rankId is null
@@ -415,99 +420,93 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 		}
 	}, [employee_id, keyword]);
 
+	const sectionHeaderColor = "#3874CB";
+
 	return (
 		officerData && (
 			<>
 				officerData && (
 				<>
-					<section style={{ width: "100vw", backgroundColor: "white", paddingBottom: "2rem", position: "relative" }}>
-						<div className="title" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#032752" }}>
-							<p className={"absolute text-4xl font-bold underline"} style={{ top: "3rem" }}>
-								{officerData.name}
-							</p>
-							<SearchBar title="Officer Profile" officerName={officerData.name} />
-						</div>
-						<div className="sections" style={{ display: "flex", justifyContent: "center" }}>
-							<div className="image" style={{ width: "20%", backgroundColor: "grey", display: "flex", alignItems: "center", justifyContent: "center", margin: "2em 5em" }}>
-								<img src={"../officer_icon.png"} alt={"Officer Icon"} />
-							</div>
-
-							<div className="overview" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "30%", margin: "2em 5em" }}>
-								<p style={{ color: "#032752" }} className="text-2xl ">
-									Overview
-								</p>
-								<p className={"text-med mt-3"}>
-									<strong>Employee ID:</strong> {officerData.employee_no}
-								</p>
-								<p className={"text-med"}>
-									<strong>Title:</strong> {officerData.title}
-								</p>
-								<p className={"text-med"}>
-									<strong>Police Department:</strong> {officerData.police_dept_name}
-								</p>
-								<p className={"text-med"}>
-									<strong>City Department:</strong> {officerData.city_dept_name}
-								</p>
-								<p className={"text-med"}>
-									<strong>Number of IA:</strong> {officerData.ia_num}
-								</p>
-								<p className={"text-med"}>
-									<strong>Postal:</strong> {officerData.postal} {/*missing this}*/}
-								</p>
-								<p className={"text-med"}>
-									<strong>Sex:</strong> {officerData.sex} {/*missing this}*/}
-								</p>
-								<p className={"text-med"}>
-									<strong>Race:</strong> {officerData.ethnicity} {/*missing this}*/}
+					<section style={{ width: "100vw", backgroundColor: "white", paddingBottom: "2rem", position: "relative", marginTop: "-1.5rem" }}>
+						<div className="contain-content" style={{ width: "80vw", margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+							<div className="title" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#032752" }}>
+								<p className="relative text-4xl font-bold underline" style={{ paddingTop: "2rem", marginLeft: "1rem" }}>
+									{officerData.name}
 								</p>
 							</div>
-							<div className="table-of-contents" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "30%", margin: "2em 5em", height: "20%" }}>
-								<p style={{ color: "#032752" }} className="text-2xl ">
-									Table of Contents
-								</p>
-								<div className={"text-med mt-3"}>
-									<strong style={{}}>Detail Record:</strong>
-									<p
-										style={{ display: "inline-block", textIndent: "0.2em", textDecoration: "underline", cursor: "pointer" }}
-										onClick={() => {
-											document.getElementById("detail-record").scrollIntoView({ behavior: "smooth" });
-										}}
-									>
-										{officerData.detail_num}
+							<div className="sections" style={{ display: "flex", justifyContent: "flex-start", width: "100%", padding: "1rem" }}>
+								<div className="overview" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "calc(50% - 1rem)", marginRight: "2rem", height: "300px" }}>
+									<p style={{ color: sectionHeaderColor }} className="text-3xl">
+										Overview
+									</p>
+									<p className="text-lg mt-3">
+										<strong>Employee ID:</strong> {officerData.employee_no}
+									</p>
+									<p className="text-lg">
+										<strong>Rank:</strong> {officerData.title}
+									</p>
+									<p className="text-lg">
+										<strong>Unit:</strong> {officerData.city_dept_name}
+									</p>
+									<p className="text-lg">
+										<strong>Residence:</strong> {officerData.postal}
+									</p>
+									<p className="text-lg">
+										<strong>Number of IA:</strong> {officerData.ia_num}
+									</p>
+									<p className="text-lg">
+										<strong>Sex:</strong> {officerData.sex}
+									</p>
+									<p className="text-lg">
+										<strong>Race:</strong> {officerData.ethnicity}
 									</p>
 								</div>
-
-								<div className={"text-med"}>
-									<strong style={{ cursor: "pointer" }}>Officer IA:</strong>
-									<p
-										style={{ display: "inline-block", textIndent: "0.2em", textDecoration: "underline", cursor: "pointer" }}
-										onClick={() => {
-											document.getElementById("officer-ia").scrollIntoView({ behavior: "smooth" });
-										}}
-									>
-										{officerData.ia_num}
+								<div className="table-of-contents" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "35%", height: "300px" }}>
+									<p style={{ color: sectionHeaderColor }} className="text-3xl">
+										Data Summary
+									</p>
+									<div className="text-lg mt-3">
+										<strong>Detail Record:</strong>
+										<p
+											style={{ display: "inline-block", textIndent: "0.2em", textDecoration: "underline", cursor: "pointer" }}
+											onClick={() => {
+												document.getElementById("detail-record").scrollIntoView({ behavior: "smooth" });
+											}}
+										>
+											{officerData.detail_num}
+										</p>
+									</div>
+									<div className="text-lg">
+										<strong style={{ cursor: "pointer" }}>Officer IA:</strong>
+										<p
+											style={{ display: "inline-block", textIndent: "0.2em", textDecoration: "underline", cursor: "pointer" }}
+											onClick={() => {
+												document.getElementById("officer-ia").scrollIntoView({ behavior: "smooth" });
+											}}
+										>
+											{officerData.ia_num}
+										</p>
+									</div>
+									<p className="text-lg">
+										<strong
+											style={{ cursor: "pointer", textDecoration: "underline" }}
+											onClick={() => {
+												document.getElementById("police-financial").scrollIntoView({ behavior: "smooth" });
+											}}
+										>
+											Police Financial
+										</strong>
+									</p>
+									<p className="text-lg">
+										<strong style={{ cursor: "pointer" }}>Earnings:</strong> {officerData.total_pay}
+									</p>
+									<p className="text-lg">
+										<strong style={{ cursor: "pointer" }}>FIO:</strong> {officerData.fio_record}
+									</p>
+									<p className="text-lg">
+										<strong style={{ cursor: "pointer" }}>Traffic Tickets:</strong> {officerData.traffic_no}
 									</p>
 								</div>
-								<p className={"text-med"}>
-									<strong
-										style={{ cursor: "pointer", textDecoration: "underline" }}
-										onClick={() => {
-											document.getElementById("police-financial").scrollIntoView({ behavior: "smooth" });
-										}}
-									>
-										Police Financial
-									</strong>
-								</p>
-								{/*missing tables}*/}
-								<p className={"text-med"}>
-									<strong style={{ cursor: "pointer" }}>Earnings:</strong> {officerData.total_pay} {/*missing this}*/} {/*missing table}*/}
-								</p>
-								<p className={"text-med"}>
-									<strong style={{ cursor: "pointer" }}>FIO:</strong> {officerData.fio_record} {/*missing this}*/} {/*missing table}*/}
-								</p>
-								<p className={"text-med"}>
-									<strong style={{ cursor: "pointer" }}>Traffic Tickets:</strong> {officerData.traffic_no} {/*missing this}*/} {/*missing table}*/}
-								</p>
 							</div>
 						</div>
 					</section>

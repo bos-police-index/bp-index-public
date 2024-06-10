@@ -24,39 +24,37 @@ export default function SearchBar({ title, officerName }: SearchBarProps) {
 		}
 	};
 	let HeaderText = () => {
-		if (router.pathname === "/search/[keyword]") {
-			return <h4 className={`font-normal text-l`} style={{ color: '#032752'}}>Search results for "{router.query.keyword}"</h4>;
-		}
+		// if (router.pathname === "/search/[keyword]") {
+		// 	return <h4 className={`font-normal text-l`} style={{ color: '#032752'}}>Search results for "{router.query.keyword}"</h4>;
+		// }
 		return (
-			<h4 className={`font-light text-l `}
-			
-			style={{ color: '#032752', maxWidth: '80%'}}>
-				<Link
-					href={{
-						pathname: "/search/[keyword]",
-						query: { keyword: initialKeyword },
-					}}
-					className="link hover:text-gray-300 transition-font-color duration-300"
-				>
-					Search results for "{router.query.keyword}"
-				</Link>{" "}
-				
-			</h4>
+			// <h4 className={`font-light text-l `} style={{ color: "#032752", maxWidth: "80%" }}>
+			// 	<Link
+			// 		href={{
+			// 			pathname: "/search/[keyword]",
+			// 			query: { keyword: initialKeyword },
+			// 		}}
+			// 		className="link hover:text-gray-300 transition-font-color duration-300"
+			// 	>
+			// 		Search results for "{router.query.keyword}"
+			// 	</Link>{" "}
+			// </h4>
+			<></>
 		);
 	};
 	return (
-		<div className="flex justify-between px-12 w-screen items-center shrink mt-10">
-			<span className={"font-urbanist"} style={{ color: '#032752',}}>
-				<h2 className="font-bold text-2xl">{title}</h2>
-				<HeaderText />
+		<div className="flex justify-between px-12 w-screen items-center shrink mt-[3em]">
+			<span className={"font-urbanist"} style={{ color: "#032752" }}>
+				{/* <h2 className="font-bold text-2xl">{title}</h2>
+				<HeaderText /> */}
 			</span>
-			
-			<div className="w-full max-w-sm mt-2 relative ">
+
+			<div className="w-full max-w-sm relative ">
 				<button
 					type="button"
-					style={{marginRight: '-2rem'}}
+					style={{ marginRight: "-2rem" }}
 					className="absolute inset-y-0 grid w-10 place-content-center bg-white
-					rounded-r-3xl text-gray-400 hover:bg-gray-300 transition-background duration-300 z-10 absolute right-0"
+					rounded-r-3xl text-gray-400 hover:bg-gray-300 transition-background duration-300 z-10 right-0"
 					onClick={() => handleSearch()}
 				>
 					<span className="sr-only">Search</span>
@@ -65,18 +63,20 @@ export default function SearchBar({ title, officerName }: SearchBarProps) {
 					</svg>
 				</button>
 				<input
-				type="text"
-				placeholder="Search"
-				style={{boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)"}}
-				className="input h-12 w-[calc(100% - 8rem)] bg-white join-item ml-[8rem] rounded-3xl pl-8 pr-10 placeholder:text-gray text-xl focus:outline-none "					
-				onChange={(e) => setKeyword(e.target.value)}
-				onKeyDown={(e) => {
-					if (e.key === "Enter") {
-						e.preventDefault();
-						handleSearch();
-					}
-				}}
-									/>
+					type="text"
+					value={keyword}
+					placeholder="Search"
+					style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", color: "#000" }}
+					className="input h-12 w-[calc(100% - 8rem)] bg-white join-item ml-[8rem] rounded-3xl pl-8 pr-10 placeholder:text-gray text-xl focus:outline-none "
+					onChange={(e) => setKeyword(e.target.value)}
+					onKeyDown={(e) => {
+						if (e.key === "Enter") {
+							e.preventDefault();
+							handleSearch();
+							setKeyword("");
+						}
+					}}
+				/>
 			</div>
 		</div>
 	);

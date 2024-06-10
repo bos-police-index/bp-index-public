@@ -277,7 +277,6 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 
 	return (
 		<>
-			<SearchBar title="Search" officerName={""} />
 			{/* Table */}
 			<section className="w-full pt-16 pb-16">
 				<DataGrid
