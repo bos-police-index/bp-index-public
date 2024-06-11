@@ -93,8 +93,11 @@ export default function FullWidthTabs({ tables }: FullWidthTabsProps) {
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		setValue(newValue);
 	};
-
-	const lastTable = tables.length - 1;
+    let lastTable = 0;
+	if (tables) {
+		lastTable = tables?.length - 1;
+	}
+	
 	return (
 		<Box sx={{ width: "80vw", margin: "4rem auto" }}>
 			<AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
