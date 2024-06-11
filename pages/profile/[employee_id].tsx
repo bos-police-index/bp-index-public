@@ -82,7 +82,7 @@ export const getData = async (keyword: string, employee_no: string) => {
 			rankAsOf: cleanEmployeeData.rankAsOf || node.rankAsOf,
 			orgId: cleanEmployeeData.orgId || node.orgId,
 			districtWorked: cleanEmployeeData.districtWorked || node.districtWorked,
-			unionCode: cleanEmployeeData.unionCode || node.unionCode,,
+			unionCode: cleanEmployeeData.unionCode || node.unionCode,
 		};;
 	});
 	//NULL FIELDS: policeDeptName, cityDeptName
