@@ -6,6 +6,7 @@ import apolloClient from "@lib/apollo-client";
 import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import { Button } from "antd";
+import FullWidthTabs from "./TabTables";
 interface Table {
 	title: string;
 	tables: DataTables;
@@ -83,7 +84,7 @@ export const getData = async (keyword: string, employee_no: string) => {
 			orgId: cleanEmployeeData.orgId || node.orgId,
 			districtWorked: cleanEmployeeData.districtWorked || node.districtWorked,
 			unionCode: cleanEmployeeData.unionCode || node.unionCode,
-		};;
+		};
 	});
 	//NULL FIELDS: policeDeptName, cityDeptName
 	//BECAUSE deptId is null
@@ -425,121 +426,120 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 	return (
 		officerData && (
 			<>
-				officerData && (
-				<>
-					<section style={{ width: "100vw", backgroundColor: "white", paddingBottom: "2rem", position: "relative", marginTop: "-1.5rem" }}>
-						<div className="contain-content" style={{ width: "80vw", margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-							<div className="title" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#032752" }}>
-								<p className="relative text-4xl font-bold underline" style={{ paddingTop: "2rem", marginLeft: "1rem" }}>
-									{officerData.name}
+				<section style={{ width: "100vw", backgroundColor: "white", paddingBottom: "2rem", position: "relative" }}>
+					<div className="contain-content" style={{ width: "80vw", margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+						<div className="title" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#032752" }}>
+							<p className="relative text-4xl font-bold underline" style={{ paddingTop: "2rem", marginLeft: "1rem" }}>
+								{officerData.name}
+							</p>
+						</div>
+						<div className="sections" style={{ display: "flex", justifyContent: "flex-start", width: "100%", padding: "1rem" }}>
+							<div className="overview" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "calc(50% - 1rem)", marginRight: "2rem", height: "300px" }}>
+								<p style={{ color: sectionHeaderColor }} className="text-3xl">
+									Overview
+								</p>
+								<p className="text-lg mt-3">
+									<strong>Employee ID:</strong> {officerData.employee_no}
+								</p>
+								<p className="text-lg">
+									<strong>Rank:</strong> {officerData.title}
+								</p>
+								<p className="text-lg">
+									<strong>Unit:</strong> {officerData.city_dept_name}
+								</p>
+								<p className="text-lg">
+									<strong>Residence:</strong> {officerData.postal}
+								</p>
+								<p className="text-lg">
+									<strong>Number of IA:</strong> {officerData.ia_num}
+								</p>
+								<p className="text-lg">
+									<strong>Sex:</strong> {officerData.sex}
+								</p>
+								<p className="text-lg">
+									<strong>Race:</strong> {officerData.ethnicity}
 								</p>
 							</div>
-							<div className="sections" style={{ display: "flex", justifyContent: "flex-start", width: "100%", padding: "1rem" }}>
-								<div className="overview" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "calc(50% - 1rem)", marginRight: "2rem", height: "300px" }}>
-									<p style={{ color: sectionHeaderColor }} className="text-3xl">
-										Overview
-									</p>
-									<p className="text-lg mt-3">
-										<strong>Employee ID:</strong> {officerData.employee_no}
-									</p>
-									<p className="text-lg">
-										<strong>Rank:</strong> {officerData.title}
-									</p>
-									<p className="text-lg">
-										<strong>Unit:</strong> {officerData.city_dept_name}
-									</p>
-									<p className="text-lg">
-										<strong>Residence:</strong> {officerData.postal}
-									</p>
-									<p className="text-lg">
-										<strong>Number of IA:</strong> {officerData.ia_num}
-									</p>
-									<p className="text-lg">
-										<strong>Sex:</strong> {officerData.sex}
-									</p>
-									<p className="text-lg">
-										<strong>Race:</strong> {officerData.ethnicity}
+							<div className="table-of-contents" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "35%", height: "300px" }}>
+								<p style={{ color: sectionHeaderColor }} className="text-3xl">
+									Data Summary
+								</p>
+								<div className="text-lg mt-3">
+									<strong>Detail Record:</strong>
+									<p
+										style={{ display: "inline-block", textIndent: "0.2em", textDecoration: "underline", cursor: "pointer" }}
+										// onClick={() => {
+										// 	document.getElementById("detail-record").scrollIntoView({ behavior: "smooth" });
+										// }}
+									>
+										{officerData.detail_num}
 									</p>
 								</div>
-								<div className="table-of-contents" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "35%", height: "300px" }}>
-									<p style={{ color: sectionHeaderColor }} className="text-3xl">
-										Data Summary
-									</p>
-									<div className="text-lg mt-3">
-										<strong>Detail Record:</strong>
-										<p
-											style={{ display: "inline-block", textIndent: "0.2em", textDecoration: "underline", cursor: "pointer" }}
-											onClick={() => {
-												document.getElementById("detail-record").scrollIntoView({ behavior: "smooth" });
-											}}
-										>
-											{officerData.detail_num}
-										</p>
-									</div>
-									<div className="text-lg">
-										<strong style={{ cursor: "pointer" }}>Officer IA:</strong>
-										<p
-											style={{ display: "inline-block", textIndent: "0.2em", textDecoration: "underline", cursor: "pointer" }}
-											onClick={() => {
-												document.getElementById("officer-ia").scrollIntoView({ behavior: "smooth" });
-											}}
-										>
-											{officerData.ia_num}
-										</p>
-									</div>
-									<p className="text-lg">
-										<strong
-											style={{ cursor: "pointer", textDecoration: "underline" }}
-											onClick={() => {
-												document.getElementById("police-financial").scrollIntoView({ behavior: "smooth" });
-											}}
-										>
-											Police Financial
-										</strong>
-									</p>
-									<p className="text-lg">
-										<strong style={{ cursor: "pointer" }}>Earnings:</strong> {officerData.total_pay}
-									</p>
-									<p className="text-lg">
-										<strong style={{ cursor: "pointer" }}>FIO:</strong> {officerData.fio_record}
-									</p>
-									<p className="text-lg">
-										<strong style={{ cursor: "pointer" }}>Traffic Tickets:</strong> {officerData.traffic_no}
+								<div className="text-lg">
+									<strong style={{ cursor: "pointer" }}>Officer IA:</strong>
+									<p
+										style={{ display: "inline-block", textIndent: "0.2em", textDecoration: "underline", cursor: "pointer" }}
+										// onClick={() => {
+										// 	document.getElementById("officer-ia").scrollIntoView({ behavior: "smooth" });
+										// }}
+									>
+										{officerData.ia_num}
 									</p>
 								</div>
+								<p className="text-lg">
+									<strong
+										style={{ cursor: "pointer", textDecoration: "underline" }}
+										// onClick={() => {
+										// 	document.getElementById("police-financial").scrollIntoView({ behavior: "smooth" });
+										// }}
+									>
+										Police Financial
+									</strong>
+								</p>
+								<p className="text-lg">
+									<strong style={{ cursor: "pointer" }}>Earnings:</strong> {officerData.total_pay}
+								</p>
+								<p className="text-lg">
+									<strong style={{ cursor: "pointer" }}>FIO:</strong> {officerData.fio_record}
+								</p>
+								<p className="text-lg">
+									<strong style={{ cursor: "pointer" }}>Traffic Tickets:</strong> {officerData.traffic_no}
+								</p>
 							</div>
 						</div>
-					</section>
-				</>
-				);
-				{tablesArr.map((table) => {
-					return (
-						<section className={"min-w-screen px-52 flex flex-col gap-0 py-8"} key={table.title} id={table.title.replace(/\s+/g, "-").toLowerCase()}>
-							<div className={" rounded-2xl px-10 py-8"}>
-								<div className={"flex justify-between items-center flex-row"}>
-									<h2 className={"text-2xl  text-white"}>{table.title}</h2>
-									<Button
-										type="primary"
-										shape="round"
-										onClick={() => {
-											setCurrentOverlay({ table: table.tables.fullTable, title: table.title });
-											document.getElementById("screen-overlay").classList.add("flex");
-											document.getElementById("screen-overlay").classList.remove("hidden");
-										}}
-										className={"bg-primary text-white font-urbanist p-2 w-32 flex items-center justify-center active:scale-[.95] shadow-xl transition-button duration-300 hover:bg-primary-hover"}
-									>
-										See All
-									</Button>
-								</div>
+					</div>
+				</section>
 
-								<div className={"mt-6"}>{table.tables.filteredTable}</div>
-							</div>
-						</section>
-					);
-				})}
-				<ScreenOverlay title={currentOverlay.title} children={currentOverlay.table} />
+				{tablesArr ? <FullWidthTabs tables={tablesArr} /> : <></>}
+
+				{/* Uncomment and modify if needed
+			{tablesArr.map((table) => {
+			  return (
+				<section className={"min-w-screen px-52 flex flex-col gap-0 py-8"} key={table.title} id={table.title.replace(/\s+/g, "-").toLowerCase()}>
+				  <div className={" rounded-2xl px-10 py-8"}>
+					<div className={"flex justify-between items-center flex-row"}>
+					  <h2 className={"text-2xl  text-white"}>{table.title}</h2>
+					  <Button
+						type="primary"
+						shape="round"
+						onClick={() => {
+						  setCurrentOverlay({ table: table.tables.fullTable, title: table.title });
+						  document.getElementById("screen-overlay").classList.add("flex");
+						  document.getElementById("screen-overlay").classList.remove("hidden");
+						}}
+						className={"bg-primary text-white font-urbanist p-2 w-32 flex items-center justify-center active:scale-[.95] shadow-xl transition-button duration-300 hover:bg-primary-hover"}
+					  >
+						See All
+					  </Button>
+					</div>
+					<div className={"mt-6"}>{table.tables.filteredTable}</div>
+				  </div>
+				</section>
+			  );
+			})}
+			<ScreenOverlay title={currentOverlay.title} children={currentOverlay.table} />
+			*/}
 			</>
 		)
 	);
-	return <></>;
-}
+}	  
