@@ -98,7 +98,7 @@ export default function FullWidthTabs({ tables }: FullWidthTabsProps) {
 		lastTable = tables?.length - 1;
 	}
 	
-	return (
+	return tables ? (
 		<Box sx={{ width: "80vw", margin: "4rem auto" }}>
 			<AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
 				<StyledTabs value={value} onChange={handleChange} aria-label="full width tabs example">
@@ -119,5 +119,7 @@ export default function FullWidthTabs({ tables }: FullWidthTabsProps) {
 				</TabPanel>
 			))}
 		</Box>
+	) : (
+		<></>
 	);
 }
