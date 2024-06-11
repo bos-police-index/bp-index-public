@@ -7,7 +7,6 @@ import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import { Button } from "antd";
 import FullWidthTabs from "./TabTables";
-import FullWidthTabs from "./TabTables";
 interface Table {
 	title: string;
 	tables: DataTables;
