@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import { Button } from "antd";
+import ScreenOverlay from "@components/ScreenOverlay";
 
 interface Table {
 	title: string;
@@ -46,10 +48,10 @@ const StyledTab = styled(Tab)(({ theme }) => ({
 	},
 	fontWeight: theme.typography.fontWeightRegular,
 	marginRight: theme.spacing(0.5),
-	color: "rgba(0, 0, 0, 0.85)",
+	color: "white",
 	fontFamily: ["-apple-system", "BlinkMacSystemFont", '"Segoe UI"', "Roboto", '"Helvetica Neue"', "Arial", "sans-serif", '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"'].join(","),
-	backgroundColor: "#3874CB",
-	opacity: "40%",
+	backgroundColor: sectionHeaderColor,
+	opacity: "50%",
 	"&:hover": {
 		color: "#40a9ff",
 		opacity: 1,
@@ -59,9 +61,6 @@ const StyledTab = styled(Tab)(({ theme }) => ({
 		color: "white",
 		fontWeight: theme.typography.fontWeightMedium,
 		opacity: "100%",
-	},
-	"&.Mui-focusVisible": {
-		backgroundColor: "green",
 	},
 }));
 
@@ -89,35 +88,52 @@ function a11yProps(index: number) {
 export default function FullWidthTabs({ tables }: FullWidthTabsProps) {
 	const theme = useTheme();
 	const [value, setValue] = React.useState(0);
+	const [currentOverlay, setCurrentOverlay] = useState({ table: null, title: null });
 
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		setValue(newValue);
 	};
-    let lastTable = 0;
+
+	const handleSeeAllClick = () => {
+		const selectedTable = tables[value];
+		setCurrentOverlay({ table: selectedTable.tables.fullTable, title: selectedTable.title });
+		document.getElementById("screen-overlay").classList.add("flex");
+		document.getElementById("screen-overlay").classList.remove("hidden");
+	};
+
+	let lastTable = 0;
 	if (tables) {
 		lastTable = tables?.length - 1;
 	}
-	
+
 	return tables ? (
-		<Box sx={{ width: "80vw", margin: "4rem auto" }}>
-			<AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
-				<StyledTabs value={value} onChange={handleChange} aria-label="full width tabs example">
-					{tables.map((table, index) =>
-						index === 0 ? (
-							<StyledTab style={{ borderTopLeftRadius: "1rem" }} label={table.title} key={index} {...a11yProps(index)} />
-						) : index === lastTable ? (
-							<StyledTab style={{ borderTopRightRadius: "1rem" }} label={table.title} key={index} {...a11yProps(index)} />
-						) : (
-							<StyledTab label={table.title} key={index} {...a11yProps(index)} />
-						),
-					)}
-				</StyledTabs>
-			</AppBar>
+		<Box sx={{ width: "80vw", margin: "4rem auto", marginBottom: "10rem" }}>
+			<div style={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
+				<AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
+					<StyledTabs value={value} onChange={handleChange} aria-label="full width tabs example">
+						{tables.map((table, index) =>
+							index === 0 ? (
+								<StyledTab style={{ borderTopLeftRadius: "1rem" }} label={table.title} key={index} {...a11yProps(index)} />
+							) : index === lastTable ? (
+								<StyledTab style={{ borderTopRightRadius: "1rem" }} label={table.title} key={index} {...a11yProps(index)} />
+							) : (
+								<StyledTab label={table.title} key={index} {...a11yProps(index)} />
+							),
+						)}
+					</StyledTabs>
+				</AppBar>
+
+				<Button type="primary" shape="round" onClick={handleSeeAllClick} className={"bg-[sectionHeaderColor] text-white font-urbanist active:scale-[.95] p-2 w-32 shadow-xl transition-button duration-300 hover:bg-primary-hover"} style={{ marginLeft: "-5rem" }}>
+					See All
+				</Button>
+			</div>
 			{tables.map((table, index) => (
 				<TabPanel value={value} index={index} dir={theme.direction} key={index}>
 					{table.tables.filteredTable || table.tables.fullTable}
 				</TabPanel>
 			))}
+
+			<ScreenOverlay title={currentOverlay.title} children={currentOverlay.table} />
 		</Box>
 	) : (
 		<></>
