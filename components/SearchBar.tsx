@@ -7,10 +7,12 @@ interface SearchBarProps {
 	title: string;
 	officerName: string;
 }
+
 export default function SearchBar({ title, officerName }: SearchBarProps) {
 	const router = useRouter();
 	const [keyword, setKeyword] = useState<string>("");
 	const initialKeyword = (router.query.keyword as string) || "";
+
 	const handleSearch = () => {
 		if (keyword.length > 0) {
 			router
@@ -23,38 +25,20 @@ export default function SearchBar({ title, officerName }: SearchBarProps) {
 			toast.error("Please enter a valid keyword");
 		}
 	};
-	let HeaderText = () => {
-		// if (router.pathname === "/search/[keyword]") {
-		// 	return <h4 className={`font-normal text-l`} style={{ color: '#032752'}}>Search results for "{router.query.keyword}"</h4>;
-		// }
-		return (
-			// <h4 className={`font-light text-l `} style={{ color: "#032752", maxWidth: "80%" }}>
-			// 	<Link
-			// 		href={{
-			// 			pathname: "/search/[keyword]",
-			// 			query: { keyword: initialKeyword },
-			// 		}}
-			// 		className="link hover:text-gray-300 transition-font-color duration-300"
-			// 	>
-			// 		Search results for "{router.query.keyword}"
-			// 	</Link>{" "}
-			// </h4>
-			<></>
-		);
-	};
+
 	return (
 		<div className="flex justify-between px-12 w-screen items-center shrink mt-[3em]">
-			<span className={"font-urbanist"} style={{ color: "#032752" }}>
+			<span className="font-urbanist" style={{ color: "#032752" }}>
 				{/* <h2 className="font-bold text-2xl">{title}</h2>
-				<HeaderText /> */}
+        <HeaderText /> */}
 			</span>
 
-			<div className="w-full max-w-sm relative ">
+			<div className="w-full max-w-sm relative">
 				<button
 					type="button"
 					style={{ marginRight: "-2rem" }}
 					className="absolute inset-y-0 grid w-10 place-content-center bg-white
-					rounded-r-3xl text-gray-400 hover:bg-gray-300 transition-background duration-300 z-10 right-0"
+          rounded-r-3xl text-gray-400 hover:bg-gray-300 transition-background duration-300 z-10 right-0"
 					onClick={() => handleSearch()}
 				>
 					<span className="sr-only">Search</span>
@@ -65,9 +49,13 @@ export default function SearchBar({ title, officerName }: SearchBarProps) {
 				<input
 					type="text"
 					value={keyword}
-					placeholder="Search"
-					style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", color: "#000" }}
-					className="input h-12 w-[calc(100% - 8rem)] bg-white join-item ml-[8rem] rounded-3xl pl-8 pr-10 placeholder:text-gray text-xl focus:outline-none "
+					placeholder="Search Officers"
+					style={{
+						boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)",
+						color: "#000",
+						boxSizing: "border-box",
+					}}
+					className="input h-12 w-[18rem] bg-white join-item ml-[8rem] rounded-3xl pl-8 pr-10 placeholder:text-gray text-xl focus:outline-none"
 					onChange={(e) => setKeyword(e.target.value)}
 					onKeyDown={(e) => {
 						if (e.key === "Enter") {
