@@ -81,7 +81,7 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 			renderCell: (params) => {
 				const { row } = params;
 				const badgeText = row.badge_no === "Unknown Badge" ? (row.rank === "Civilian" ? "Not Applicable" : "Unknown") : row.badge_no;
-				return <span style={badgeText === "Not Applicable" || badgeText === "Unknown" ? { fontSize: "0.75em" } : {}}>{badgeText}</span>;
+				return <span style={badgeText === "Not Applicable" || badgeText === "Unknown" ? { color: "grey" } : {}}>{badgeText}</span>;
 			},
 			renderHeader: (params) => (
 				<Tooltip title="The badge number assigned to the police officer; used for identification">
