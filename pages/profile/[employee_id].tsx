@@ -450,9 +450,10 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 								<p className="text-lg">
 									<strong>Residence:</strong> {officerData.postal}
 								</p>
-								<p className="text-lg">
+								{/* Redundant */}
+								{/* <p className="text-lg">
 									<strong>Number of IA:</strong> {officerData.ia_num}
-								</p>
+								</p> */}
 								<p className="text-lg">
 									<strong>Sex:</strong> {officerData.sex}
 								</p>
@@ -465,9 +466,9 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 									Data Summary
 								</p>
 								<div className="text-lg mt-3">
-									<strong>Detail Record:</strong>
+									<strong>Detail Records:</strong>
 									<p
-										style={{ display: "inline-block", textIndent: "0.2em", textDecoration: "underline", cursor: "pointer" }}
+										style={{ display: "inline-block", textIndent: "0.2em" }}
 										// onClick={() => {
 										// 	document.getElementById("detail-record").scrollIntoView({ behavior: "smooth" });
 										// }}
@@ -476,9 +477,9 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 									</p>
 								</div>
 								<div className="text-lg">
-									<strong style={{ cursor: "pointer" }}>Officer IA:</strong>
+									<strong>Officer IA:</strong>
 									<p
-										style={{ display: "inline-block", textIndent: "0.2em", textDecoration: "underline", cursor: "pointer" }}
+										style={{ display: "inline-block", textIndent: "0.2em" }}
 										// onClick={() => {
 										// 	document.getElementById("officer-ia").scrollIntoView({ behavior: "smooth" });
 										// }}
@@ -486,16 +487,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 										{officerData.ia_num}
 									</p>
 								</div>
-								<p className="text-lg">
-									<strong
-										style={{ cursor: "pointer", textDecoration: "underline" }}
-										// onClick={() => {
-										// 	document.getElementById("police-financial").scrollIntoView({ behavior: "smooth" });
-										// }}
-									>
-										Police Financial
-									</strong>
-								</p>
+
 								<p className="text-lg">
 									<strong style={{ cursor: "pointer" }}>Earnings:</strong> {officerData.total_pay}
 								</p>

@@ -1,5 +1,5 @@
 import Button, { ButtonProps } from "@mui/material/Button";
-import { createSvgIcon } from "@mui/material";
+import { Stack, createSvgIcon } from "@mui/material";
 import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFilterButton, GridToolbarDensitySelector, GridCsvExportOptions, useGridApiContext, GridColDef } from "@mui/x-data-grid";
 
 export default function DataTable({ cols, table, table_name, height, pageSize, pageSizeOptions }: { cols: GridColDef[]; table: any[]; table_name: string; height: string; pageSize: number; pageSizeOptions: number[] }) {
@@ -51,7 +51,21 @@ export default function DataTable({ cols, table, table_name, height, pageSize, p
 			columns={cols}
 			rows={table}
 			density={"compact"}
-			slots={{ toolbar: CustomToolbar }}
+			slots={{
+				toolbar: CustomToolbar,
+				noRowsOverlay: () => {
+					return (
+						<Stack height="100%" alignItems="center" justifyContent="center">
+							According to available data, this individual has no <b>{table_name.substring(table_name.lastIndexOf("-") + 1)}</b>
+						</Stack>
+					);
+				},
+				noResultsOverlay: () => (
+					<Stack height="100%" alignItems="center" justifyContent="center">
+						Local filter returns no result
+					</Stack>
+				),
+			}}
 			pageSizeOptions={pageSizeOptions}
 			autoHeight={height === "auto"}
 			initialState={{
@@ -61,6 +75,7 @@ export default function DataTable({ cols, table, table_name, height, pageSize, p
 					},
 				},
 			}}
+			// localeText={{ noRowsLabel: "This is a custom message :)", noResultsOverlayLabel: 'With available data, no rows fit this filter' }}
 		/>
 	);
 }
