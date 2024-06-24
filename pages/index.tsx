@@ -8,6 +8,7 @@ import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { fetchData } from "@utility/dataUtils";
 import backgroundImage from '../public/fist-in-air.jpeg'
 import properCaseName from "@utility/properNameCasing";
+import { StyledGridOverlay } from "@styles/reusedStyledComponents";
 
 export default function Home() {
 	const [keyword, setKeyword] = useState<string>("");
@@ -239,33 +240,9 @@ export default function Home() {
 		// BLOCKER: data doesn't exist
 	];
 
-	const StyledGridOverlay = styled("div")(() => ({
-		display: "flex",
-		flexDirection: "column",
-		alignItems: "center",
-		justifyContent: "center",
-		height: "100%",
-		"& .ant-empty-img-1": {
-			fill: "#aeb8c2",
-		},
-		"& .ant-empty-img-2": {
-			fill: "#f5f5f7",
-		},
-		"& .ant-empty-img-3": {
-			fill: "#dce0e6",
-		},
-		"& .ant-empty-img-4": {
-			fill: "#fff",
-		},
-		"& .ant-empty-img-5": {
-			fillOpacity: "0.8",
-			fill: "#f5f5f5",
-		},
-	}));
-
 	function noRowsOverlay(keyword: string) {
 		return (
-			<StyledGridOverlay>
+			<StyledGridOverlay style={{ marginTop: "2.5rem" }}>
 				<svg width="120" height="100" viewBox="0 0 184 152" aria-hidden focusable="false">
 					<g fill="none" fillRule="evenodd">
 						<g transform="translate(24 31.67)">
@@ -291,7 +268,7 @@ export default function Home() {
 
 	function noResultsOverlay() {
 		return (
-			<StyledGridOverlay>
+			<StyledGridOverlay style={{ marginTop: "2.5rem" }}>
 				<svg width="120" height="100" viewBox="0 0 184 152" aria-hidden focusable="false">
 					<g fill="none" fillRule="evenodd">
 						<g transform="translate(24 31.67)">
