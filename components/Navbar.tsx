@@ -65,8 +65,8 @@ export default function Navbar() {
 	};
 
 	return (
-		<header className="flex justify-between items-center h-[7rem] w-screen px-16 text-white pb-[1rem] ">
-			<div style={{ width: "86%", marginLeft: "3rem" }} className="flex justify-between items-center">
+		<header className="flex justify-between items-center h-[7rem] w-screen px-0 text-white pb-[0rem] max-w-1128">
+			<div style={{ width: "86%", marginLeft: "0rem" }} className="flex justify-between items-center">
 				<div className="flex justify-center items-end font-roboto mt-[1rem]">
 					<Link href="/">
 						<p className="font-bold text-3xl font-righteous">BPI</p>

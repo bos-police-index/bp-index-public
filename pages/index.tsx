@@ -294,50 +294,63 @@ export default function Home() {
 
 	return (
 		<div>
-			<div
-				className="bg-cover bg-center"
-				style={{
-					backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${backgroundImage.src})`,
-					width: "100%",
-					paddingBottom: "0rem",
-					marginBottom: "1rem",
-				}}
-			>
-				<section className="hero py-0">
-					<div className="hero-content text-center px-0 min-w-full">
-						<div className="flex flex-col items-start gap-8 w-full pt-2 max-w-5xl mx-auto relative">
-							<h1 className="text-8xl font-bold text-white text-left ml-[-0.25em] break-words">
-								Boston <br />
-								Police Index
-							</h1>
-							<p style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)", width: "70%", display: "flex", alignItems: "center", justifyContent: "start", marginLeft: "-1.5rem" }} className="text-l text-white text-left mx-auto">
-								The Boston Police Index is a resource to bring transparency to the activities of law enforcers in our communities. We wish to be a resource for journalists, policy makers, residents, workers, and students of the City of Boston. All information here is data from public
-								sources and public records requests.
-							</p>
-							<div className=" relative w-full">
-								<div className="flex items-center w-full bg-white join-item rounded-3xl">
-									{/* <div className="pl-8">
-										<svg fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="transform scale-x-[-1] h-6 w-6">
-											<path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-										</svg>
-									</div> */}
-									{/* <input
-										type="text"
-										placeholder="Search by Employee ID, Name, Department, Title, Postal Code"
-										className="input w-full h-12 bg-white join-item rounded-3xl pl-8 pe-20 placeholder:text-gray text-2xl focus:outline-none"
-										onChange={(e) => setKeyword(e.target.value)}
-										onKeyDown={(e) => {
-											if (e.key === "Enter") {
-												e.preventDefault();
-												handleSearch();
-											}
-										}}
-									/> */}
+			<div className="w-full overflow-visible">
+				<div
+					className="bg-cover bg-center"
+					style={{
+						backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${backgroundImage.src})`,
+						width: "110vw",
+						paddingBottom: "0rem",
+						marginBottom: "1rem",
+						marginLeft: "-11vw",
+					}}
+				>
+					<section className="hero py-0">
+						<div className="hero-content text-center px-0">
+							<div className="flex flex-col items-start gap-8 w-full pt-2 max-w-5xl mx-auto relative">
+								<h1 className="text-8xl font-bold text-white text-left ml-[-0.25em] break-words">
+									Boston <br />
+									Police Index
+								</h1>
+								<p
+									style={{
+										textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
+										width: "70%",
+										display: "flex",
+										alignItems: "center",
+										justifyContent: "start",
+										marginLeft: "-1.5rem",
+									}}
+									className="text-l text-white text-left mx-auto"
+								>
+									The Boston Police Index is a resource to bring transparency to the activities of law enforcers in our communities. We wish to be a resource for journalists, policy makers, residents, workers, and students of the City of Boston. All information here is data from
+									public sources and public records requests.
+								</p>
+								<div className="relative w-full">
+									<div className="flex items-center w-full bg-white join-item rounded-3xl">
+										{/* <div className="pl-8">
+                  <svg fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="transform scale-x-[-1] h-6 w-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                  </svg>
+                </div> */}
+										{/* <input
+                  type="text"
+                  placeholder="Search by Employee ID, Name, Department, Title, Postal Code"
+                  className="input w-full h-12 bg-white join-item rounded-3xl pl-8 pe-20 placeholder:text-gray text-2xl focus:outline-none"
+                  onChange={(e) => setKeyword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleSearch();
+                    }
+                  }}
+                /> */}
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-				</section>
+					</section>
+				</div>
 			</div>
 			<FadeIn>
 				<section className="w-full pb-16">

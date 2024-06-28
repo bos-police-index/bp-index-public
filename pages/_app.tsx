@@ -77,11 +77,13 @@ const Application: FunctionComponent<ApplicationAppProps> = (props) => {
 								<title>Boston Police Index</title>
 								<link rel="icon" href="/favicon.ico" />
 							</Head>
-							<Navbar />
-							<main className="flex-1 bg-transparent">
-								<Component {...pageProps} />
-								<Toaster richColors closeButton />
-							</main>
+							<div id="prevent-screen-stretch" style={{ maxWidth: "1128px", height: "100vh", margin: "0 auto" }}>
+								<Navbar />
+								<main className="flex-1 bg-transparent">
+									<Component {...pageProps} />
+									<Toaster richColors closeButton />
+								</main>
+							</div>
 						</div>
 					</div>
 				</QueryClientProvider>
