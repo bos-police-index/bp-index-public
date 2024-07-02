@@ -5,8 +5,8 @@ import { toast } from "sonner";
 import { useRouter } from "next/router";
 import { styled, Tooltip } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { fetchData } from "@utility/dataUtils";
-import backgroundImage from '../public/fist-in-air.jpeg'
+import { fetchHompage } from "@utility/dataUtils";
+import backgroundImage from "../public/fist-in-air.jpeg";
 import properCaseName from "@utility/properNameCasing";
 import { StyledGridOverlay } from "@styles/reusedStyledComponents";
 
@@ -19,9 +19,13 @@ export default function Home() {
 	// fetchData returns a promise that resolves to an array of objects representing rows in the table
 	useEffect(() => {
 		setLoading(true);
-		fetchData({ keyword: null })
+		fetchHompage({ keyword: keyword as string | string[] })
 			.then((data) => {
-				setSearchResData(data);
+				const formattedData = data.map((row, index) => ({
+					...row,
+					id: row.bpiId, // Assuming employee_no is unique
+				}));
+				setSearchResData(formattedData);
 			})
 			.catch((error) => {
 				console.error("Failed to fetch data", error);
@@ -47,33 +51,19 @@ export default function Home() {
 	};
 
 	const cols: GridColDef[] = [
-		//Deemed not important (so hidden by default)
 		{
-			field: "employee_no",
-			headerName: "Employee No.",
-			width: 100,
-			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			renderHeader: (params) => (
-				<Tooltip title="A unique identifier assigned to each police officer">
-					<span className="font-semibold">{params.colDef.headerName}</span>
-				</Tooltip>
-			),
-		},
-		{
-			field: "name",
+			field: "fullName",
 			headerName: "Full Name",
 			width: 200,
 			type: "string",
 			renderCell: (params) => {
-				const properCasedName = properCaseName(params.row.name);
+				// const properCasedName = properCaseName(params.row.name);
+				const properCasedName = params.row.fullName;
 				return (
 					<Link
 						href={{
-							pathname: "/profile/[employee_id]",
-							query: { employee_id: params.row.employee_no, keyword: params.row.name },
+							pathname: `/profile/[bpiId]`,
+							query: { bpiId: params.row.bpiId, keyword: params.row.fullName },
 						}}
 						className="link hover:text-blue-500"
 					>
@@ -89,13 +79,13 @@ export default function Home() {
 		},
 
 		{
-			field: "badge_no",
+			field: "badgeNo",
 			headerName: "Badge No.*",
 			width: 200,
 			type: "string",
 			renderCell: (params) => {
 				const { row } = params;
-				const badgeText = row.badge_no === "Unknown Badge" ? (row.rank === "Civilian" ? "Not Applicable" : "Unknown") : row.badge_no;
+				const badgeText = row.badgeNo === "Unknown Badge" ? (row.rank === "Civilian" ? "Not Applicable" : "Unknown") : row.badgeNo;
 				return <span style={badgeText === "Not Applicable" || badgeText === "Unknown" ? { color: "#B3B3B3" } : {}}>{badgeText}</span>;
 			},
 			renderHeader: (params) => (
@@ -133,13 +123,13 @@ export default function Home() {
 		//TO DO: Add Gender
 		//BLOCKER: data in raw form
 		{
-			field: "ia_no",
+			field: "numOfIa",
 			headerName: "No. of IA",
 			width: 100,
 			type: "string",
 			renderCell: (params) => {
 				const { row } = params;
-				return `${row.ia_no.toLocaleString()}`;
+				return `${row.numOfIa.toLocaleString()}`;
 			},
 			renderHeader: (params) => (
 				<Tooltip title="The cumulative number of Internal Affairs complaints linked to the officer">
@@ -177,14 +167,14 @@ export default function Home() {
 		// BLOCKER: data hasn't been found
 
 		{
-			field: "otPay",
+			field: "overtimePay",
 			headerName: "Overtime Pay",
 			width: 150,
 			type: "string",
 			renderCell: (params) => {
 				const { row } = params;
-				if (row.otPay != null || undefined) {
-					return `$${row.otPay.toLocaleString()}`;
+				if (row.overtimePay != null || undefined) {
+					return `$${row.overtimePay.toLocaleString()}`;
 				}
 				return ``;
 			},

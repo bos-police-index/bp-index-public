@@ -41,6 +41,17 @@ function formatDate(params: GridValueFormatterParams) {
 	}
 	return formatted;
 }
+
+function formatMoney(number: number): string {
+	if (number < 0.01) {
+		return "0";
+	}
+	return new Intl.NumberFormat("en-US", {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	}).format(number);
+}
+
 export const getMUIGrid = (table: string, rows: any[], officerName: string, includesOnly = [], excludes = []) => {
 	const cols: GridColDef[] = functionMapping[table];
 	if (!rows) {
@@ -535,65 +546,6 @@ const detail_record_columns = () => {
 	];
 	return cols;
 };
-const officer_misconduct_columns = () => {
-	const cols: GridColDef[] = [
-		{
-			field: "id",
-			hideable: false,
-			headerName: "ID",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 100,
-		},
-		{
-			field: "ia_no",
-			headerName: "IA #",
-			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 200,
-		},
-		{
-			field: "incident_type",
-			headerName: "Incident Type",
-			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 250,
-		},
-		{
-			field: "received_date",
-			headerName: "Received Date",
-			type: "date",
-			valueFormatter: formatDateShort,
-			width: 200,
-		},
-		{
-			field: "allegation",
-			headerName: "Allegation",
-			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			flex: 1,
-		},
-		{
-			field: "disposition",
-			headerName: "Disposition",
-			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 150,
-		},
-	];
-
-	return cols;
-};
 //new for ia
 const officer_ia_columns = () => {
 	const cols: GridColDef[] = [
@@ -608,7 +560,7 @@ const officer_ia_columns = () => {
 			width: 100,
 		},
 		{
-			field: "bpdIaNo",
+			field: "iaNo",
 			headerName: "IA Number",
 			type: "string",
 			valueFormatter: (params) => {
@@ -617,10 +569,64 @@ const officer_ia_columns = () => {
 			width: 250,
 		},
 		{
-			field: "receivedDate",
-			headerName: "Received Date",
+			field: "dateReceived",
+			headerName: "Date Received",
 			type: "date",
 			valueFormatter: formatDateShort,
+			width: 200,
+		},
+		{
+			field: "incidentType",
+			headerName: "Incident Type",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "allegation",
+			headerName: "Allegation",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "finding",
+			headerName: "Finding",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "actionTaken",
+			headerName: "Action Taken",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "adminLeave",
+			headerName: "Administrative Leave",
+			type: "boolean",
+			valueFormatter: (params) => {
+				return params.value == "Y";
+			},
+			width: 200,
+		},
+		{
+			field: "daysOrHoursSuspended",
+			headerName: "Days/Hours Suspended",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
 			width: 200,
 		},
 	];
@@ -977,97 +983,79 @@ const police_financial_columns = () => {
 			valueFormatter: (params) => {
 				return params.value;
 			},
-			width: 100,
-		},
-		{
-			field: "title",
-			headerName: "Title",
-			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			flex: 1,
-		},
-		{
-			field: "regular_pay",
-			headerName: "Regular Pay",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 150,
-		},
-		{
-			field: "retro_pay",
-			headerName: "Retro Pay",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 140,
-		},
-		{
-			field: "other_pay",
-			headerName: "Other Pay",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 140,
-		},
-		{
-			field: "ot_pay",
-			headerName: "OT Pay",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 140,
-		},
-		{
-			field: "injured_pay",
-			headerName: "Injured Pay",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 140,
-		},
-		{
-			field: "detail_pay",
-			headerName: "Detail Pay",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 140,
-		},
-		{
-			field: "quinn_pay",
-			headerName: "Quinn Pay",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 140,
-		},
-		{
-			field: "total_pay",
-			headerName: "Total Pay",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 140,
+			width: 50,
 		},
 		{
 			field: "year",
 			headerName: "Year",
-			type: "number",
+			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
 			},
-			width: 150,
+			width: 100,
+		},
+		{
+			field: "regularPay",
+			headerName: "Regular Pay",
+			type: "number",
+			valueFormatter: (params) => {
+				return formatMoney(params.value);
+			},
+			width: 100,
+		},
+		{
+			field: "detailPay",
+			headerName: "Detail Pay",
+			type: "number",
+			valueFormatter: (params) => {
+				return formatMoney(params.value);
+			},
+			width: 100,
+		},
+		{
+			field: "otPay",
+			headerName: "Overtime Pay",
+			type: "number",
+			valueFormatter: (params) => {
+				return formatMoney(params.value);
+			},
+			width: 100,
+		},
+		{
+			field: "retroPay",
+			headerName: "Retroactive Pay",
+			type: "number",
+			valueFormatter: (params) => {
+				return formatMoney(params.value);
+			},
+			width: 100,
+		},
+		{
+			field: "quinnPay",
+			headerName: "Quinn Pay",
+			type: "number",
+			valueFormatter: (params) => {
+				return formatMoney(params.value);
+			},
+			width: 100,
+		},
+		{
+			field: "injuredPay",
+			headerName: "Injured Pay",
+			type: "number",
+			valueFormatter: (params) => {
+				return formatMoney(params.value);
+			},
+			width: 100,
+		},
+		{
+			field: "otherPay",
+			headerName: "Other Pay",
+			type: "number",
+			valueFormatter: (params) => {
+				return formatMoney(params.value);
+			},
+			width: 100,
 		},
 	];
 

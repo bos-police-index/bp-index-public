@@ -115,6 +115,9 @@ export default function DataTable({ cols, table, table_name, height, pageSize, p
 			autoHeight={true}
 			style={{ minHeight: "20rem" }}
 			initialState={{
+				sorting: {
+					sortModel: [{ field: "year", sort: "desc" }],
+				},
 				pagination: {
 					paginationModel: {
 						pageSize: pageSize,

@@ -71,7 +71,9 @@ function TabPanel(props: TabPanelProps) {
 		<div role="tabpanel" hidden={value !== index} id={`full-width-tabpanel-${index}`} aria-labelledby={`full-width-tab-${index}`} {...other}>
 			{value === index && (
 				<Box sx={{ p: 0, maxHeight: "30rem" }}>
-					<Typography>{children}</Typography>
+					<Typography component={"span"} variant={"body2"}>
+						{children}
+					</Typography>
 				</Box>
 			)}
 		</div>

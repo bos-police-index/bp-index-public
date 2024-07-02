@@ -22,6 +22,29 @@ export const GET_EMPLOYEE_DATA = gql`
 	}
 `;
 
+export const GET_HOMEPAGE_DATA = gql`
+	query MyQuery {
+		allSu24Homepages {
+			edges {
+				node {
+					employeeId
+					fullName
+					org
+					badgeNo
+					totalPay
+					overtimePay
+					detailPay
+					otherPay
+					year
+					numOfIa
+					bpiId
+					rank
+				}
+			}
+		}
+	}
+`;
+
 export const GET_ORG_DATA = gql`
 	query MyQuery {
 		allOrganizationFromFa23Data {

@@ -10,13 +10,7 @@ declare module "nextjs-routes" {
     GetServerSidePropsResult as NextGetServerSidePropsResult
   } from "nextjs";
 
-  export type Route =
-    | StaticRoute<"/about">
-    | StaticRoute<"/data">
-    | DynamicRoute<"/data/tables/[table_name]", { "table_name": string }>
-    | StaticRoute<"/">
-    | DynamicRoute<"/profile/[employee_id]", { "employee_id": string }>
-    | DynamicRoute<"/search/[keyword]", { "keyword": string }>;
+  export type Route = StaticRoute<"/about"> | StaticRoute<"/data"> | DynamicRoute<"/data/tables/[table_name]", { table_name: string }> | StaticRoute<"/"> | DynamicRoute<"/profile/[bpiId]", { bpiId: string }> | DynamicRoute<"/search/[keyword]", { keyword: string }>;
 
   interface StaticRoute<Pathname> {
     pathname: Pathname;
