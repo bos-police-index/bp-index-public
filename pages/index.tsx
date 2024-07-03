@@ -81,7 +81,7 @@ export default function Home() {
 		{
 			field: "badgeNo",
 			headerName: "Badge No.*",
-			width: 200,
+			width: 100,
 			type: "string",
 			renderCell: (params) => {
 				const { row } = params;

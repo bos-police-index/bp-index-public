@@ -1,6 +1,7 @@
 import { GridColDef, GridValueFormatterParams } from "@mui/x-data-grid";
 import React from "react";
 import DataTable from "@components/DataTable";
+import { Tooltip } from "@mui/material";
 
 function formatDateShort(params: GridValueFormatterParams) {
 	const date = new Date(params.value as string);
@@ -46,10 +47,11 @@ function formatMoney(number: number): string {
 	if (number < 0.01) {
 		return "0";
 	}
-	return new Intl.NumberFormat("en-US", {
+	const formatted = new Intl.NumberFormat("en-US", {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
 	}).format(number);
+	return `$${formatted}`;
 }
 
 export const getMUIGrid = (table: string, rows: any[], officerName: string, includesOnly = [], excludes = []) => {
@@ -992,7 +994,20 @@ const police_financial_columns = () => {
 			valueFormatter: (params) => {
 				return params.value;
 			},
-			width: 100,
+			width: 70,
+		},
+		{
+			field: "totalPay",
+			headerName: "Total Pay",
+			type: "number",
+			valueGetter: (params) => {
+				const { regularPay, detailPay, otPay, retroPay, quinnPay, injuredPay, otherPay } = params.row;
+				return regularPay + detailPay + otPay + retroPay + quinnPay + injuredPay + otherPay;
+			},
+			valueFormatter: (params) => {
+				return formatMoney(params.value);
+			},
+			width: 120,
 		},
 		{
 			field: "regularPay",
@@ -1001,7 +1016,7 @@ const police_financial_columns = () => {
 			valueFormatter: (params) => {
 				return formatMoney(params.value);
 			},
-			width: 100,
+			width: 110,
 		},
 		{
 			field: "detailPay",
@@ -1010,7 +1025,7 @@ const police_financial_columns = () => {
 			valueFormatter: (params) => {
 				return formatMoney(params.value);
 			},
-			width: 100,
+			width: 110,
 		},
 		{
 			field: "otPay",
@@ -1019,7 +1034,7 @@ const police_financial_columns = () => {
 			valueFormatter: (params) => {
 				return formatMoney(params.value);
 			},
-			width: 100,
+			width: 110,
 		},
 		{
 			field: "retroPay",
@@ -1028,7 +1043,7 @@ const police_financial_columns = () => {
 			valueFormatter: (params) => {
 				return formatMoney(params.value);
 			},
-			width: 100,
+			width: 125,
 		},
 		{
 			field: "quinnPay",
@@ -1037,7 +1052,12 @@ const police_financial_columns = () => {
 			valueFormatter: (params) => {
 				return formatMoney(params.value);
 			},
-			width: 100,
+			renderHeader: (params) => (
+				<Tooltip title="Earnings from the Quinn Bill educational incentive program">
+					<span className="font-semibold">Quinn Pay</span>
+				</Tooltip>
+			),
+			width: 110,
 		},
 		{
 			field: "injuredPay",
@@ -1046,7 +1066,7 @@ const police_financial_columns = () => {
 			valueFormatter: (params) => {
 				return formatMoney(params.value);
 			},
-			width: 100,
+			width: 110,
 		},
 		{
 			field: "otherPay",
@@ -1055,7 +1075,7 @@ const police_financial_columns = () => {
 			valueFormatter: (params) => {
 				return formatMoney(params.value);
 			},
-			width: 100,
+			width: 110,
 		},
 	];
 

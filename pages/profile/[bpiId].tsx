@@ -158,9 +158,21 @@ export const getData = async (keyword: string, bpiId: string) => {
 		}
 	});
 
+	// Filter the data to remove duplicates based on bpdIaNo
+	const uniqueFinancialYears = new Set();
+	const filteredFinanceEmployeeData = financeEmployeeData.filter((node: FinancialEmployeeData) => {
+		const { year } = node;
+
+		if (!uniqueFinancialYears.has(`${year}`)) {
+			uniqueFinancialYears.add(`${year}`);
+			return true;
+		}
+		return false;
+	});
+
 	//add artificial id for MUI purposes
 	let financialRowId = 1;
-	const newFinancialRows = police_financial_rows.map((node) => {
+	const newFinancialRows = filteredFinanceEmployeeData.map((node) => {
 		return { id: financialRowId++, ...node };
 	});
 

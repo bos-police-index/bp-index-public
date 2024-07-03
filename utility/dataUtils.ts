@@ -1,6 +1,6 @@
 import Fuse from "fuse.js";
 import apolloClient from "@lib/apollo-client";
-import { GET_EMPLOYEE_DATA, GET_IA_DATA, GET_ORG_DATA, GET_FINANCIAL_DATA, GET_HOMEPAGE_DATA } from "@lib/graphql/queries";
+import { GET_HOMEPAGE_DATA } from "@lib/graphql/queries";
 
 interface EmployeeNode {
 	employeeId: string;

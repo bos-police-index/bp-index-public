@@ -88,6 +88,19 @@ function a11yProps(index: number) {
 }
 
 export default function FullWidthTabs({ tables }: FullWidthTabsProps) {
+	// Find the indices of the specific tables
+	const policeFinancialIndex = tables.findIndex((table) => table.title === "Police Financial");
+	const officerIaIndex = tables.findIndex((table) => table.title === "Officer IA");
+
+	let orderedTables: Table[] = [];
+	if (policeFinancialIndex !== -1) {
+		orderedTables.push(tables[policeFinancialIndex]);
+	}
+	if (officerIaIndex !== -1) {
+		orderedTables.push(tables[officerIaIndex]);
+	}
+
+	orderedTables = orderedTables.concat(tables.filter((table, index) => index !== policeFinancialIndex && index !== officerIaIndex));
 	const theme = useTheme();
 	const [value, setValue] = React.useState(0);
 	const [currentOverlay, setCurrentOverlay] = useState({ table: null, title: null });
@@ -113,7 +126,7 @@ export default function FullWidthTabs({ tables }: FullWidthTabsProps) {
 			<div style={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
 				<AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
 					<StyledTabs value={value} onChange={handleChange} aria-label="full width tabs example">
-						{tables.map((table, index) =>
+						{orderedTables.map((table, index) =>
 							index === 0 ? (
 								<StyledTab style={{ borderTopLeftRadius: "1rem" }} label={table.title} key={index} {...a11yProps(index)} />
 							) : index === lastTable ? (
@@ -129,7 +142,7 @@ export default function FullWidthTabs({ tables }: FullWidthTabsProps) {
 					See All
 				</Button>
 			</div>
-			{tables.map((table, index) => (
+			{orderedTables.map((table, index) => (
 				<TabPanel value={value} index={index} dir={theme.direction} key={index}>
 					{table.tables.filteredTable || table.tables.fullTable}
 				</TabPanel>
