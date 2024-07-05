@@ -81,7 +81,7 @@ export default function About() {
 						"Collections of public records regarding the Boston Police Department (BPD). This is a full list of the data sources we use to populate the BPI (and some data sources we have yet to incorporate). Most of these data sets are spreadsheets or other tabular data that were received in response to public records requests."
 					}
 				/>
-				<Section title={"Contact Us"} content={"For inquiries, collaboration opportunities, or more information about the Boston Police Index Project, please reach out to: [CONTACT] \n\nJoin us in making Boston a safer, more transparent, and accountable community."} />
+				<Section title={"Contact Us"} content={"For inquiries, collaboration opportunities, or more information about the Boston Police Index Project, please reach out to: buspark@bu.edu \n\nJoin us in making Boston a safer, more transparent, and accountable community."} />
 			</div>
 			<div style={{ display: "flex", alignItems: "center", justifyContent: "end", marginTop: "-5rem" }}>
 				<img src={BPILogo.src} alt="logo" width={250} />
