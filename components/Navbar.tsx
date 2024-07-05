@@ -5,6 +5,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import BPILogo from "../public/BPI Logo White 1.png";
 
 export default function Navbar() {
 	const HamburgerMenu = () => {
@@ -69,7 +70,7 @@ export default function Navbar() {
 			<div style={{ width: "86%", marginLeft: "0rem" }} className="flex justify-between items-center">
 				<div className="flex justify-center items-end font-roboto mt-[1rem]">
 					<Link href="/">
-						<p className="font-bold text-3xl font-righteous">BPI</p>
+						<img src={BPILogo.src} alt="logo" width={100} />
 					</Link>
 				</div>
 
