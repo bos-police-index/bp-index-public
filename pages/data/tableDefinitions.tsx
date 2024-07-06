@@ -14,7 +14,7 @@ interface IconWrapperProps {
 	color?: string;
 }
 
-export const IconWrapper = ({ Icon, fontSize = "48px", color = "#3874CB" }: IconWrapperProps) => {
+const IconWrapper = ({ Icon, fontSize = "48px", color = "#3874CB" }: IconWrapperProps) => {
 	const iconStyle: CSSProperties = {
 		fontSize: fontSize,
 		color: color,
@@ -104,3 +104,5 @@ export const tableDefinitions = rawTableDefinitions.map((table) => ({
 	...table,
 	source: tablesFromPublicRecordsRequests.includes(table.query) ? "Public Records Request" : tablesFromAnalyzeBoston.includes(table.query) ? <a href="https://data.boston.gov/">Analyze Boston</a> : "Public Records Request",
 }));
+
+export default IconWrapper;

@@ -3,7 +3,7 @@ import { getMUIGrid } from "@utility/createMUIGrid";
 import { extractID, tableExists } from "@utility/utility";
 import apolloClient from "@lib/apollo-client";
 import { GET_DETAIL_RECORDS } from "@lib/graphql/queries";
-import { IconWrapper, tableDefinitions } from "@pages/data/tableDefinitions";
+import IconWrapper, { tableDefinitions } from "@pages/data/tableDefinitions";
 
 interface DetailRecord {
 	customerId: number;
