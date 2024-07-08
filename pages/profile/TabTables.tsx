@@ -88,9 +88,12 @@ function a11yProps(index: number) {
 }
 
 export default function FullWidthTabs({ tables }: FullWidthTabsProps) {
+	if (!tables) {
+		return;
+	}
 	// Find the indices of the specific tables
-	const policeFinancialIndex = tables.findIndex((table) => table.title === "Police Financial");
-	const officerIaIndex = tables.findIndex((table) => table.title === "Officer IA");
+	const policeFinancialIndex = tables?.findIndex((table) => table.title === "Police Financial");
+	const officerIaIndex = tables?.findIndex((table) => table.title === "Officer IA");
 
 	let orderedTables: Table[] = [];
 	if (policeFinancialIndex !== -1) {
