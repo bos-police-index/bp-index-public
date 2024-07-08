@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Card } from "antd";
-import { tableDefinitions } from "./tableDefinitions";
+import { tableDefinitions } from "../../utility/tableDefinitions";
 
 export default function Home() {
 	const [cardFlipped, setCardFlipped] = useState<any>(null);
