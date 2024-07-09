@@ -6,46 +6,40 @@ import { GET_DETAIL_RECORDS } from "@lib/graphql/queries";
 import IconWrapper, { tableDefinitions } from "@utility/tableDefinitions";
 
 interface DetailRecord {
-	customerId: number;
-	crossStreetNo: number;
-	crossStreetName: string;
-	adminFeeRate: number;
-	contractNo: number;
-	detailPayRate: number;
-	detailStart: Date;
-	detailEnd: Date;
-	hoursWorked: number;
-	adminFeeFlag: boolean;
-	detailClerkEmployeeId: number;
-	detailRank: string;
-	detailRecordId: number;
+	adminFeeFlag: string;
+	badgeNo: number;
+	bpdCustomerNo: number;
+	customerNo: number;
+	customerNoAndSeq: string;
+	customerSeq: number;
+	detailRank: number;
 	detailType: string;
-	employeeId: number;
-	fbkPayDate: Date;
-	incidentNo: number;
-	licensePremiseFlag: boolean;
-	locationDesc: string;
-	noShowFlag: boolean;
+	districtWorked: number;
+	endTime: number;
+	fbkPayDate: string;
+	location: string;
+	hoursWorked: number;
+	nameId: string;
 	payAmount: number;
 	payHours: number;
+	payRate: number;
+	race: string;
 	payTrcCode: string;
-	prepaidFlag: boolean;
-	rateChangeAuthorizationEmployeeId: number;
-	recordCreatedBy: string;
-	recordCreatedDate: Date;
-	recordUpdatedBy: string;
-	recordUpdatedDate: Date;
-	requestRank: string;
 	rowId: number;
-	streetName: string;
-	streetId: number;
-	stateFunded: boolean;
-	streetNo: number;
+	sex: string;
+	startDate: string;
+	startTime: number;
+	street: string;
+	xStreet: string;
 	trackingNo: number;
+	streetNo: number;
+	empRank: number;
+	empOrgCode: number;
 }
+  
 
 interface DetailRecordsResponse {
-	allDetailRecordFromFa23Data: {
+	allLinkSu24DetailRecords: {
 		nodes: DetailRecord[];
 	};
 }
@@ -64,8 +58,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 	let dataArr: any[] = [];
 
-	if (data && data.allDetailRecordFromFa23Data && data.allDetailRecordFromFa23Data.nodes) {
-		dataArr = data.allDetailRecordFromFa23Data.nodes.map((item, index) => ({
+	if (data && data.allLinkSu24DetailRecords && data.allLinkSu24DetailRecords.nodes) {
+		dataArr = data.allLinkSu24DetailRecords.nodes.map((item, index) => ({
 			id: index + 1,
 			...item,
 		}));

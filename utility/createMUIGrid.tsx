@@ -43,6 +43,28 @@ function formatDate(params: GridValueFormatterParams) {
 	return formatted;
 }
 
+//changes 830 to 8.5
+function formatHours(number: number): string {
+	const hours = Math.floor(number / 100);
+	const minutes = (number % 100) / 60;
+
+	const total = hours + minutes;
+
+	return total.toString();
+}
+
+//changes 1500 to 2pm
+function formatTime(number: number): string {
+	const isPm = number / 1200 >= 1;
+	let hours = number / 100;
+	hours = isPm ? hours - 12 : hours;
+	hours = Math.floor(hours);
+	const minutes = number.toString().padStart(4, "0").slice(-2);
+	let total = hours.toString() + ":" + minutes;
+	total += isPm ? "pm" : "am";
+	return total;
+}
+
 function formatMoney(number: number): string {
 	if (number < 0.01) {
 		return "0";
@@ -275,35 +297,27 @@ const detail_record_columns = () => {
 			valueFormatter: (params) => {
 				return params.value;
 			},
-			width: 150,
+			width: 100,
 		},
 		{
-			field: "customerId",
-			headerName: "Customer ID",
+			field: "customerNo",
+			headerName: "Customer #",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+		},
+		{
+			field: "badgeNo",
+			headerName: "Officer Badge #",
 			type: "number",
 			valueFormatter: (params) => {
 				return params.value;
 			},
 			width: 150,
 		},
-		{
-			field: "incidentNo",
-			headerName: "Incident #",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 150,
-		},
-		{
-			field: "contractNo",
-			headerName: "Contract #",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 150,
-		},
+
 		{
 			field: "streetNo",
 			headerName: "Street #",
@@ -311,10 +325,10 @@ const detail_record_columns = () => {
 			valueFormatter: (params) => {
 				return params.value;
 			},
-			width: 150,
+			width: 75,
 		},
 		{
-			field: "streetName",
+			field: "street",
 			headerName: "Street Name",
 			type: "string",
 			valueFormatter: (params) => {
@@ -323,8 +337,8 @@ const detail_record_columns = () => {
 			width: 150,
 		},
 		{
-			field: "crossStreetNo",
-			headerName: "Cross Street #",
+			field: "xStreet",
+			headerName: "Cross Street",
 			type: "number",
 			valueFormatter: (params) => {
 				return params.value;
@@ -332,17 +346,8 @@ const detail_record_columns = () => {
 			width: 170,
 		},
 		{
-			field: "crossStreetName",
-			headerName: "Cross Street Name",
-			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 200,
-		},
-		{
-			field: "locationDesc",
-			headerName: "Location Description",
+			field: "location",
+			headerName: "Location",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -350,144 +355,102 @@ const detail_record_columns = () => {
 			width: 250,
 		},
 		{
-			field: "detailStart",
-			headerName: "Detail Start",
+			field: "startDate",
+			headerName: "Start Date",
 			type: "date",
 			valueFormatter: formatDate,
 			width: 200,
 		},
 		{
-			field: "detailEnd",
+			field: "startTime",
+			headerName: "Detail Start",
+			type: "number",
+			valueFormatter: (params) => {
+				return formatTime(params.value);
+			},
+			width: 100,
+		},
+		{
+			field: "endTime",
 			headerName: "Detail End",
-			type: "date",
-			valueFormatter: formatDate,
-			width: 200,
+			type: "number",
+			valueFormatter: (params) => {
+				return formatTime(params.value);
+			},
+			width: 100,
 		},
 		{
 			field: "hoursWorked",
 			headerName: "Hours Worked",
 			type: "number",
 			valueFormatter: (params) => {
-				return params.value;
+				return formatHours(params.value);
 			},
-			align: "center",
-			width: 170,
+			width: 120,
 		},
-		{
-			field: "detailType",
-			headerName: "Detail Type",
-			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			align: "center",
-			width: 150,
-		},
-		{
-			field: "stateFunded",
-			headerName: "State Funded",
-			type: "boolean",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 160,
-		},
-		{
-			field: "detailRank",
-			headerName: "Detail Rank",
-			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			align: "center",
-			width: 150,
-		},
-		{
-			field: "noShowFlag",
-			headerName: "No Show Flag",
-			type: "boolean",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 170,
-		},
-		{
-			field: "licensePremiseFlag",
-			headerName: "License Premise Flag",
-			type: "boolean",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 250,
-		},
-		{
-			field: "adminFeeFlag",
-			headerName: "Admin Fee Flag",
-			type: "boolean",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 200,
-		},
-		{
-			field: "prepaidFlag",
-			headerName: "Prepaid Flag",
-			type: "boolean",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 170,
-		},
-		{
-			field: "requestRank",
-			headerName: "Request Rank",
-			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 170,
-		},
-		{
-			field: "adminFeeRate",
-			headerName: "Admin Fee Rate",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 170,
-		},
-		{
-			field: "rateChangeAuthorizationEmployeeId",
-			headerName: "Rate Change Authorization Employee ID",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 330,
-		},
-		{
-			field: "detailClerkEmployeeId",
-			headerName: "Detail Clerk Employee ID",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 250,
-		},
+
 		{
 			field: "payHours",
 			headerName: "Pay Hours",
 			type: "number",
 			valueFormatter: (params) => {
-				return params.value;
+				return formatHours(params.value);
 			},
-			align: "center",
-			width: 150,
+			width: 100,
 		},
 		{
 			field: "payAmount",
 			headerName: "Pay Amount",
 			type: "number",
+			valueFormatter: (params) => {
+				return formatMoney(params.value);
+			},
+			width: 150,
+		},
+		{
+			field: "payRate",
+			headerName: "Pay Rate",
+			type: "number",
+			valueFormatter: (params) => {
+				return formatMoney(params.value);
+			},
+			width: 170,
+		},
+		// add sex, race, emp rank, empOrgCode
+		{
+			field: "sex",
+			headerName: "Officer Sex",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			align: "center",
+			width: 100,
+		},
+		{
+			field: "race",
+			headerName: "Officer Race",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			align: "center",
+			width: 100,
+		},
+		{
+			field: "empRank",
+			headerName: "Officer Rank",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			align: "center",
+			width: 100,
+		},
+		{
+			field: "empOrgCode",
+			headerName: "Officer Org Code",
+			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
 			},
@@ -505,45 +468,33 @@ const detail_record_columns = () => {
 			width: 170,
 		},
 		{
-			field: "detailPayRate",
-			headerName: "Detail Pay Rate",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 170,
-		},
-		{
-			field: "recordCreatedDate",
-			headerName: "Record Created Date",
-			type: "date",
-			valueFormatter: formatDate,
-			width: 220,
-		},
-		{
-			field: "recordCreatedBy",
-			headerName: "Record Created By",
+			field: "detailType",
+			headerName: "Detail Type",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
 			},
-			width: 200,
+			align: "center",
+			width: 100,
 		},
 		{
-			field: "recordUpdatedDate",
-			headerName: "Record Updated Date",
-			type: "date",
-			valueFormatter: formatDate,
-			width: 220,
-		},
-		{
-			field: "recordUpdatedBy",
-			headerName: "Record Updated By",
+			field: "detailRank",
+			headerName: "Detail Rank",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
 			},
-			width: 200,
+			align: "center",
+			width: 100,
+		},
+		{
+			field: "adminFeeFlag",
+			headerName: "Admin Fee?",
+			type: "boolean",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
 		},
 	];
 	return cols;

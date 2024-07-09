@@ -26,44 +26,37 @@ export const GET_HOMEPAGE_DATA = gql`
 
 export const GET_DETAIL_RECORDS = gql`
 	query MyQuery {
-		allDetailRecordFromFa23Data {
+		allLinkSu24DetailRecords {
 			nodes {
-				customerId
-				crossStreetNo
-				crossStreetName
-				adminFeeRate
-				contractNo
-				detailPayRate
-				detailStart
-				detailEnd
-				hoursWorked
 				adminFeeFlag
-				detailClerkEmployeeId
+				badgeNo
+				bpdCustomerNo
+				customerNo
+				customerNoAndSeq
+				customerSeq
 				detailRank
-				detailRecordId
 				detailType
-				employeeId
+				districtWorked
+				endTime
 				fbkPayDate
-				incidentNo
-				licensePremiseFlag
-				locationDesc
-				noShowFlag
+				location
+				hoursWorked
+				nameId
 				payAmount
 				payHours
+				payRate
+				race
 				payTrcCode
-				prepaidFlag
-				rateChangeAuthorizationEmployeeId
-				recordCreatedBy
-				recordCreatedDate
-				recordUpdatedBy
-				recordUpdatedDate
-				requestRank
 				rowId
-				streetName
-				streetId
-				stateFunded
-				streetNo
+				sex
+				startDate
+				startTime
+				street
+				xStreet
 				trackingNo
+				streetNo
+				empRank
+				empOrgCode
 			}
 		}
 	}

@@ -178,52 +178,45 @@ export const getData = async (keyword: string, bpiId: string) => {
 
 	police_financial_rows = newFinancialRows;
 
-	//REPLACE THIS
-	const detail_record_query = gql`query MyQuery {
-			allDetailRecordFromFa23Data(condition: {employeeId: "${bpiId}"}) {
-			  edges {
-				node {
-				  detailRecordId
-				  rowId
-				  trackingNo
-				  employeeId
-				  customerId
-				  incidentNo
-				  contractNo
-				  streetNo
-				  streetId
-				  streetName
-				  crossStreetNo
-				  crossStreetName
-				  locationDesc
-				  detailStart
-				  detailEnd
-				  hoursWorked
-				  detailType
-				  stateFunded
-				  detailRank
-				  noShowFlag
-				  licensePremiseFlag
-				  adminFeeFlag
-				  prepaidFlag
-				  requestRank
-				  adminFeeRate
-				  rateChangeAuthorizationEmployeeId
-				  detailClerkEmployeeId
-				  payHours
-				  payAmount
-				  payTrcCode
-				  detailPayRate
-				  recordCreatedDate
-				  recordCreatedBy
-				  recordUpdatedDate
-				  recordUpdatedBy
-				  fbkPayDate
-				}
-			  }
-			}
-		  }`;
-	// const detail_response = await apolloClient.query({ query: detail_record_query });
+	const detail_record_query = gql`
+	query MyQuery {
+		allLinkSu24DetailRecords(condition: {bpiId: "${bpiId}"}) {
+		  nodes {
+			adminFeeFlag
+			bpdCustomerNo
+			customerNo
+			customerNoAndSeq
+			customerSeq
+			detailRank
+			detailType
+			districtWorked
+			endTime
+			fbkPayDate
+			location
+			hoursWorked
+			payAmount
+			payHours
+			payRate
+			payTrcCode
+			rowId
+			startDate
+			startTime
+			street
+			xStreet
+			trackingNo
+			streetNo
+		  }
+		}
+	  }
+	  `;
+	const detail_response = await apolloClient.query({ query: detail_record_query });
+
+	//add artificial id for MUI purposes
+	let detailRowId = 1;
+	const newDetailRows = detail_response.data.allLinkSu24DetailRecords.nodes.map((node) => {
+		return { id: detailRowId++, ...node };
+	});
+	detail_record_rows = newDetailRows;
 
 	officerData.detail_num = detail_record_rows.length;
 
@@ -248,26 +241,33 @@ export const getData = async (keyword: string, bpiId: string) => {
 	const iaResponse: any = await apolloClient.query({ query: ia_query });
 	const iaData = iaResponse.data.allLinkSu24EmployeeIas.nodes;
 
-	// Filter the data to remove duplicates based on bpdIaNo
-	const uniqueBpdIaNos = new Set();
-	const filteredEmployeeIaData = iaData.filter((node: any) => {
-		const { iaNo } = node;
+	// DETERMINE IF THEY ARE DUPLICATES OR JUST COINCIDENCE?
+	//Filter the data to remove duplicates based on bpdIaNo
+	// const uniqueBpdIaNos = new Set();
+	// const filteredEmployeeIaData = iaData.filter((node: any) => {
+	// 	const { iaNo } = node;
 
-		if (!uniqueBpdIaNos.has(`${iaNo}`)) {
-			uniqueBpdIaNos.add(`${iaNo}`);
-			return true;
-		}
-		return false;
-	});
+	// 	if (!uniqueBpdIaNos.has(`${iaNo}`)) {
+	// 		uniqueBpdIaNos.add(`${iaNo}`);
+	// 		return true;
+	// 	}
+	// 	return false;
+	// });
 
 	//add artificial id for MUI purposes
+	// let iaRowId = 1;
+	// const newOfficerIaRows = filteredEmployeeIaData.map((node) => {
+	// 	return { id: iaRowId++, ...node };
+	// });
+	// officerData.ia_num = uniqueBpdIaNos.size;
 	let iaRowId = 1;
-	const newOfficerIaRows = filteredEmployeeIaData.map((node) => {
+	const newOfficerIaRows = iaData.map((node) => {
 		return { id: iaRowId++, ...node };
 	});
 
 	officer_IA_rows = newOfficerIaRows;
-	officerData.ia_num = uniqueBpdIaNos.size;
+
+	officerData.ia_num = newOfficerIaRows.length;
 
 	return {
 		props: {
@@ -340,7 +340,31 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 			excludes: [],
 		},
 		detail_record: {
-			includesOnly: ["trackingNo", "customerId", "incidentNo", "contract", "contractNo", "detailStart", "detailEnd"],
+			includesOnly: [
+				"adminFeeFlag",
+				"bpdCustomerNo",
+				"customerNo",
+				"customerNoAndSeq",
+				"customerSeq",
+				"detailRank",
+				"detailType",
+				"districtWorked",
+				"endTime",
+				"fbkPayDate",
+				"location",
+				"hoursWorked",
+				"payAmount",
+				"payHours",
+				"payRate",
+				"payTrcCode",
+				"rowId",
+				"startDate",
+				"startTime",
+				"street",
+				"xStreet",
+				"trackingNo",
+				"streetNo",
+			],
 			excludes: [],
 		},
 		officer_ia: {
