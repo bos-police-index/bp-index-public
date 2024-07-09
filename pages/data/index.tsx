@@ -19,9 +19,8 @@ export default function Home() {
 		<div
 			style={{
 				backgroundColor: "white",
-				height: "100%",
-				width: "110vw",
-				marginLeft: "-11vw",
+				height: "100vh", //fix this later to be 100vh - height of Navbar
+				width: "100%",
 			}}
 		>
 			<div style={{ maxWidth: "1128px", margin: "0 auto", color: "#3874CB" }}>
@@ -57,11 +56,11 @@ export default function Home() {
 									justifyContent: "space-between",
 									color: cardFlipped === table.table ? "white" : "#3874CB",
 									backgroundColor: cardFlipped !== table.table ? "white" : "#3874CB",
-									lineHeight: "1.5",
+									lineHeight: "1.3",
 								}}
 							>
 								{cardFlipped == table.table ? (
-									<div style={{ fontSize: "small" }}>{table.shortDescription}</div>
+									<div style={{ fontSize: "medium" }}>{table.shortDescription}</div>
 								) : (
 									<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 										<div>{table.image.component}</div>

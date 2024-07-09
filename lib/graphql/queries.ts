@@ -23,7 +23,6 @@ export const GET_HOMEPAGE_DATA = gql`
 		}
 	}
 `;
-
 export const GET_DETAIL_RECORDS = gql`
 	query MyQuery {
 		allLinkSu24DetailRecords {
@@ -58,6 +57,7 @@ export const GET_DETAIL_RECORDS = gql`
 				empRank
 				empOrgCode
 			}
+			totalCount
 		}
 	}
 `;

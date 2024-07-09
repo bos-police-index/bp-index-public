@@ -270,12 +270,12 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 	return (
 		<>
 			{/* Table */}
-			<section className="w-full pt-16 pb-16">
+			<section className="w-full pt-16 pb-16 ">
 				<DataGrid
 					density="compact"
 					columns={cols}
 					rows={searchResData}
-					className="max-w-5xl mx-auto min-h-[300px] bg-white"
+					className="mx-auto min-h-[300px] bg-white"
 					initialState={{
 						pagination: { paginationModel: { pageSize: 10 } },
 						columns: {
@@ -292,7 +292,7 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 						noResultsOverlay: () => noResultsOverlay(),
 					}}
 					loading={loading}
-					style={{ minWidth: "80%" }}
+					style={{ maxWidth: "1128px" }}
 				/>
 			</section>
 			<p className="text-xs text-white mt-[-3.5em] text-center mx-auto w-full max-w-[70em]">* Not Applicable in Badge No. is due to Civilians not having one. Unknown means there is missing data for this officer's badge.</p>

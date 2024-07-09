@@ -99,8 +99,8 @@ export const getMUIGrid = (table: string, rows: any[], officerName: string, incl
 	const height = officerName !== "" ? "calc(100vh - 7rem)" : "calc(100vh - 90px)";
 
 	return {
-		fullTable: <DataTable table={rows} cols={cols} table_name={`${officerName}-${table}`} height={height} pageSizeOptions={[25, 50, 75, 100]} pageSize={25} />,
-		filteredTable: <DataTable table={rows} cols={filteredCols} table_name={`${officerName}-${table}`} height={"auto"} pageSizeOptions={[5]} pageSize={5} />,
+		fullTable: <DataTable table={rows} cols={cols} table_name={`${officerName}-${table}`} height={height} pageSizeOptions={[25, 50, 75, 100]} pageSize={25} rowCount={undefined} />,
+		filteredTable: <DataTable table={rows} cols={filteredCols} table_name={`${officerName}-${table}`} height={"auto"} pageSizeOptions={[5]} pageSize={5} rowCount={undefined} />,
 	};
 };
 
@@ -2093,7 +2093,7 @@ const shooting_report_columns = () => {
 	return cols;
 };
 
-const functionMapping = {
+export const functionMapping = {
 	alpha_listing: alpha_listing_columns(),
 	bpd_customer: bpd_customer_columns(),
 	crime_incident: crime_incident_columns(),

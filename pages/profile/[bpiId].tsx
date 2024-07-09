@@ -447,7 +447,6 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 					paddingBottom: "2rem",
 					position: "relative",
 					width: "110vw",
-					marginLeft: "-11vw",
 				}}
 			>
 				<div className="contain-content" style={{ width: "80vw", margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "flex-start" }}>

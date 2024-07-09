@@ -66,19 +66,18 @@ export default function Navbar() {
 	};
 
 	return (
-		<header className="flex justify-between items-center h-[7rem] w-screen px-0 text-white pb-[0rem] max-w-1128">
-			<div style={{ width: "86%", marginLeft: "0rem" }} className="flex justify-between items-center">
-				<div className="flex justify-center items-end font-roboto mt-[1rem]">
+		<header className="flex justify-center items-center h-[5rem] px-0 text-white pb-[0rem]" style={{ borderBottom: "white 2px solid", width: "100%" }}>
+			<div style={{ maxWidth: "1128px" }} className="flex justify-between items-center">
+				<div className="flex justify-center items-center font-roboto">
 					<Link href="/">
 						<img src={BPILogo.src} alt="logo" width={100} />
 					</Link>
 				</div>
 
-				<div className="flex justify-start items-center font-roboto w-1/2 mt-[-2rem] ">
+				<div className="flex justify-start items-center font-roboto max-w-1128">
 					<SearchBar title="Search Officers" officerName="" />
-					<div style={{ marginTop: "2.5rem" }}>
-						<HamburgerMenu />
-					</div>
+
+					<HamburgerMenu />
 				</div>
 			</div>
 		</header>

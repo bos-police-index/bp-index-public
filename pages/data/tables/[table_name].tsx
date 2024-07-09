@@ -5,6 +5,8 @@ import apolloClient from "@lib/apollo-client";
 import { GET_DETAIL_RECORDS } from "@lib/graphql/queries";
 import IconWrapper, { tableDefinitions } from "@utility/tableDefinitions";
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 interface DetailRecord {
 	adminFeeFlag: string;
@@ -80,14 +82,28 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default function Table(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-
-	console.log(props.rows[0]);
+	const router = useRouter();
 	const tableDef = tableDefinitions.find((tableDef) => tableDef.query === props.table_name);
-	console.log(tableDef);
 
 	const table = getMUIGrid(props.table_name, props.rows, "", [], []);
 	return (
-		<div className={"w-full h-full"} style={{ color: "white", fontSize: "large" }}>
+		<div className={"max-w-1128 h-full"} style={{ color: "white", fontSize: "large" }}>
+			
+			<div style={{ margin: "1rem 0" }}>
+				<span>
+				<Link href="/" style={{ color: "#3874CB" }}>
+					{"Home > "}
+				</Link>
+				<Link href="/data" style={{ color: "#3874CB" }}>
+					{"Data > "}
+				</Link>
+				<span style={{ color: "#3874CB", textDecoration: "none", cursor: "default" }}>
+            {tableDef.table}
+        </span>
+
+				</span>
+				
+			</div>
 			<div>
 				<div style={{ display: "flex", alignItems: "center", justifyContent: "start", marginBottom: "1rem" }}>
 					<div style={{ marginLeft: "-0.8rem" }}>

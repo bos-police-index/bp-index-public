@@ -104,6 +104,7 @@ export default function FullWidthTabs({ tables }: FullWidthTabsProps) {
 	}
 
 	orderedTables = orderedTables.concat(tables.filter((table, index) => index !== policeFinancialIndex && index !== officerIaIndex));
+	tables = orderedTables;
 	const theme = useTheme();
 	const [value, setValue] = React.useState(0);
 	const [currentOverlay, setCurrentOverlay] = useState({ table: null, title: null });
