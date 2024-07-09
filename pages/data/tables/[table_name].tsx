@@ -4,6 +4,7 @@ import { extractID, tableExists } from "@utility/utility";
 import apolloClient from "@lib/apollo-client";
 import { GET_DETAIL_RECORDS } from "@lib/graphql/queries";
 import IconWrapper, { tableDefinitions } from "@utility/tableDefinitions";
+import { useEffect, useState } from "react";
 
 interface DetailRecord {
 	adminFeeFlag: string;
@@ -79,6 +80,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default function Table(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+
 	console.log(props.rows[0]);
 	const tableDef = tableDefinitions.find((tableDef) => tableDef.query === props.table_name);
 	console.log(tableDef);
