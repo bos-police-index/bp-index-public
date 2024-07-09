@@ -568,7 +568,8 @@ const officer_ia_columns = () => {
 			field: "adminLeave",
 			headerName: "Administrative Leave",
 			type: "boolean",
-			valueFormatter: (params) => {
+			renderCell: (params) => {
+				console.log(params.value,  params.value == "Y")
 				return params.value == "Y";
 			},
 			width: 200,
