@@ -569,7 +569,6 @@ const officer_ia_columns = () => {
 			headerName: "Administrative Leave",
 			type: "boolean",
 			renderCell: (params) => {
-				console.log(params.value,  params.value == "Y")
 				return params.value == "Y";
 			},
 			width: 200,
