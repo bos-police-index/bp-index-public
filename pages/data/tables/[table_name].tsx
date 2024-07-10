@@ -83,6 +83,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 export default function Table(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
 	const [rows, setRows] = useState<any[]>(props.rows);
+	const [loadingMoreData, setLoadingMoreData] = useState<boolean>(true)
 	const router = useRouter();
 	const tableDef = tableDefinitions.find((tableDef) => tableDef.query === props.table_name);
 
@@ -108,7 +109,9 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 		});
 	}
 		setRows([...rows, ...dataArr])
+		setLoadingMoreData(false)
 		}
+		setLoadingMoreData(true)
 		fetchRestRecords()
 	},[])
 
@@ -116,18 +119,24 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 		<div className={"max-w-1128 h-full"} style={{ color: "white", fontSize: "large" }}>
 			
 			<div style={{ margin: "1rem 0" }}>
+			<div style={{ margin: "1rem 0" }}>
+				<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
 				<span>
-				<Link href="/" style={{ color: "#3874CB" }}>
-					{"Home > "}
-				</Link>
-				<Link href="/data" style={{ color: "#3874CB" }}>
-					{"Data > "}
-				</Link>
-				<span style={{ color: "#3874CB", textDecoration: "none", cursor: "default" }}>
-            {tableDef.table}
-        </span>
-
+					<Link href="/" style={{ color: "#3874CB" }}>
+						{"Home > "}
+					</Link>
+					<Link href="/data" style={{ color: "#3874CB" }}>
+						{"Data > "}
+					</Link>
+					<span style={{ color: "#3874CB", textDecoration: "none", cursor: "default" }}>
+				{tableDef.table}
+					</span>
 				</span>
+				{loadingMoreData ? <p>Currently loading more rows...</p> : <></>}
+					
+				</div>
+				
+			</div>
 				
 			</div>
 			<div>
