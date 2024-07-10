@@ -2,7 +2,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getMUIGrid } from "@utility/createMUIGrid";
 import { extractID, tableExists } from "@utility/utility";
 import apolloClient from "@lib/apollo-client";
-import { GET_DETAIL_RECORDS } from "@lib/graphql/queries";
+import { GET_FIRST_1000_DETAIL_RECORDS, GET_REST_DETAIL_RECORDS } from "@lib/graphql/queries";
 import IconWrapper, { tableDefinitions } from "@utility/tableDefinitions";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -57,7 +57,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		};
 	}
 
-	const { data } = await apolloClient.query<DetailRecordsResponse>({ query: GET_DETAIL_RECORDS });
+	const { data } = await apolloClient.query<DetailRecordsResponse>({ query: GET_FIRST_1000_DETAIL_RECORDS });
 
 	let dataArr: any[] = [];
 
@@ -82,10 +82,36 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default function Table(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+	const [rows, setRows] = useState<any[]>(props.rows);
 	const router = useRouter();
 	const tableDef = tableDefinitions.find((tableDef) => tableDef.query === props.table_name);
 
-	const table = getMUIGrid(props.table_name, props.rows, "", [], []);
+	const table = getMUIGrid(props.table_name, rows, "", [], []);
+
+	//fetch the rest of the rows once loaded
+	useEffect( () =>{
+		const fetchRestRecords = async() =>{
+			const { data } = await apolloClient.query<DetailRecordsResponse>({ query: GET_REST_DETAIL_RECORDS });
+
+	let dataArr: any[] = [];
+
+	if (data && data.allLinkSu24DetailRecords && data.allLinkSu24DetailRecords.nodes) {
+		dataArr = data.allLinkSu24DetailRecords.nodes.map((item, index) => ({
+			id: index + 1,
+			...item,
+		}));
+	}
+	if (props.table_name === "employee") {
+		// remove the officer_photo column
+		dataArr.forEach((item) => {
+			delete item["officer_photo"];
+		});
+	}
+		setRows([...rows, ...dataArr])
+		}
+		fetchRestRecords()
+	},[])
+
 	return (
 		<div className={"max-w-1128 h-full"} style={{ color: "white", fontSize: "large" }}>
 			
