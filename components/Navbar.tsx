@@ -5,9 +5,14 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import BPILogo from "../public/BPI Logo White 1.png";
+import BPILogo from '../public/BPI-Logo-White.png'
+import dept from '../public/department.png'
+import Image from "next/image";
+import '../public/favicon.ico'
+
 
 export default function Navbar() {
+	console.log(BPILogo, BPILogo.src)
 	const HamburgerMenu = () => {
 		const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 		const open = Boolean(anchorEl);
@@ -68,9 +73,10 @@ export default function Navbar() {
 	return (
 		<header className="flex justify-center items-center h-[5rem] px-0 text-white pb-[0rem]" style={{ borderBottom: "white 2px solid", width: "100%" }}>
 			<div style={{ maxWidth: "1128px" }} className="flex justify-between items-center">
-				<div className="flex justify-center items-center font-roboto">
+				<div className="flex justify-center items-center font-roboto" >
 					<Link href="/">
-						<img src={BPILogo.src} alt="logo" width={100} />
+						<img src={'../public/favicon.ico'} width={100} style={{visibility: 'hidden', height: 0, marginTop: '-0rem'}}/>
+					<img src={BPILogo.src} alt="BPI Logo" width={100} height={50} />
 					</Link>
 				</div>
 
