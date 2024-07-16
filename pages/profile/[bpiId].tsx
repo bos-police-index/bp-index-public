@@ -446,10 +446,10 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 					backgroundColor: "white",
 					paddingBottom: "2rem",
 					position: "relative",
-					width: "110vw",
+					
 				}}
 			>
-				<div className="contain-content" style={{ width: "80vw", margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+				<div className="contain-content" style={{ maxWidth: '1128px', margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
 					<div className="title" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#032752" }}>
 						<p className="relative text-4xl font-bold underline" style={{ paddingTop: "2rem", marginLeft: "1rem" }}>
 							{officerData.name}

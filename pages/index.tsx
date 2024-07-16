@@ -117,11 +117,29 @@ export default function Home() {
 			),
 		},
 
-		//TO DO: Add Race
-		//BLOCKER: data in raw form
-
-		//TO DO: Add Gender
-		//BLOCKER: data in raw form
+		{
+			field: "race",
+			headerName: "Race",
+			width: 100,
+			type: "string",
+			renderHeader: (params) => (
+				<Tooltip title="The race of the officer">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		},
+		
+		{
+			field: "gender",
+			headerName: "gender",
+			width: 100,
+			type: "string",
+			renderHeader: (params) => (
+				<Tooltip title="The gender of the officer">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		},
 		{
 			field: "numOfIa",
 			headerName: "No. of IA",

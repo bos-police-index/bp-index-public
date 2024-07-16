@@ -126,7 +126,7 @@ export default function FullWidthTabs({ tables }: FullWidthTabsProps) {
 	}
 
 	return tables ? (
-		<Box sx={{ width: "80vw", margin: "4rem auto", marginBottom: "10rem" }}>
+		<Box sx={{ maxWidth: '1128px', margin: "4rem auto", marginBottom: "10rem" }}>
 			<div style={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
 				<AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
 					<StyledTabs value={value} onChange={handleChange} aria-label="full width tabs example">
