@@ -73,7 +73,7 @@ export default function Navbar() {
 	return (
 		<header className="flex justify-center items-center h-[5rem] px-0 text-white pb-[0rem]" style={{ borderBottom: "white 2px solid", width: "100%" }}>
 			<div style={{ maxWidth: "1128px" }} className="flex justify-between items-center">
-				<div className="flex justify-center items-center font-roboto ml-[-1rem]">
+				<div className="flex justify-center items-center font-roboto ml-[-1.7rem]">
 					<Link href="/" style={{width: '5rem'}}>
 					<img src={BPILogo.src} alt="BPI Logo" width={1000} height={1000} />
 					</Link>

@@ -19,7 +19,7 @@ export default function Home() {
 		<div
 			style={{
 				backgroundColor: "white",
-				height: "100vh", //fix this later to be 100vh - height of Navbar
+				height: "auto", //fix this later to be 100vh - height of Navbar
 				width: "100%",
 			}}
 		>
@@ -32,14 +32,16 @@ export default function Home() {
 								borderColor: "#3874CB",
 								boxShadow: "0px 0px 4px 4px rgba(0, 0, 0, 0.1)",
 								color: "#3874CB",
-								width: "272px",
-								height: "177px",
+								width: "241px",
+								height: "170px",
+								margin: '1rem 1rem',
 								alignContent: "center",
 								transition: "transform 0.5s",
 								// transform: cardFlipped == table.table ? "rotateY(180deg)" : "rotateY(0deg)", // Flipping animation
 								backgroundColor: cardFlipped == table.table ? "#3874CB" : "transparent", // Blue background on hover
 								opacity: table.isFake ? "50%" : "100%",
 								pointerEvents: table.isFake ? "none" : "all",
+								
 							}}
 							onMouseEnter={() => handleHover(table)}
 							onMouseLeave={handleLeave}
@@ -70,7 +72,25 @@ export default function Home() {
 							</Link>
 						</Card>
 					))}
-					<p style={{ color: "#B3B3B3", margin: "0 0.5rem" }}>More Coming...</p>
+
+					{/* dummy cards */}
+					{[...Array(5)].map((_, index) => (
+                <Card
+                    key={`dummy-${index}`}
+                    style={{
+                        borderColor: "none",
+                        boxShadow: "0px 0px 4px 4px rgba(0, 0, 0, 0.1)",
+                        color: "#3874CB",
+						width: "241px",
+						height: "170px",
+						margin: '1rem 1rem',
+                        alignContent: "center",
+                        transition: "transform 0.5s",
+                        backgroundColor: "#F0F0F0", 
+                        pointerEvents: "none",
+                    }}
+                />
+            ))}
 				</div>
 			</div>
 		</div>

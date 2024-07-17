@@ -18,6 +18,8 @@ export const GET_HOMEPAGE_DATA = gql`
 					numOfIa
 					bpiId
 					rank
+					sex
+					race
 				}
 			}
 		}

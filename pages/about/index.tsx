@@ -33,8 +33,8 @@ const Section = ({ title, content }) => {
 					padding: "1rem 2rem",
 					textAlign: "center",
 					color: "white",
-					minWidth: "10rem", // Adjust based on your content width
-					minHeight: "4rem", // Adjust based on your content height
+					minWidth: "10rem", 
+					minHeight: "4rem",
 					display: "flex",
 					justifyContent: "center",
 					alignItems: "center",
@@ -43,7 +43,7 @@ const Section = ({ title, content }) => {
 				{title}
 			</div>
 			<div style={{ flex: 1, minHeight: "4rem", paddingLeft: "1rem" }}>
-				{/* Call formatContent function to render formatted content */}
+			
 				{formatContent(content)}
 			</div>
 		</div>

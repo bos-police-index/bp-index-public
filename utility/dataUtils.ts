@@ -56,8 +56,8 @@ interface SearchResponseData {
 	detailPay: number | null;
 	otherPay: number | null;
 	numOfIa: number | null;
-	// race: string | null; UNCOMMENT WHEN ADDED TO TABLE
-	// gender: string | null
+	race: string | null; 
+	sex: string | null
 }
 
 async function fetchHomepageData(): Promise<SearchResponseData[]> {
@@ -79,8 +79,8 @@ async function fetchHomepageData(): Promise<SearchResponseData[]> {
 				detailPay: existing.detailPay || node.detailPay,
 				otherPay: existing.otherPay || node.otherPay,
 				numOfIa: existing.numOfIa || node.numOfIa,
-				// race: existing.race || node.race,
-				// gender: existing.gender || node.gender
+				race: existing.race || node.race,
+				sex: existing.sex || node.sex
 			};
 			rows.set(node.bpiId, mergedEmployee);
 		} else {

@@ -107,12 +107,12 @@ export default function Home() {
 		},
 		
 		{
-			field: "gender",
-			headerName: "Gender",
+			field: "sex",
+			headerName: "Sex",
 			width: 100,
 			type: "string",
 			renderHeader: (params) => (
-				<Tooltip title="The gender of the officer">
+				<Tooltip title="The sex of the officer">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
@@ -298,7 +298,7 @@ export default function Home() {
 			</StyledGridOverlay>
 		);
 	}
-
+	console.log(searchResData[0])
 	return (
 		<div>
 			<div className="w-full overflow-visible mb-[2.5rem]">
@@ -352,8 +352,7 @@ export default function Home() {
 							pagination: { paginationModel: { pageSize: 10 } },
 							columns: {
 								columnVisibilityModel: {
-									gender: false,
-									race: false
+									
 								},
 							},
 						}}
