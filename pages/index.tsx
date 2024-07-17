@@ -95,6 +95,29 @@ export default function Home() {
 			),
 		},
 		{
+			field: "race",
+			headerName: "Race",
+			width: 100,
+			type: "string",
+			renderHeader: (params) => (
+				<Tooltip title="The race of the officer">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		},
+		
+		{
+			field: "gender",
+			headerName: "Gender",
+			width: 100,
+			type: "string",
+			renderHeader: (params) => (
+				<Tooltip title="The gender of the officer">
+					<span className="font-semibold">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		},
+		{
 			field: "rank",
 			headerName: "Rank",
 			width: 150,
@@ -112,30 +135,6 @@ export default function Home() {
 			type: "string",
 			renderHeader: (params) => (
 				<Tooltip title="The department or unit within the Boston Police Department where the officer works">
-					<span className="font-semibold">{params.colDef.headerName}</span>
-				</Tooltip>
-			),
-		},
-
-		{
-			field: "race",
-			headerName: "Race",
-			width: 100,
-			type: "string",
-			renderHeader: (params) => (
-				<Tooltip title="The race of the officer">
-					<span className="font-semibold">{params.colDef.headerName}</span>
-				</Tooltip>
-			),
-		},
-		
-		{
-			field: "gender",
-			headerName: "gender",
-			width: 100,
-			type: "string",
-			renderHeader: (params) => (
-				<Tooltip title="The gender of the officer">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
@@ -302,7 +301,7 @@ export default function Home() {
 
 	return (
 		<div>
-			<div className="w-full overflow-visible">
+			<div className="w-full overflow-visible mb-[2.5rem]">
 				<div
 					className="bg-cover bg-center"
 					style={{
@@ -353,7 +352,8 @@ export default function Home() {
 							pagination: { paginationModel: { pageSize: 10 } },
 							columns: {
 								columnVisibilityModel: {
-									employee_no: false,
+									gender: false,
+									race: false
 								},
 							},
 						}}

@@ -444,7 +444,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 			<section
 				style={{
 					backgroundColor: "white",
-					paddingBottom: "2rem",
+					paddingBottom: "0rem",
 					position: "relative",
 					
 				}}

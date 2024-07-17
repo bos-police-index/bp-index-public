@@ -153,10 +153,13 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 				<strong style={{ fontSize: "x-large" }}>Sources: </strong>
 				{tableDef.source}
 				<br />
-				<strong style={{ fontSize: "x-large" }}>Years: </strong>
-				{tableDef.years}
+				<strong style={{ fontSize: "x-large"}}>Years: </strong>
+				{tableDef.years  == "Unknown" ? "Unspecified" : tableDef.years} 
 			</div>
-			{table.fullTable}
+			<div style= {{ marginTop: '1rem' }}>
+				{table.fullTable}	
+			</div>
+			
 		</div>
 	);
 }
