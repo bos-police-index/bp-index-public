@@ -80,7 +80,7 @@ export default function Home() {
 
 		{
 			field: "badgeNo",
-			headerName: "Badge No.*",
+			headerName: "Badge No.",
 			width: 100,
 			type: "string",
 			renderCell: (params) => {
@@ -143,10 +143,10 @@ export default function Home() {
 			field: "numOfIa",
 			headerName: "No. of IA",
 			width: 100,
-			type: "string",
+			type: "number",
 			renderCell: (params) => {
 				const { row } = params;
-				return `${row.numOfIa.toLocaleString()}`;
+				return `${row.numOfIa}`;
 			},
 			renderHeader: (params) => (
 				<Tooltip title="The cumulative number of Internal Affairs complaints linked to the officer">
@@ -159,11 +159,11 @@ export default function Home() {
 			field: "totalPay",
 			headerName: "Total Pay",
 			width: 150,
-			type: "string",
+			type: "number",
 			renderCell: (params) => {
 				const { row } = params;
 				if (row.totalPay != null || undefined) {
-					return `$${row.totalPay.toLocaleString()}`;
+					return `$${row.totalPay}`;
 				}
 				return ``;
 			},
@@ -187,11 +187,11 @@ export default function Home() {
 			field: "overtimePay",
 			headerName: "Overtime Pay",
 			width: 150,
-			type: "string",
+			type: "number",
 			renderCell: (params) => {
 				const { row } = params;
 				if (row.overtimePay != null || undefined) {
-					return `$${row.overtimePay.toLocaleString()}`;
+					return `$${row.overtimePay}`;
 				}
 				return ``;
 			},
@@ -206,11 +206,11 @@ export default function Home() {
 			field: "detailPay",
 			headerName: "Detail Pay",
 			width: 150,
-			type: "string",
+			type: "number",
 			renderCell: (params) => {
 				const { row } = params;
 				if (row.detailPay != null || undefined) {
-					return `$${row.detailPay.toLocaleString()}`;
+					return `$${row.detailPay}`;
 				}
 				return ``;
 			},
@@ -225,11 +225,11 @@ export default function Home() {
 			field: "otherPay",
 			headerName: "Other Pay",
 			width: 150,
-			type: "string",
+			type: "number",
 			renderCell: (params) => {
 				const { row } = params;
 				if (row.otherPay != null || undefined) {
-					return `$${row.otherPay.toLocaleString()}`;
+					return `$${row.otherPay}`;
 				}
 				return ``;
 			},
@@ -368,7 +368,7 @@ export default function Home() {
 					/>
 				</section>
 			</FadeIn>
-			<p className="text-xs text-white mt-[-3.5em] text-center mx-auto w-full max-w-[70em]">* Not Applicable in Badge No. is due to Civilians not having one. Unknown means there is missing data for this officer's badge.</p>
+			{/* <p className="text-xs text-white mt-[1em] text-center mx-auto w-full max-w-[70em]">* Not Applicable in Badge No. is due to Civilians not having one. Unknown means there is missing data for this officer's badge.</p> */}
 		</div>
 	);
 }
