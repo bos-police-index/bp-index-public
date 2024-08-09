@@ -55,6 +55,11 @@ export default function Navbar() {
 						</Link>
 					</MenuItem>
 					<MenuItem onClick={handleClose} style={{ justifyContent: "center" }}>
+						<Link href={"/feedback"} className="text-l hover:link" style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+							Feedback
+						</Link>
+					</MenuItem>
+					<MenuItem onClick={handleClose} style={{ justifyContent: "center" }}>
 						<a
 							href={"https://boston.nxone.com/ApplicationBuilder/eFormRender.html?code=AA6693252735B48211CC5C0E68BC949D&Process=OPATPoliceAccountability"}
 							// className={"outline outline-2 font-bold bg-primary text-white text-xl rounded-lg py-2 w-32 flex items-center justify-center active:scale-90 shadow-xl transition-button duration-200 hover:bg-primary-hover"}
