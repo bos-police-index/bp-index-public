@@ -4,6 +4,8 @@ import { useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import axios from "axios";
 
 interface CreateNewIssueParams {
 	title: String;
@@ -11,7 +13,9 @@ interface CreateNewIssueParams {
 	contactInfo: String | undefined;
 }
 
-const FeedbackForm = () => {
+const FeedbackForm = ({setSubmit}) => {
+	const { executeRecaptcha } = useGoogleReCaptcha();
+
 	const [title, setTitle] = useState<String>("");
 	const [feedback, setFeedback] = useState<String>("");
 	const [email, setEmail] = useState<String>("");
@@ -23,6 +27,7 @@ const FeedbackForm = () => {
 	const gitOwner = process.env.NEXT_PUBLIC_GITHUB_REPO_OWNER;
 	const gitRepoName = process.env.NEXT_PUBLIC_GITHUB_REPO_NAME;
 	const gitRepoAssignee = process.env.NEXT_PUBLIC_GITHUB_ASSIGNEE;
+	const secretCaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SECRET_KEY;
 
 	const octokit = new Octokit({
 		auth: gitToken,
@@ -30,7 +35,7 @@ const FeedbackForm = () => {
 
 	async function createNewIssue({ title, feedback, contactInfo }: CreateNewIssueParams) {
 		const body = `**User's Feedback:** ${feedback}\n\n**Contact Info:** ${contactInfo}`;
-		console.log(gitToken, gitOwner, gitRepoName, gitRepoAssignee);
+		// console.log(gitToken, gitOwner, gitRepoName, gitRepoAssignee);
 		try {
 			const response = await octokit.request(`POST /repos/${gitOwner}/${gitRepoName}/issues`, {
 				owner: gitOwner,
@@ -43,7 +48,7 @@ const FeedbackForm = () => {
 					"X-GitHub-Api-Version": "2022-11-28",
 				},
 			});
-			console.log("Issue created successfully:", response.data);
+			// console.log("Issue created successfully:", response.data);
 		} catch (error) {
 			console.error("Error creating issue:", error);
 		}
@@ -55,6 +60,26 @@ const FeedbackForm = () => {
 		// Reset error states
 		setTitleError(false);
 		setFeedbackError(false);
+		setSubmit("");
+
+		if (!executeRecaptcha) {
+			console.log("not available to execute captcha");
+			return;
+		}
+
+		const gRecaptchaToken = await executeRecaptcha("inquirySubmit");
+
+		const response = await axios({
+			method: "post",
+			url: "/api/recaptchaSubmit",
+			data: {
+				gRecaptchaToken,
+			},
+			headers: {
+				Accept: "application/json, text/plain, */*",
+				"Content-Type": "application/json",
+			},
+		});
 
 		// Validate input fields
 		if (!title) setTitleError(true);
@@ -62,6 +87,15 @@ const FeedbackForm = () => {
 
 		if (!title || !feedback) {
 			console.error("Feedback and/or title not supplied");
+			return;
+		}
+
+		if (response?.data?.success === true) {
+			// console.log(`Success with score of ${response.data.score}`);
+			setSubmit("Recatpcha verified and form submitted");
+		} else {
+			// console.log(`Failed with score ${response?.data?.score}`);
+			setSubmit("Failed to verify captcha. You may be a robot.");
 			return;
 		}
 

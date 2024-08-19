@@ -22,6 +22,7 @@ import "nprogress/nprogress.css";
 import lightThemeOptions from "@styles/theme/lightTheme";
 import Navbar from "@components/Navbar";
 import { ApolloProvider } from "@apollo/client";
+import GoogleCaptchaWrapper from "@utility/GoogleCaptchaWrapper";
 import apolloClient from "@lib/apollo-client";
 interface ApplicationAppProps extends AppProps {
   emotionCache?: EmotionCache;
@@ -80,22 +81,24 @@ const Application: FunctionComponent<ApplicationAppProps> = (props) => {
 			<CacheProvider value={emotionCache}>
 				<ThemeProvider theme={lightTheme}>
 					<QueryClientProvider client={queryClient}>
-						<CssBaseline />
-						<div data-theme="light" className={"max-w-screen h-screen overflow-clip bg-transparent max-h-screen"}>
-							<div id={"wrapper"} className={"max-w-screen h-full overflow-y-auto overflow-x-clip flex flex-col"}>
-								<Head>
-									<title>Boston Police Index</title>
-									<link rel="icon" href="/favicon.ico" />
-								</Head>
-								<div id="allow-screen-stretch" style={{ height: "100vh", margin: "0 auto", width: "100%" }}>
-									<Navbar />
-									<main className="flex-1 bg-transparent">
-									{loading ? <Loading /> : <Component {...pageProps} />}
-										<Toaster richColors closeButton />
-									</main>
+						<GoogleCaptchaWrapper>
+							<CssBaseline />
+							<div data-theme="light" className={"max-w-screen h-screen overflow-clip bg-transparent max-h-screen"}>
+								<div id={"wrapper"} className={"max-w-screen h-full overflow-y-auto overflow-x-clip flex flex-col"}>
+									<Head>
+										<title>Boston Police Index</title>
+										<link rel="icon" href="/favicon.ico" />
+									</Head>
+									<div id="allow-screen-stretch" style={{ height: "100vh", margin: "0 auto", width: "100%" }}>
+										<Navbar />
+										<main className="flex-1 bg-transparent">
+											{loading ? <Loading /> : <Component {...pageProps} />}
+											<Toaster richColors closeButton />
+										</main>
+									</div>
 								</div>
 							</div>
-						</div>
+						</GoogleCaptchaWrapper>
 					</QueryClientProvider>
 				</ThemeProvider>
 			</CacheProvider>
