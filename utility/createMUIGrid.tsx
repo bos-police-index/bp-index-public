@@ -284,6 +284,7 @@ const detail_record_columns = () => {
 			field: "id",
 			hideable: false,
 			headerName: "ID",
+			description: "An arbitrary unique identifier used for getting a specific row of data.",
 			type: "number",
 			valueFormatter: (params) => {
 				return params.value;
@@ -293,6 +294,7 @@ const detail_record_columns = () => {
 		{
 			field: "trackingNo",
 			headerName: "Tracking #",
+			description: "",
 			type: "number",
 			valueFormatter: (params) => {
 				return params.value;
@@ -302,6 +304,7 @@ const detail_record_columns = () => {
 		{
 			field: "customerNo",
 			headerName: "Customer #",
+			description: "",
 			type: "number",
 			valueFormatter: (params) => {
 				return params.value;
@@ -311,6 +314,7 @@ const detail_record_columns = () => {
 		{
 			field: "badgeNo",
 			headerName: "Officer Badge #",
+			description: "The badge number of an officer. Note that this is not necessarily unique.",
 			type: "number",
 			valueFormatter: (params) => {
 				return params.value;
@@ -321,6 +325,7 @@ const detail_record_columns = () => {
 		{
 			field: "streetNo",
 			headerName: "Street #",
+			description: "The address of the detail done.",
 			type: "number",
 			valueFormatter: (params) => {
 				return params.value;
@@ -330,6 +335,7 @@ const detail_record_columns = () => {
 		{
 			field: "street",
 			headerName: "Street Name",
+			description: "The name of the street where the detail was done.",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -339,31 +345,35 @@ const detail_record_columns = () => {
 		{
 			field: "xStreet",
 			headerName: "Cross Street",
+			description: "The cross street of where the detail was done",
 			type: "number",
 			valueFormatter: (params) => {
 				return params.value;
 			},
 			width: 170,
 		},
-		{
-			field: "location",
-			headerName: "Location",
-			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			width: 250,
-		},
+		// {
+		// 	field: "location",
+		// 	headerName: "Location",
+		// 	description: "",
+		// 	type: "string",
+		// 	valueFormatter: (params) => {
+		// 		return params.value;
+		// 	},
+		// 	width: 250,
+		// },
 		{
 			field: "startDate",
 			headerName: "Start Date",
+			description: "The day that the detail work took place",
 			type: "date",
-			valueFormatter: formatDate,
+			valueFormatter: formatDateShort,
 			width: 200,
 		},
 		{
 			field: "startTime",
-			headerName: "Detail Start",
+			headerName: "Start Time",
+			description: "The time of day it started",
 			type: "number",
 			valueFormatter: (params) => {
 				return formatTime(params.value);
@@ -372,7 +382,8 @@ const detail_record_columns = () => {
 		},
 		{
 			field: "endTime",
-			headerName: "Detail End",
+			headerName: "End Time",
+			description: "The time of day it ended",
 			type: "number",
 			valueFormatter: (params) => {
 				return formatTime(params.value);
@@ -382,6 +393,7 @@ const detail_record_columns = () => {
 		{
 			field: "hoursWorked",
 			headerName: "Hours Worked",
+			description: "Number of hours worked that day",
 			type: "number",
 			valueFormatter: (params) => {
 				return formatHours(params.value);
@@ -392,6 +404,7 @@ const detail_record_columns = () => {
 		{
 			field: "payHours",
 			headerName: "Pay Hours",
+			description: "Number of hours officer was paid for in detail from that job",
 			type: "number",
 			valueFormatter: (params) => {
 				return formatHours(params.value);
@@ -401,6 +414,7 @@ const detail_record_columns = () => {
 		{
 			field: "payAmount",
 			headerName: "Pay Amount",
+			description: "The amount that officer was paid for this detail work",
 			type: "number",
 			valueFormatter: (params) => {
 				return formatMoney(params.value);
@@ -410,6 +424,7 @@ const detail_record_columns = () => {
 		{
 			field: "payRate",
 			headerName: "Pay Rate",
+			description: "The rate per hour that the officer was paid for this detail work",
 			type: "number",
 			valueFormatter: (params) => {
 				return formatMoney(params.value);
@@ -420,6 +435,7 @@ const detail_record_columns = () => {
 		{
 			field: "sex",
 			headerName: "Officer Sex",
+			description: "The sex of the officer",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -430,6 +446,7 @@ const detail_record_columns = () => {
 		{
 			field: "race",
 			headerName: "Officer Race",
+			description: "The race of the officer",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -440,6 +457,7 @@ const detail_record_columns = () => {
 		{
 			field: "empRank",
 			headerName: "Officer Rank",
+			description: "The rank of the officer",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -450,6 +468,7 @@ const detail_record_columns = () => {
 		{
 			field: "empOrgCode",
 			headerName: "Officer Org Code",
+			description: "5-digit code assigned to each organization within BPD",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -460,6 +479,7 @@ const detail_record_columns = () => {
 		{
 			field: "payTrcCode",
 			headerName: "Pay TRC Code",
+			description: "",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -470,6 +490,7 @@ const detail_record_columns = () => {
 		{
 			field: "detailType",
 			headerName: "Detail Type",
+			description: "C is construction (traffic control + pedestrian safety). S is standard (security etc.)",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -477,19 +498,21 @@ const detail_record_columns = () => {
 			align: "center",
 			width: 100,
 		},
-		{
-			field: "detailRank",
-			headerName: "Detail Rank",
-			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
-			align: "center",
-			width: 100,
-		},
+		// {
+		// 	field: "detailRank",
+		// 	headerName: "Detail Rank",
+		// 	description: "",
+		// 	type: "string",
+		// 	valueFormatter: (params) => {
+		// 		return params.value;
+		// 	},
+		// 	align: "center",
+		// 	width: 100,
+		// },
 		{
 			field: "adminFeeFlag",
-			headerName: "Admin Fee?",
+			headerName: "Admin Fee",
+			description: "",
 			type: "boolean",
 			valueFormatter: (params) => {
 				return params.value;

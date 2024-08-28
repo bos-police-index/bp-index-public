@@ -1,5 +1,5 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { getMUIGrid } from "@utility/createMUIGrid";
+import { functionMapping, getMUIGrid } from "@utility/createMUIGrid";
 import { extractID, tableExists } from "@utility/utility";
 import apolloClient from "@lib/apollo-client";
 import { GET_FIRST_1000_DETAIL_RECORDS, GET_REST_DETAIL_RECORDS } from "@lib/graphql/queries";
@@ -7,6 +7,8 @@ import IconWrapper, { tableDefinitions } from "@utility/tableDefinitions";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import getHeaderWithDescription from "@utility/columnDefinitions";
+import Glossary from "@components/Glossary";
 
 interface DetailRecord {
 	adminFeeFlag: string;
@@ -39,7 +41,6 @@ interface DetailRecord {
 	empRank: number;
 	empOrgCode: number;
 }
-  
 
 interface DetailRecordsResponse {
 	allLinkSu24DetailRecords: {
@@ -77,67 +78,62 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		props: {
 			rows: dataArr,
 			table_name: table_name,
+			columns: getHeaderWithDescription(functionMapping[table_name]),
 		},
 	};
 };
 
 export default function Table(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
 	const [rows, setRows] = useState<any[]>(props.rows);
-	const [loadingMoreData, setLoadingMoreData] = useState<boolean>(true)
+	const [loadingMoreData, setLoadingMoreData] = useState<boolean>(true);
 	const router = useRouter();
 	const tableDef = tableDefinitions.find((tableDef) => tableDef.query === props.table_name);
 
 	const table = getMUIGrid(props.table_name, rows, "", [], []);
 
 	//fetch the rest of the rows once loaded
-	useEffect( () =>{
-		const fetchRestRecords = async() =>{
+	useEffect(() => {
+		const fetchRestRecords = async () => {
 			const { data } = await apolloClient.query<DetailRecordsResponse>({ query: GET_REST_DETAIL_RECORDS });
 
-	let dataArr: any[] = [];
+			let dataArr: any[] = [];
 
-	if (data && data.allLinkSu24DetailRecords && data.allLinkSu24DetailRecords.nodes) {
-		dataArr = data.allLinkSu24DetailRecords.nodes.map((item, index) => ({
-			id: index + 1,
-			...item,
-		}));
-	}
-	if (props.table_name === "employee") {
-		// remove the officer_photo column
-		dataArr.forEach((item) => {
-			delete item["officer_photo"];
-		});
-	}
-		setRows([...rows, ...dataArr])
-		setLoadingMoreData(false)
-		}
-		setLoadingMoreData(true)
-		fetchRestRecords()
-	},[])
+			if (data && data.allLinkSu24DetailRecords && data.allLinkSu24DetailRecords.nodes) {
+				dataArr = data.allLinkSu24DetailRecords.nodes.map((item, index) => ({
+					id: index + 1,
+					...item,
+				}));
+			}
+			if (props.table_name === "employee") {
+				// remove the officer_photo column
+				dataArr.forEach((item) => {
+					delete item["officer_photo"];
+				});
+			}
+			setRows([...rows, ...dataArr]);
+			setLoadingMoreData(false);
+		};
+		setLoadingMoreData(true);
+		fetchRestRecords();
+	}, []);
 
 	return (
 		<div className={"max-w-1128 h-full"} style={{ color: "white", fontSize: "large" }}>
-			
 			<div style={{ margin: "1rem 0" }}>
-			<div style={{ margin: "1rem 0" }}>
-				<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-				<span>
-					<Link href="/" style={{ color: "#3874CB" }}>
-						{"Home > "}
-					</Link>
-					<Link href="/data" style={{ color: "#3874CB" }}>
-						{"Data > "}
-					</Link>
-					<span style={{ color: "#3874CB", textDecoration: "none", cursor: "default" }}>
-				{tableDef.table}
-					</span>
-				</span>
-				{loadingMoreData ? <p>Currently loading more rows...</p> : <></>}
-					
+				<div style={{ margin: "1rem 0" }}>
+					<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+						<span>
+							<Link href="/" style={{ color: "#3874CB" }}>
+								{"Home > "}
+							</Link>
+							<Link href="/data" style={{ color: "#3874CB" }}>
+								{"Data > "}
+							</Link>
+							<span style={{ color: "#3874CB", textDecoration: "none", cursor: "default" }}>{tableDef.table}</span>
+						</span>
+						{loadingMoreData ? <p>Currently loading more rows...</p> : <></>}
+					</div>
 				</div>
-				
-			</div>
-				
 			</div>
 			<div>
 				<div style={{ display: "flex", alignItems: "center", justifyContent: "start", marginBottom: "1rem" }}>
@@ -153,13 +149,11 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 				<strong style={{ fontSize: "x-large" }}>Sources: </strong>
 				{tableDef.source}
 				<br />
-				<strong style={{ fontSize: "x-large"}}>Years: </strong>
-				{tableDef.years  == "Unknown" ? "Unspecified" : tableDef.years} 
+				<strong style={{ fontSize: "x-large" }}>Years: </strong>
+				{tableDef.years == "Unknown" ? "Unspecified" : tableDef.years}
 			</div>
-			<div style= {{ marginTop: '1rem' }}>
-				{table.fullTable}	
-			</div>
-			
+			<div style={{ marginTop: "1rem" }}>{table.fullTable}</div>
+			<Glossary columnObjects={props.columns} />
 		</div>
 	);
 }
