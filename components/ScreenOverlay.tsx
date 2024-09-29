@@ -1,5 +1,6 @@
 import { TbArrowBackUp } from "react-icons/tb";
 import React from "react";
+import { bpi_deep_green, bpi_light_green } from "@styles/theme/lightTheme";
 
 interface ScreenOverlayProps {
 	title: string;
@@ -16,9 +17,15 @@ export default function ScreenOverlay({ title, children }: ScreenOverlayProps) {
 							document.getElementById("screen-overlay").classList.add("hidden");
 							document.getElementById("screen-overlay").classList.remove("flex");
 						}}
-						className={"bg-primary rounded-lg p-2 w-32 flex items-center justify-center active:scale-90 shadow-xl transition-button duration-300 hover:bg-primary-hover"}
+						className={`rounded-lg p-2 w-32 flex items-center justify-center active:scale-90 shadow-xl transition-button duration-300 `}
+						style={{
+							backgroundColor: bpi_light_green,
+							transition: "background-color 0.3s",
+						}}
+						onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = bpi_deep_green)}
+						onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = bpi_light_green)}
 					>
-						<TbArrowBackUp className={"text-3xl text-white"} />
+						<TbArrowBackUp className={`text-3xl text-white bg-[${bpi_deep_green}]`} />
 					</button>
 				</span>
 				<div className={"mt-6 px-10 flex-1"}>{children}</div>
