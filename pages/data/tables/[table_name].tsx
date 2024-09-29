@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import getHeaderWithDescription from "@utility/columnDefinitions";
 import Glossary from "@components/Glossary";
+import { bpi_deep_green, bpi_light_green } from "@styles/theme/lightTheme";
 
 interface DetailRecord {
 	adminFeeFlag: string;
@@ -118,20 +119,20 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 	}, []);
 
 	return (
-		<div className={"max-w-1128 h-full"} style={{ color: "white", fontSize: "large" }}>
+		<div className={"max-w-1128 h-full"} style={{ color: bpi_deep_green, fontSize: "large" }}>
 			<div style={{ margin: "1rem 0" }}>
 				<div style={{ margin: "1rem 0" }}>
 					<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 						<span>
-							<Link href="/" style={{ color: "#3874CB" }}>
+							<Link href="/" style={{ color: bpi_light_green }}>
 								{"Home > "}
 							</Link>
-							<Link href="/data" style={{ color: "#3874CB" }}>
+							<Link href="/data" style={{ color: bpi_light_green }}>
 								{"Data > "}
 							</Link>
-							<span style={{ color: "#3874CB", textDecoration: "none", cursor: "default" }}>{tableDef.table}</span>
+							<span style={{ color: bpi_light_green, textDecoration: "none", cursor: "default" }}>{tableDef.table}</span>
 						</span>
-						{loadingMoreData ? <p>Currently loading more rows...</p> : <></>}
+						{loadingMoreData ? <p style={{ color: bpi_light_green }}>Currently loading more rows...</p> : <></>}
 					</div>
 				</div>
 			</div>
@@ -139,12 +140,12 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 				<div style={{ display: "flex", alignItems: "center", justifyContent: "start", marginBottom: "1rem" }}>
 					<div style={{ marginLeft: "-0.8rem" }}>
 						{" "}
-						<IconWrapper Icon={tableDef.image.src} color="white" fontSize="4rem" />
+						<IconWrapper Icon={tableDef.image.src} color={bpi_light_green} fontSize="4rem" />
 					</div>
 					<h2 style={{ marginLeft: "1rem", fontSize: "xx-large", fontWeight: "bold" }}>{tableDef.table}</h2>
 				</div>
 
-				<p style={{ color: "white" }}>{tableDef?.longDescription}</p>
+				<p style={{ color: bpi_deep_green, fontSize: "medium" }}>{tableDef?.longDescription}</p>
 				<br />
 				<strong style={{ fontSize: "x-large" }}>Sources: </strong>
 				{tableDef.source}

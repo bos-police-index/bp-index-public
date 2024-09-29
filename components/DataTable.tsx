@@ -3,6 +3,7 @@ import { Stack, createSvgIcon } from "@mui/material";
 import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFilterButton, GridToolbarDensitySelector, GridCsvExportOptions, useGridApiContext, GridColDef } from "@mui/x-data-grid";
 import styled from "@emotion/styled";
 import { StyledGridOverlay } from "@styles/reusedStyledComponents";
+import { bpi_light_green } from "@styles/theme/lightTheme";
 
 export default function DataTable({ cols, table, table_name, height, pageSize, pageSizeOptions, rowCount }: { cols: GridColDef[]; table: any[]; table_name: string; height: string; pageSize: number; pageSizeOptions: number[]; rowCount: number | undefined }) {
 	const ExportIcon = createSvgIcon(<path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z" />, "SaveAlt");
@@ -102,7 +103,12 @@ export default function DataTable({ cols, table, table_name, height, pageSize, p
 	return (
 		<DataGrid
 			className={"w-full bg-white"}
-			sx={{ height: height }}
+			sx={{
+				height: height,
+				"& .MuiButtonBase-root": {
+					color: bpi_light_green,
+				},
+			}}
 			columns={cols}
 			rows={table}
 			density={"compact"}

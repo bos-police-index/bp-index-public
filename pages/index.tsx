@@ -9,6 +9,7 @@ import { fetchHompage } from "@utility/dataUtils";
 import backgroundImage from "../public/fist-in-air.jpeg";
 import properCaseName from "@utility/properNameCasing";
 import { StyledGridOverlay } from "@styles/reusedStyledComponents";
+import { bpi_light_green, bpi_light_gray } from "@styles/theme/lightTheme";
 
 export default function Home() {
 	const [keyword, setKeyword] = useState<string>("");
@@ -105,7 +106,7 @@ export default function Home() {
 				</Tooltip>
 			),
 		},
-		
+
 		{
 			field: "sex",
 			headerName: "Sex",
@@ -298,17 +299,16 @@ export default function Home() {
 			</StyledGridOverlay>
 		);
 	}
-	console.log(searchResData[0])
 	return (
-		<div>
-			<div className="w-full overflow-visible mb-[2.5rem]">
+		<div style={{ backgroundColor: bpi_light_gray }}>
+			<div className="w-full overflow-visible mb-[2.5rem">
 				<div
 					className="bg-cover bg-center"
 					style={{
 						backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${backgroundImage.src})`,
 						width: "110vw",
 						paddingBottom: "0rem",
-						marginBottom: "1rem",
+						marginBottom: "3rem",
 						marginLeft: "-10vw",
 					}}
 				>
@@ -351,9 +351,7 @@ export default function Home() {
 						initialState={{
 							pagination: { paginationModel: { pageSize: 10 } },
 							columns: {
-								columnVisibilityModel: {
-									
-								},
+								columnVisibilityModel: {},
 							},
 						}}
 						pageSizeOptions={[5, 10, 15, 20]}
@@ -365,6 +363,11 @@ export default function Home() {
 						}}
 						style={{ minWidth: "80%" }}
 						loading={loading}
+						sx={{
+							"& .MuiButtonBase-root": {
+								color: bpi_light_green, // Changes the color of the buttons
+							},
+						}}
 					/>
 				</section>
 			</FadeIn>

@@ -3,6 +3,17 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+ 
+  --bpi_deep_green: #296351;
+  --bpi_light_green: #439679;
+  --light_gray: #F5F5F5;
+  --white: #ffffff;
+
+  /* Old colors */
+  --bpi_dark_blue: #032752;
+}
+
 html,
 body {
   padding: 0;
@@ -11,7 +22,7 @@ body {
 }
 
 html {
-  background: linear-gradient(0deg, #032752 0%, #032752 50%, #032752 100%);
+  background: linear-gradient(0deg, var(--white) 0%, var(--white) 50%, var(--white) 100%);
 }
 
 * {

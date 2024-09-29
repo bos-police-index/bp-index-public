@@ -9,7 +9,7 @@ import BPILogo from '../public/BPI-Logo-White.png'
 import dept from '../public/department.png'
 import Image from "next/image";
 import '../public/favicon.ico'
-
+import { bpi_deep_green } from "@styles/theme/lightTheme";
 
 export default function Navbar() {
 	const HamburgerMenu = () => {
@@ -75,7 +75,7 @@ export default function Navbar() {
 	};
 
 	return (
-		<header className="flex justify-center items-center h-[5rem] px-0 text-white pb-[0rem]" style={{ borderBottom: "white 2px solid", width: "100%" }}>
+		<header className="flex justify-center items-center h-[4rem] px-0 text-white pb-[0rem]" style={{ borderBottom: "white 0px solid", width: "100%", backgroundColor: bpi_deep_green }}>
 			<div style={{ maxWidth: "1128px" }} className="flex justify-between items-center">
 				<div className="flex justify-center items-center font-roboto ml-[-1.7rem]">
 					<Link href="/" style={{ width: "5rem" }}>

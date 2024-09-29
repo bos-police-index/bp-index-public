@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { Button } from "antd";
 import ScreenOverlay from "@components/ScreenOverlay";
+import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
 
 interface Table {
 	title: string;
@@ -31,14 +32,14 @@ interface FullWidthTabsProps {
 
 const StyledTabs = styled(Tabs)({
 	"& .MuiTabs-indicator": {
-		backgroundColor: "#1890ff",
+		backgroundColor: bpi_deep_green,
 	},
 	"& .MuiTabs-flexContainer": {
 		justifyContent: "start",
 	},
 });
 
-const sectionHeaderColor = "#3874CB";
+const sectionHeaderColor = bpi_deep_green;
 
 const StyledTab = styled(Tab)(({ theme }) => ({
 	textTransform: "none",
@@ -126,7 +127,7 @@ export default function FullWidthTabs({ tables }: FullWidthTabsProps) {
 	}
 
 	return tables ? (
-		<Box sx={{ maxWidth: '1128px', margin: "2rem auto", marginBottom: "10rem", minHeight: '10rem' }}>
+		<Box sx={{ maxWidth: "1128px", margin: "2rem auto", marginBottom: "10rem", minHeight: "10rem" }}>
 			<div style={{ display: "flex", alignItems: "center", justifyContent: "space-around" }}>
 				<AppBar position="static" sx={{ backgroundColor: "transparent", boxShadow: "none" }}>
 					<StyledTabs value={value} onChange={handleChange} aria-label="full width tabs example">
@@ -142,7 +143,7 @@ export default function FullWidthTabs({ tables }: FullWidthTabsProps) {
 					</StyledTabs>
 				</AppBar>
 
-				<Button type="primary" shape="round" onClick={handleSeeAllClick} className={"bg-[sectionHeaderColor] text-white font-urbanist active:scale-[.95] p-2 w-32 shadow-xl transition-button duration-300 hover:bg-primary-hover"} style={{ marginLeft: "-5rem" }}>
+				<Button type="primary" shape="round" onClick={handleSeeAllClick} className={" text-white font-urbanist active:scale-[.95] p-2 w-32 shadow-xl transition-button duration-300 hover:bg-primary-hover"} style={{ marginLeft: "-5rem", backgroundColor: bpi_deep_green }}>
 					See All
 				</Button>
 			</div>

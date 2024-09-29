@@ -7,6 +7,7 @@ import CrisisAlertIcon from "@mui/icons-material/CrisisAlert";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import { CSSProperties } from "react";
+import { bpi_deep_green } from "@styles/theme/lightTheme";
 
 interface IconWrapperProps {
 	Icon: React.ElementType;
@@ -14,7 +15,7 @@ interface IconWrapperProps {
 	color?: string;
 }
 
-const IconWrapper = ({ Icon, fontSize = "48px", color = "#3874CB" }: IconWrapperProps) => {
+const IconWrapper = ({ Icon, fontSize = "48px", color = bpi_deep_green }: IconWrapperProps) => {
 	const iconStyle: CSSProperties = {
 		fontSize: fontSize,
 		color: color,

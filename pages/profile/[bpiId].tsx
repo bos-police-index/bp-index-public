@@ -7,6 +7,8 @@ import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import { Button } from "antd";
 import FullWidthTabs from "./TabTables";
+import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
+
 interface Table {
 	title: string;
 	tables: DataTables;
@@ -430,7 +432,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 		}
 	}, [bpiId, keyword]);
 
-	const sectionHeaderColor = "#3874CB";
+	const sectionHeaderColor = bpi_light_green;
 
 	function formatMoney(number: number): string {
 		return new Intl.NumberFormat("en-US", {
@@ -446,17 +448,16 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 					backgroundColor: "white",
 					paddingBottom: "0rem",
 					position: "relative",
-					
 				}}
 			>
-				<div className="contain-content" style={{ maxWidth: '1128px', margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-					<div className="title" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: "#032752" }}>
-						<p className="relative text-4xl font-bold underline" style={{ paddingTop: "2rem", marginLeft: "1rem" }}>
+				<div className="contain-content" style={{ width: "68.25%", margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "flex-start", marginBottom: "1.5rem" }}>
+					<div className="title" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: bpi_deep_green }}>
+						<p className="relative text-4xl font-bold" style={{ paddingTop: "2rem", marginLeft: "1rem", marginBottom: "1.5rem" }}>
 							{officerData.name}
 						</p>
 					</div>
-					<div className="sections" style={{ display: "flex", justifyContent: "flex-start", width: "100%", padding: "1rem" }}>
-						<div className="overview" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "calc(50% - 1rem)", marginRight: "2rem", height: "300px" }}>
+					<div className="sections" style={{ display: "flex", justifyContent: "space-between", width: "100%", padding: "1rem" }}>
+						<div className="overview" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "52%", marginRight: "2rem", height: "300px" }}>
 							<p style={{ color: sectionHeaderColor }} className="text-3xl">
 								Overview
 							</p>
@@ -479,35 +480,21 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 								<strong>Race:</strong> {officerData.race}
 							</p>
 						</div>
-						<div className="table-of-contents" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "35%", height: "300px" }}>
+						<div className="table-of-contents" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2.5rem", width: "43%", height: "300px" }}>
 							<p style={{ color: sectionHeaderColor }} className="text-3xl">
 								Data Summary
 							</p>
-							<div className="text-lg mt-3">
-								<strong>Detail Records:</strong>
-								<span
-									style={{ display: "inline-block", textIndent: "0.2em" }}
-									// onClick={() => {
-									//  document.getElementById("detail-record").scrollIntoView({ behavior: "smooth" });
-									// }}
-								>
-									{officerData.detail_num}
-								</span>
+							<div className="text-lg mt-3" style={{ display: "flex", justifyContent: "space-between" }}>
+								<strong>Detail Records</strong>
+								<span>{officerData.detail_num}</span>
 							</div>
-							<div className="text-lg">
-								<strong>Officer IA:</strong>
-								<span
-									style={{ display: "inline-block", textIndent: "0.2em" }}
-									// onClick={() => {
-									//  document.getElementById("officer-ia").scrollIntoView({ behavior: "smooth" });
-									// }}
-								>
-									{officerData.ia_num}
-								</span>
+							<div className="text-lg" style={{ display: "flex", justifyContent: "space-between" }}>
+								<strong>Officer IA</strong>
+								<span>{officerData.ia_num}</span>
 							</div>
 
-							<div className="text-lg">
-								<strong style={{ cursor: "pointer" }}>Earnings:</strong> {`$${formatMoney(officerData.totalEarnings)}`}
+							<div className="text-lg" style={{ display: "flex", justifyContent: "space-between" }}>
+								<strong style={{ cursor: "pointer" }}>Earnings</strong> {`$${formatMoney(officerData.totalEarnings)}`}
 							</div>
 							<p className="text-lg">{/* <strong style={{ cursor: "pointer" }}>FIO:</strong> {officerData.fio_record} */}</p>
 							<p className="text-lg">{/* <strong style={{ cursor: "pointer" }}>Traffic Tickets:</strong> {officerData.traffic_no} */}</p>
@@ -516,7 +503,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 				</div>
 			</section>{" "}
 			: <></>
-			{tablesArr ? <FullWidthTabs tables={tablesArr} /> : <></>}
+			<div style={{ backgroundColor: bpi_light_gray, paddingTop: "1.25rem" }}>{tablesArr ? <FullWidthTabs tables={tablesArr} /> : <></>}</div>
 			{/* Uncomment and modify if needed
 			{tablesArr.map((table) => {
 			  return (

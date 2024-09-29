@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Card } from "antd";
 import { tableDefinitions } from "../../utility/tableDefinitions";
+import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
 
 export default function Home() {
 	const [cardFlipped, setCardFlipped] = useState<any>(null);
@@ -29,19 +30,17 @@ export default function Home() {
 						<Card
 							key={table.table}
 							style={{
-								borderColor: "#3874CB",
+								borderColor: bpi_deep_green,
 								boxShadow: "0px 0px 4px 4px rgba(0, 0, 0, 0.1)",
-								color: "#3874CB",
+								color: bpi_deep_green,
 								width: "241px",
 								height: "170px",
-								margin: '1rem 1rem',
+								margin: "1rem 1rem",
 								alignContent: "center",
 								transition: "transform 0.5s",
-								// transform: cardFlipped == table.table ? "rotateY(180deg)" : "rotateY(0deg)", // Flipping animation
-								backgroundColor: cardFlipped == table.table ? "#3874CB" : "transparent", // Blue background on hover
+								backgroundColor: cardFlipped == table.table ? bpi_light_green : "transparent",
 								opacity: table.isFake ? "50%" : "100%",
 								pointerEvents: table.isFake ? "none" : "all",
-								
 							}}
 							onMouseEnter={() => handleHover(table)}
 							onMouseLeave={handleLeave}
@@ -51,20 +50,20 @@ export default function Home() {
 									pathname: "/data/tables/[table_name]",
 									query: { table_name: table.query },
 								}}
-								className={`flex flex-col items-center justify-center text-lg font-medium bg-white rounded-lg overflow-clip gap-4`}
+								className={`flex flex-col items-center justify-center text-lg font-medium rounded-lg overflow-clip gap-4`}
 								style={{
 									display: "flex",
 									alignItems: "center",
 									justifyContent: "space-between",
-									color: cardFlipped === table.table ? "white" : "#3874CB",
-									backgroundColor: cardFlipped !== table.table ? "white" : "#3874CB",
+									color: cardFlipped === table.table ? "white" : bpi_deep_green,
+									backgroundColor: cardFlipped !== table.table ? "white" : bpi_light_green,
 									lineHeight: "1.3",
 								}}
 							>
 								{cardFlipped == table.table ? (
 									<div style={{ fontSize: "medium" }}>{table.shortDescription}</div>
 								) : (
-									<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+									<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: bpi_deep_green }}>
 										<div>{table.image.component}</div>
 										<div style={{ textAlign: "center" }}>{table.table}</div>
 									</div>
@@ -75,22 +74,22 @@ export default function Home() {
 
 					{/* dummy cards */}
 					{[...Array(5)].map((_, index) => (
-                <Card
-                    key={`dummy-${index}`}
-                    style={{
-                        borderColor: "none",
-                        boxShadow: "0px 0px 4px 4px rgba(0, 0, 0, 0.1)",
-                        color: "#3874CB",
-						width: "241px",
-						height: "170px",
-						margin: '1rem 1rem',
-                        alignContent: "center",
-                        transition: "transform 0.5s",
-                        backgroundColor: "#F0F0F0", 
-                        pointerEvents: "none",
-                    }}
-                />
-            ))}
+						<Card
+							key={`dummy-${index}`}
+							style={{
+								borderColor: "none",
+								boxShadow: "0px 0px 4px 4px rgba(0, 0, 0, 0.1)",
+								color: "#3874CB",
+								width: "241px",
+								height: "170px",
+								margin: "1rem 1rem",
+								alignContent: "center",
+								transition: "transform 0.5s",
+								backgroundColor: "#F0F0F0",
+								pointerEvents: "none",
+							}}
+						/>
+					))}
 				</div>
 			</div>
 		</div>
