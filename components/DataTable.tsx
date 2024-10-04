@@ -104,9 +104,15 @@ export default function DataTable({ cols, table, table_name, height, pageSize, p
 		<DataGrid
 			className={"w-full bg-white"}
 			sx={{
-				height: height,
+							
+				"& .MuiSwitch-switchBase.Mui-checked": {
+					backgroundColor: bpi_light_green,
+				},
+				"& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+					backgroundColor: bpi_light_green,
+				},
 				"& .MuiButtonBase-root": {
-					color: bpi_light_green,
+					color: bpi_light_green, // Changes the color of the buttons
 				},
 			}}
 			columns={cols}
@@ -120,6 +126,7 @@ export default function DataTable({ cols, table, table_name, height, pageSize, p
 			pageSizeOptions={pageSizeOptions}
 			autoHeight={true}
 			style={{ minHeight: "20rem" }}
+			
 			initialState={{
 				sorting: {
 					sortModel: [{ field: "year", sort: "desc" }],

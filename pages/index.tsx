@@ -364,12 +364,20 @@ export default function Home() {
 						style={{ minWidth: "80%" }}
 						loading={loading}
 						sx={{
+							
+							"& .MuiSwitch-switchBase.Mui-checked": {
+								backgroundColor: bpi_light_green,
+							},
+							"& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+								backgroundColor: bpi_light_green,
+							},
 							"& .MuiButtonBase-root": {
 								color: bpi_light_green, // Changes the color of the buttons
 							},
 						}}
 					/>
 				</section>
+				<div style={{ height: "2.5rem" }}></div>
 			</FadeIn>
 			{/* <p className="text-xs text-white mt-[1em] text-center mx-auto w-full max-w-[70em]">* Not Applicable in Badge No. is due to Civilians not having one. Unknown means there is missing data for this officer's badge.</p> */}
 		</div>

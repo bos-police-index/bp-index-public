@@ -1,4 +1,4 @@
-import FeedbackForm from "./FeedbackForm";
+import FeedbackForm from "../pages/feedback/FeedbackForm";
 import GoogleCaptchaWrapper from "@utility/GoogleCaptchaWrapper";
 
 const Feedback = ({setSubmit}) => {

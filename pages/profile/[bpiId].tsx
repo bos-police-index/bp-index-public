@@ -503,7 +503,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 				</div>
 			</section>{" "}
 			: <></>
-			<div style={{ backgroundColor: bpi_light_gray, paddingTop: "1.25rem" }}>{tablesArr ? <FullWidthTabs tables={tablesArr} /> : <></>}</div>
+			<div style={{ backgroundColor: bpi_light_gray, paddingTop: "1.25rem", paddingBottom: ".25rem" }}>{tablesArr ? <FullWidthTabs tables={tablesArr} /> : <></>}</div>
 			{/* Uncomment and modify if needed
 			{tablesArr.map((table) => {
 			  return (

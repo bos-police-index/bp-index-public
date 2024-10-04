@@ -7,6 +7,7 @@ import Link from "next/link";
 import { fetchHompage } from "@utility/dataUtils";
 import properCaseName from "@utility/properNameCasing";
 import { StyledGridOverlay } from "@styles/reusedStyledComponents";
+import { bpi_light_green } from "@styles/theme/lightTheme";
 
 export default function SearchResult(): FunctionComponentElement<{}> {
 	const router = useRouter();
@@ -293,6 +294,18 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 					}}
 					loading={loading}
 					style={{ maxWidth: "1128px" }}
+					sx={{
+							
+						"& .MuiSwitch-switchBase.Mui-checked": {
+							backgroundColor: bpi_light_green,
+						},
+						"& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+							backgroundColor: bpi_light_green,
+						},
+						"& .MuiButtonBase-root": {
+							color: bpi_light_green, // Changes the color of the buttons
+						},
+					}}
 				/>
 			</section>
 			{/* <p className="text-xs text-white mt-[-3.5em] text-center mx-auto w-full max-w-[70em]">* Not Applicable in Badge No. is due to Civilians not having one. Unknown means there is missing data for this officer's badge.</p> */}

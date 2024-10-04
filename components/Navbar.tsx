@@ -24,7 +24,7 @@ export default function Navbar() {
 		return (
 			<div>
 				<Button id="basic-button" aria-controls={open ? "basic-menu" : undefined} aria-haspopup="true" aria-expanded={open ? "true" : undefined} onClick={handleClick}>
-					<MenuIcon style={{ color: "white", fontSize: "3rem" }} />
+					<MenuIcon style={{ color: "white", fontSize: "2.2rem" }} />
 				</Button>
 				<Menu
 					id="basic-menu"

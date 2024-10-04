@@ -23,6 +23,7 @@ import lightThemeOptions from "@styles/theme/lightTheme";
 import Navbar from "@components/Navbar";
 import { ApolloProvider } from "@apollo/client";
 import apolloClient from "@lib/apollo-client";
+import Link from "next/link";
 interface ApplicationAppProps extends AppProps {
   emotionCache?: EmotionCache;
 }
@@ -93,6 +94,7 @@ const Application: FunctionComponent<ApplicationAppProps> = (props) => {
 										<main className="flex-1 bg-transparent">
 											{loading ? <Loading /> : <Component {...pageProps} />}
 											<Toaster richColors closeButton />
+                      <div style={{background: 'none ', fontSize: 'x-small', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>This is a beta version of the website, if you experience any bugs or would like to recommend a feature, please click <b><Link href="/feedback" content="here"> &nbsp;<u>here</u>&nbsp;</Link> </b>to submit a feedback form</div>
 										</main>
 									</div>
 								</div>
