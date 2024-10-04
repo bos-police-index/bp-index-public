@@ -1,7 +1,6 @@
-import FeedbackForm from "@components/FeedbackForm";
 import { useState } from "react";
 import Alert from '@mui/material/Alert';
-import Feedback from "@components/Feedback";
+import FeedbackForm from "./FeedbackForm";
 
 export default function Home() {
     const [submit, setSubmit] = useState<string>("");
@@ -41,7 +40,7 @@ export default function Home() {
             Submission Failed: {submit}
         </Alert> : null
         }
-            <Feedback setSubmit={setSubmit}/>
+            <FeedbackForm setSubmit={setSubmit}/>
         </div>
     );
 }
