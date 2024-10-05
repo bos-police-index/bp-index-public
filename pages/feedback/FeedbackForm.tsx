@@ -121,16 +121,16 @@ const FeedbackForm = ({ setSubmit }) => {
 					}}
 					noValidate
 					autoComplete="off"
-					style={{ margin: "0 auto", backgroundColor: "white", width: "50vw", height: "70vh", borderRadius: "14px", boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)" }}
+					style={{ margin: "0 auto", backgroundColor: "white", width: "50vw", height: "70%", borderRadius: "14px", boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)" }}
 				>
 					<div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem 0" }}>
 						<p className="text-4xl font-bold">Feedback Form</p>
 					</div>
-					<div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "0rem 2rem" }}>
+					<div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "0rem 2rem", maxHeight: "65%" }}>
 						<TextField label="Title" style={{ width: "90%" }} required value={title} onChange={(input) => setTitle(input.target.value)} error={titleError} />
 						<TextField id="outlined-multiline-static" label="Feedback" multiline rows={3} style={{ width: "90%" }} required value={feedback} onChange={(input) => setFeedback(input.target.value)} error={feedbackError} />
 						<TextField label="Email (optional)" type="email" style={{ width: "90%" }} value={email} onChange={(input) => setEmail(input.target.value)} />
-						<Button style={{ backgroundColor: bpi_deep_green, marginTop: "1.5rem" }} type="submit" variant="contained">
+						<Button style={{ backgroundColor: bpi_deep_green, marginTop: "1.5rem", marginBottom: "3rem" }} type="submit" variant="contained">
 							Submit Feedback
 						</Button>
 					</div>

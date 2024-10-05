@@ -36,7 +36,7 @@ export default function SearchBar({ title, officerName }: SearchBarProps) {
 	};
 
 	return (
-		<div className="flex justify-between px-2 w-screen items-center shrink mt-[0em]" onMouseEnter={handleHover} onMouseLeave={handleLeave}>
+		<div className="flex justify-between px-2 w-screen items-center shrink mt-[0em]" onMouseLeave={handleLeave}>
 			<span className="font-urbanist" style={{ color: "white" }}>
 				{/* <h2 className="font-bold text-2xl">{title}</h2>
         <HeaderText /> */}
@@ -73,7 +73,7 @@ export default function SearchBar({ title, officerName }: SearchBarProps) {
 				</div>
 			) : (
 				<>
-					<div style={{ marginRight: "0.3rem" }}>
+					<div style={{ marginRight: "0.3rem" }} onMouseEnter={handleHover}>
 						<svg fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="h-5 w-5">
 							<path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
 						</svg>

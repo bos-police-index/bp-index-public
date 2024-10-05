@@ -83,9 +83,9 @@ const sectionContent: CollapsibleDescriptionProps[] = [
 
 export default function About() {
 	return (
-		<div className="w-full h-fit py-20 flex flex-col justify-center max-w-6xl mx-auto" style={{ color: bpi_deep_green }}>
+		<div className="w-[68.25%] h-fit py-20 flex flex-col justify-center max-w-6xl mx-auto" style={{ color: bpi_deep_green }}>
 			<h1 className="text-5xl font-bold text-[bpi_deep_green] text-left mb-6">About</h1>
-			<div style={{ display: "flex", flexDirection: "column", gap: "2rem", marginLeft: "-3rem", marginTop: "3rem" }}>
+			<div style={{ display: "flex", flexDirection: "column", gap: "2rem", marginTop: "3rem" }}>
 				{sectionContent.map((section, index) => {
 					return <CollapsibleDescription title={section.title} content={section.content} defaultOpen={section.defaultOpen} />;
 				})}

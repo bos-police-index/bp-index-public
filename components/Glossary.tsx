@@ -1,5 +1,6 @@
 "use client";
 
+import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
 import GlossaryCard from "./GlossaryCard";
 
 export interface ColumnObject {
@@ -23,10 +24,17 @@ const GlossaryItem: React.FC<{ columnObject: ColumnObject }> = ({ columnObject }
 
 const Glossary: React.FC<GlossaryProps> = ({ columnObjects }) => {
 	return (
-		<div style={{ display: "flex", maxWidth: "100%", flexWrap: "wrap", marginTop: "4rem" }}>
-			{columnObjects.map((col, index) => (
-				<GlossaryItem key={index} columnObject={col} />
-			))}
+		<div>
+			<div style={{ marginTop: "3rem", marginBottom: "1rem" }}>
+				<p className="text-4xl font-bold flex align-middle justify-center" style={{ color: bpi_light_green }}>
+					Glossary
+				</p>
+			</div>
+			<div style={{ display: "flex", maxWidth: "100%", flexWrap: "wrap" }}>
+				{columnObjects.map((col, index) => (
+					<GlossaryItem key={index} columnObject={col} />
+				))}
+			</div>
 		</div>
 	);
 };

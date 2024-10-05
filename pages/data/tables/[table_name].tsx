@@ -119,8 +119,8 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 	}, []);
 
 	return (
-		<div style={{ backgroundColor: bpi_light_gray, marginTop: "-1rem" }}>
-			<div className={"max-w-1128 h-full"} style={{ color: bpi_deep_green, fontSize: "large" }}>
+		<div style={{ marginTop: "-1rem" }}>
+			<div className={"max-w-1128 h-full"} style={{ backgroundColor: "white", color: bpi_deep_green, fontSize: "large", width: "68.25%", marginLeft: "auto", marginRight: "auto" }}>
 				<div style={{ margin: "1rem 0" }}>
 					<div style={{ margin: "1rem 0" }}>
 						<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -154,8 +154,13 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 					<strong style={{ fontSize: "x-large" }}>Years: </strong>
 					{tableDef.years == "Unknown" ? "Unspecified" : tableDef.years}
 				</div>
-				<div style={{ marginTop: "1rem" }}>{table.fullTable}</div>
-				<Glossary columnObjects={props.columns} />
+			</div>
+			<div style={{ backgroundColor: bpi_light_gray, paddingTop: "3rem", width: "100vw", marginLeft: 0, marginTop: "3rem" }}>
+				<div className={"max-w-1128 h-full "} style={{ width: "68.25%" }}>
+					{table.fullTable}
+
+					<Glossary columnObjects={props.columns} />
+				</div>
 			</div>
 		</div>
 	);
