@@ -1,14 +1,11 @@
 "use client";
 
-import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
-import GlossaryCard from "./GlossaryCard";
-
 export interface ColumnObject {
 	name: string;
 	description: string;
 }
 
-interface GlossaryProps {
+export interface GlossaryProps {
 	columnObjects: ColumnObject[];
 }
 

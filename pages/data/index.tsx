@@ -4,9 +4,18 @@ import Link from "next/link";
 import { Card } from "antd";
 import { tableDefinitions } from "../../utility/tableDefinitions";
 import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
+import GlossaryTotal from "@components/GlossaryTotal";
+import ScreenOverlay from "@components/ScreenOverlay";
 
 export default function Home() {
 	const [cardFlipped, setCardFlipped] = useState<any>(null);
+	const [currentOverlay, setCurrentOverlay] = useState({ table: null, title: null });
+
+	const handleSeeAllClick = () => {
+		setCurrentOverlay({ table: <GlossaryTotal tableDefinitions={tableDefinitions} />, title: "Total Glossary" });
+		document.getElementById("screen-overlay").classList.add("flex");
+		document.getElementById("screen-overlay").classList.remove("hidden");
+	};
 
 	const handleHover = (table) => {
 		setCardFlipped(table.table);
@@ -25,7 +34,17 @@ export default function Home() {
 			}}
 		>
 			<div style={{ maxWidth: "1128px", margin: "0 auto", color: "#3874CB" }}>
-				<div className={"flex flex-row flex-wrap gap-3 items-center justify-start pb-12 pt-20"}>
+				<div style={{ display: "flex", justifyContent: "start", alignItems: "center", padding: "0 1rem" }}>
+					<p style={{ color: bpi_light_green, marginTop: "1rem" }}>
+						*Click{" "}
+						<button onClick={handleSeeAllClick}>
+							<u>here</u>
+						</button>{" "}
+						to view and download the full glossary
+					</p>
+				</div>
+
+				<div className={"flex flex-row flex-wrap gap-3 items-center justify-start pb-12 pt-8"}>
 					{tableDefinitions.map((table) => (
 						<Card
 							key={table.table}
@@ -92,6 +111,7 @@ export default function Home() {
 					))}
 				</div>
 			</div>
+			<ScreenOverlay title={currentOverlay.title} children={currentOverlay.table} />
 		</div>
 	);
 }

@@ -9,7 +9,7 @@ import EventNoteIcon from "@mui/icons-material/EventNote";
 import { CSSProperties } from "react";
 import { bpi_deep_green } from "@styles/theme/lightTheme";
 
-interface IconWrapperProps {
+export interface IconWrapperProps {
 	Icon: React.ElementType;
 	fontSize?: string | number;
 	color?: string;
