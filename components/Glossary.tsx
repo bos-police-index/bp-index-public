@@ -12,27 +12,25 @@ interface GlossaryProps {
 	columnObjects: ColumnObject[];
 }
 
-const GlossaryItem: React.FC<{ columnObject: ColumnObject }> = ({ columnObject }) => {
-	return <GlossaryCard column={columnObject} />;
-	{
-		/* <div style={{ position: "relative", width: "100%", height: "auto", marginBottom: "1rem" }}>
-			<b style={{ color: "#3874CB", fontSize: "x-large", fontWeight: "600", position: "absolute", left: 0 }}>&#9643;{columnObject.name}</b>
-			<p style={{ marginLeft: "20vw", wordWrap: "break-word", fontSize: "medium" }}>{columnObject.description}</p>
-		</div> */
-	}
+const GlossaryItem: React.FC<{ columnObject: ColumnObject; isEven: boolean }> = ({ columnObject, isEven }) => {
+	return (
+		<div className={`flex p-4 ${isEven ? "bg-gray-100" : "bg-white"}`}>
+			<div className="w-1/3 font-bold pr-4">{columnObject.name}</div>
+			<div className="w-2/3">{columnObject.description}</div>
+		</div>
+	);
 };
 
 const Glossary: React.FC<GlossaryProps> = ({ columnObjects }) => {
+	if (!columnObjects || columnObjects.length === 0) {
+		return <div className="text-xl">No glossary items available.</div>;
+	}
+
 	return (
-		<div>
-			<div style={{ marginTop: "3rem", marginBottom: "1rem" }}>
-				<p className="text-4xl font-bold flex align-middle justify-center" style={{ color: bpi_light_green }}>
-					Glossary
-				</p>
-			</div>
-			<div style={{ display: "flex", maxWidth: "100%", flexWrap: "wrap" }}>
+		<div className="max-w-5xl mx-auto bg-white shadow-lg mb-[2rem]">
+			<div className="text-xl">
 				{columnObjects.map((col, index) => (
-					<GlossaryItem key={index} columnObject={col} />
+					<GlossaryItem key={index} columnObject={col} isEven={index % 2 === 0} />
 				))}
 			</div>
 		</div>

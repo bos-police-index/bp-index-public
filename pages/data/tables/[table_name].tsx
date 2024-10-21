@@ -10,6 +10,8 @@ import { useRouter } from "next/router";
 import getHeaderWithDescription from "@utility/columnDefinitions";
 import Glossary from "@components/Glossary";
 import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
+import ScreenOverlay from "@components/ScreenOverlay";
+import { Button } from "antd";
 
 interface DetailRecord {
 	adminFeeFlag: string;
@@ -89,6 +91,13 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 	const [loadingMoreData, setLoadingMoreData] = useState<boolean>(true);
 	const router = useRouter();
 	const tableDef = tableDefinitions.find((tableDef) => tableDef.query === props.table_name);
+	const [currentOverlay, setCurrentOverlay] = useState({ table: null, title: null });
+
+	const handleSeeAllClick = () => {
+		setCurrentOverlay({ table: <Glossary columnObjects={props.columns} />, title: "Glossary" });
+		document.getElementById("screen-overlay").classList.add("flex");
+		document.getElementById("screen-overlay").classList.remove("hidden");
+	};
 
 	const table = getMUIGrid(props.table_name, rows, "", [], []);
 
@@ -153,13 +162,23 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 					<br />
 					<strong style={{ fontSize: "x-large" }}>Years: </strong>
 					{tableDef.years == "Unknown" ? "Unspecified" : tableDef.years}
+
+					<ScreenOverlay title={currentOverlay.title} children={currentOverlay.table} />
 				</div>
+				<p style={{ color: bpi_light_green, marginTop: "1rem" }}>
+					*Click{" "}
+					<button onClick={handleSeeAllClick}>
+						<u>here</u>
+					</button>{" "}
+					to see the full glossary for this table
+				</p>
+				{/* <Button type="primary" shape="round" className={" text-white font-urbanist active:scale-[.95] p-2 w-32 shadow-xl transition-button duration-300 hover:bg-primary-hover"} style={{ backgroundColor: bpi_deep_green }}>
+					See Glossary
+				</Button> */}
 			</div>
-			<div style={{ backgroundColor: bpi_light_gray, paddingTop: "3rem", width: "100vw", marginLeft: 0, marginTop: "3rem" }}>
+			<div style={{ backgroundColor: bpi_light_gray, paddingTop: "2rem", width: "100vw", marginLeft: 0, marginTop: "2rem" }}>
 				<div className={"max-w-1128 h-full "} style={{ width: "68.25%" }}>
 					{table.fullTable}
-
-					<Glossary columnObjects={props.columns} />
 				</div>
 			</div>
 		</div>

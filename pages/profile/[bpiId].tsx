@@ -1,6 +1,5 @@
 import React, { FunctionComponentElement, useEffect, useState } from "react";
 import SearchBar from "@components/SearchBar";
-import ScreenOverlay from "@components/ScreenOverlay";
 import { getMUIGrid } from "@utility/createMUIGrid";
 import apolloClient from "@lib/apollo-client";
 import { gql } from "@apollo/client";
@@ -333,7 +332,6 @@ export const getData = async (keyword: string, bpiId: string) => {
 export default function OfficerProfile(): FunctionComponentElement<{}> {
 	const router = useRouter();
 	const { bpiId, keyword } = router.query;
-	// const [currentOverlay, setCurrentOverlay] = useState({ table: null, title: null });
 	const [tablesArr, setTablesArr] = useState<Table[]>([]);
 	const [officerData, setOfficerData] = useState<OfficerData>();
 	const [tableFilters] = useState({
@@ -504,33 +502,6 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 			</section>{" "}
 			: <></>
 			<div style={{ backgroundColor: bpi_light_gray, paddingTop: "1.25rem", paddingBottom: ".25rem" }}>{tablesArr ? <FullWidthTabs tables={tablesArr} /> : <></>}</div>
-			{/* Uncomment and modify if needed
-			{tablesArr.map((table) => {
-			  return (
-				<section className={"min-w-screen px-52 flex flex-col gap-0 py-8"} key={table.title} id={table.title.replace(/\s+/g, "-").toLowerCase()}>
-				  <div className={" rounded-2xl px-10 py-8"}>
-					<div className={"flex justify-between items-center flex-row"}>
-					  <h2 className={"text-2xl  text-white"}>{table.title}</h2>
-					  <Button
-						type="primary"
-						shape="round"
-						onClick={() => {
-						  setCurrentOverlay({ table: table.tables.fullTable, title: table.title });
-						  document.getElementById("screen-overlay").classList.add("flex");
-						  document.getElementById("screen-overlay").classList.remove("hidden");
-						}}
-						className={"bg-primary text-white font-urbanist p-2 w-32 flex items-center justify-center active:scale-[.95] shadow-xl transition-button duration-300 hover:bg-primary-hover"}
-					  >
-						See All
-					  </Button>
-					</div>
-					<div className={"mt-6"}>{table.tables.filteredTable}</div>
-				  </div>
-				</section>
-			  );
-			})}
-			<ScreenOverlay title={currentOverlay.title} children={currentOverlay.table} />
-			*/}
 		</>
 	) : (
 		<></>
