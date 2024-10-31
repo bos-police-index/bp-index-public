@@ -62,5 +62,5 @@ code {
 .max-w-1128 {
   max-width: 1128px;
   margin: 0 auto;
-  padding: 0 15px; /* Optional: Add some padding for spacing */
+  padding: 0 15px; 
 }

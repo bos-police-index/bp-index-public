@@ -1,7 +1,5 @@
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import { GridColDef } from "@mui/x-data-grid";
 import { functionMapping } from "./createMUIGrid";
-import DataTable from "@components/DataTable";
 import LargeDataTable from "@components/LargeDataTable";
 
 export const getSmartMUIGrid = (table: string, rows: any[], officerName: string, includesOnly = [], excludes = [], totalCount: number | undefined) => {

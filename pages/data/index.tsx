@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Card } from "antd";
 import { tableDefinitions } from "../../utility/tableDefinitions";
-import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
+import { bpi_deep_green, bpi_light_green } from "@styles/theme/lightTheme";
 import GlossaryTotal from "@components/GlossaryTotal";
 import ScreenOverlay from "@components/ScreenOverlay";
 

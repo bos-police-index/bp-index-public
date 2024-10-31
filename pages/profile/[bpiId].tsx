@@ -1,10 +1,8 @@
 import React, { FunctionComponentElement, useEffect, useState } from "react";
-import SearchBar from "@components/SearchBar";
 import { getMUIGrid } from "@utility/createMUIGrid";
 import apolloClient from "@lib/apollo-client";
 import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
-import { Button } from "antd";
 import FullWidthTabs from "./TabTables";
 import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
 

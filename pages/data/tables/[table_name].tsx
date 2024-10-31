@@ -1,6 +1,6 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { functionMapping, getMUIGrid } from "@utility/createMUIGrid";
-import { extractID, tableExists } from "@utility/utility";
+import { tableExists } from "@utility/utility";
 import apolloClient from "@lib/apollo-client";
 import { GET_FIRST_1000_DETAIL_RECORDS, GET_REST_DETAIL_RECORDS } from "@lib/graphql/queries";
 import IconWrapper, { tableDefinitions } from "@utility/tableDefinitions";
@@ -12,6 +12,7 @@ import Glossary from "@components/Glossary";
 import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
 import ScreenOverlay from "@components/ScreenOverlay";
 import { Button } from "antd";
+import { DocumentNode } from "graphql";
 
 interface DetailRecord {
 	adminFeeFlag: string;
@@ -61,7 +62,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		};
 	}
 
-	const { data } = await apolloClient.query<DetailRecordsResponse>({ query: GET_FIRST_1000_DETAIL_RECORDS });
+	var query: DocumentNode = null;
+
+	// ADDING NEW DATA? Add switch statement for each new data table
+	switch (table_name) {
+		case "detail_record":
+			query = GET_FIRST_1000_DETAIL_RECORDS;
+	}
+
+	const { data } = await apolloClient.query<DetailRecordsResponse>({ query: query });
 
 	let dataArr: any[] = [];
 
@@ -165,18 +174,14 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 
 					<ScreenOverlay title={currentOverlay.title} children={currentOverlay.table} />
 				</div>
-				<p style={{ color: bpi_light_green, marginTop: "1rem" }}>
-					*Click{" "}
-					<button onClick={handleSeeAllClick}>
-						<u>here</u>
-					</button>{" "}
-					to see the full glossary for this table
-				</p>
-				{/* <Button type="primary" shape="round" className={" text-white font-urbanist active:scale-[.95] p-2 w-32 shadow-xl transition-button duration-300 hover:bg-primary-hover"} style={{ backgroundColor: bpi_deep_green }}>
-					See Glossary
-				</Button> */}
 			</div>
 			<div style={{ backgroundColor: bpi_light_gray, paddingTop: "2rem", width: "100vw", marginLeft: 0, marginTop: "2rem" }}>
+				<div style={{ display: "flex", alignItems: "center", justifyContent: "end", width: "83%", marginBottom: "1rem" }}>
+					<Button onClick={handleSeeAllClick} type="primary" shape="round" className={" text-white font-urbanist active:scale-[.95] p-2 w-32 shadow-xl transition-button duration-300 hover:bg-primary-hover"} style={{ backgroundColor: bpi_deep_green, height: "2.3rem" }}>
+						Table Glossary
+					</Button>
+				</div>
+
 				<div className={"max-w-1128 h-full "} style={{ width: "68.25%" }}>
 					{table.fullTable}
 				</div>

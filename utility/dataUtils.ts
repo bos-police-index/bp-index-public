@@ -13,8 +13,6 @@ interface EmployeeNode {
 	badgeNo: string;
 	rankId: string;
 	orgId: string;
-	// postalCode: string;
-	// title: string;
 }
 
 interface OrganizationNode {

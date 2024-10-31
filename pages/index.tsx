@@ -3,11 +3,11 @@ import FadeIn from "@components/FadeIn";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/router";
-import { styled, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { fetchHompage } from "@utility/dataUtils";
 import backgroundImage from "../public/fist-in-air.jpeg";
-import properCaseName from "@utility/properNameCasing";
+import { properCaseName } from "@utility/textFormatHelpers";
 import { StyledGridOverlay } from "@styles/reusedStyledComponents";
 import { bpi_light_green, bpi_light_gray } from "@styles/theme/lightTheme";
 

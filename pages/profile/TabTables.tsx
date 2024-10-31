@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { Button } from "antd";
 import ScreenOverlay from "@components/ScreenOverlay";
-import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
+import { bpi_deep_green } from "@styles/theme/lightTheme";
 
 interface Table {
 	title: string;

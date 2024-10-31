@@ -1,8 +1,7 @@
 "use client";
 import getHeaderWithDescription from "@utility/columnDefinitions";
-import { ColumnObject, GlossaryProps } from "./Glossary";
+import { ColumnObject } from "./Glossary";
 import { functionMapping } from "@utility/createMUIGrid";
-import { IconWrapperProps } from "@utility/tableDefinitions";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { SvgIconTypeMap } from "@mui/material";
 

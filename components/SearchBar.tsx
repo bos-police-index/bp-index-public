@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
-import Link from "next/link";
 
 interface SearchBarProps {
 	title: string;
@@ -12,9 +11,8 @@ export default function SearchBar({ title, officerName }: SearchBarProps) {
 	const router = useRouter();
 	const [keyword, setKeyword] = useState<string>("");
 	const [hoveredOn, setHoveredOn] = useState<boolean>(false);
-	const initialKeyword = (router.query.keyword as string) || "";
 
-	const handleHover = (table) => {
+	const handleHover = () => {
 		setHoveredOn(true);
 	};
 
@@ -37,10 +35,7 @@ export default function SearchBar({ title, officerName }: SearchBarProps) {
 
 	return (
 		<div className="flex justify-between px-2 w-screen items-center shrink mt-[0em]" onMouseLeave={handleLeave}>
-			<span className="font-urbanist" style={{ color: "white" }}>
-				{/* <h2 className="font-bold text-2xl">{title}</h2>
-        <HeaderText /> */}
-			</span>
+			<span className="font-urbanist" style={{ color: "white" }}></span>
 
 			{hoveredOn ? (
 				<div className="w-full max-w-[80%] relative">
@@ -53,14 +48,14 @@ export default function SearchBar({ title, officerName }: SearchBarProps) {
 					<input
 						type="text"
 						value={keyword}
-						placeholder="Search Officers"
+						placeholder={title}
 						style={{
 							boxShadow: "0px 0px 6px 1.8px rgba(0, 0, 0, 0.1)",
 							color: "#000",
 							boxSizing: "border-box",
 							fontSize: "1.2rem",
 						}}
-						className="input h-8 w-[14.6rem] bg-white join-item ml-[35rem] rounded-[0.6rem] pl-5 pr-6 placeholder:text-gray text-base md:text-lg focus:outline-none" // Adjusted input styles
+						className="input h-8 w-[14.6rem] bg-white join-item ml-[35rem] rounded-[0.6rem] pl-5 pr-6 placeholder:text-gray text-base md:text-lg focus:outline-none"
 						onChange={(e) => setKeyword(e.target.value)}
 						onKeyDown={(e) => {
 							if (e.key === "Enter") {

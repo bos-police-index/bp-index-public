@@ -63,13 +63,6 @@ You can start editing the page by modifying any file. The page auto-updates as y
 * Then go to prisma file, select schema.prisma to assign @id from the variable and remove the @ignore for each dataset
 * The PlaceHolder tables are directly connected with the .csv files of the datasets, the user should be able to download the .csv files from under the table “download” button.
 
-## Things to be worked on (will move to issues)
-
-* **Goal 1**: The current dataset does not contain IDs of the police officers, woke windows has a way to connect all the databases together. We need to clean the data and find the IDs for the police officers for the data to be grabbed to the tables. There should also be a way to add links to the rows of the columns that contain identification of the officer (employee_id).
-* **Goal 2**: Multiple dynamic placeholder tables need to be created for the officer profiles after IDs are added to the datasets. This placeholder table needs to grab each section of the data (ie. income history) in a condensed form to display for each officer. Each table for each section of the data (on officer profiles) needs to be linked to a page that can show the full data in a non-condensed form (a different page for each section of the data).
-* **Goal 3**: The current setup displays all the columns in a dataset all at once (when clicked in from the main page). With the large datasets that we have (100k+ columns), the page is extremely slow at generating the table. The table needs to be modified to show 100 columns at a time, and there can be forward and backward buttons that let you go through the entire dataset (like a library catalog) so that it does not take as long to generate.
-* **Goal 4**: The current large data tables (when clicked in from the main page) need to be dynamically linked to the corresponding officer profiles via officer ID. For example, from the main page, clicking pay information will take you to a page with a large table of pay information data. Each column in this table should show information about an officer with an ID. Clicking on the ID the column should allow you to visit that officer’s specific officer profile page. The dynamic routing should allow you to input a link (http://localhost::3000/details/officer_profile/755) and show information about the officer with ID #27. There should NOT be a different static page for every officer.
-
 ## Contribution Steps
 **Step 1**: Move task from “Sprint Backlog” to “In Progress”
 

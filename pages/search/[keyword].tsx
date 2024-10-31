@@ -1,13 +1,12 @@
 import { FunctionComponentElement, useEffect, useState } from "react";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { Tooltip, styled } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { useRouter } from "next/router";
-import SearchBar from "@components/SearchBar";
 import Link from "next/link";
 import { fetchHompage } from "@utility/dataUtils";
-import properCaseName from "@utility/properNameCasing";
 import { StyledGridOverlay } from "@styles/reusedStyledComponents";
 import { bpi_light_green } from "@styles/theme/lightTheme";
+import { properCaseName } from "@utility/textFormatHelpers";
 
 export default function SearchResult(): FunctionComponentElement<{}> {
 	const router = useRouter();
@@ -22,7 +21,7 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 			.then((data) => {
 				const formattedData = data.map((row, index) => ({
 					...row,
-					id: row.bpiId, // Assuming employee_no is unique
+					id: row.bpiId,
 				}));
 				setSearchResData(formattedData);
 			})
@@ -295,7 +294,6 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 					loading={loading}
 					style={{ maxWidth: "1128px" }}
 					sx={{
-							
 						"& .MuiSwitch-switchBase.Mui-checked": {
 							backgroundColor: bpi_light_green,
 						},

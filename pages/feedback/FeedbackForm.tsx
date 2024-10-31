@@ -36,7 +36,6 @@ const FeedbackForm = ({ setSubmit }) => {
 
 	async function createNewIssue({ title, feedback, contactInfo }: CreateNewIssueParams) {
 		const body = `**User's Feedback:** ${feedback}\n\n**Contact Info:** ${contactInfo}`;
-		// console.log(gitToken, gitOwner, gitRepoName, gitRepoAssignee);
 		try {
 			const response = await octokit.request(`POST /repos/${gitOwner}/${gitRepoName}/issues`, {
 				owner: gitOwner,
@@ -49,7 +48,6 @@ const FeedbackForm = ({ setSubmit }) => {
 					"X-GitHub-Api-Version": "2022-11-28",
 				},
 			});
-			// console.log("Issue created successfully:", response.data);
 		} catch (error) {
 			console.error("Error creating issue:", error);
 		}
