@@ -12,7 +12,7 @@ export default function Home() {
 	const [currentOverlay, setCurrentOverlay] = useState({ table: null, title: null });
 
 	const handleSeeAllClick = () => {
-		setCurrentOverlay({ table: <GlossaryTotal tableDefinitions={tableDefinitions} />, title: "Total Glossary" });
+		setCurrentOverlay({ table: <GlossaryTotal tableDefinitions={tableDefinitions} total={true} />, title: "Total Glossary" });
 		document.getElementById("screen-overlay").classList.add("flex");
 		document.getElementById("screen-overlay").classList.remove("hidden");
 	};

@@ -8,11 +8,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import getHeaderWithDescription from "@utility/columnDefinitions";
-import Glossary from "@components/Glossary";
 import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
 import ScreenOverlay from "@components/ScreenOverlay";
 import { Button } from "antd";
 import { DocumentNode } from "graphql";
+import GlossaryTotal from "@components/GlossaryTotal";
 
 interface DetailRecord {
 	adminFeeFlag: string;
@@ -103,7 +103,7 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 	const [currentOverlay, setCurrentOverlay] = useState({ table: null, title: null });
 
 	const handleSeeAllClick = () => {
-		setCurrentOverlay({ table: <Glossary columnObjects={props.columns} />, title: "Glossary" });
+		setCurrentOverlay({ table: <GlossaryTotal columnObjects={props.columns} total={false} />, title: `${tableDef.table} Glossary` });
 		document.getElementById("screen-overlay").classList.add("flex");
 		document.getElementById("screen-overlay").classList.remove("hidden");
 	};

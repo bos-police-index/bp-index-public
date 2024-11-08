@@ -1,9 +1,19 @@
 "use client";
 import getHeaderWithDescription from "@utility/columnDefinitions";
-import { ColumnObject } from "./Glossary";
 import { functionMapping } from "@utility/createMUIGrid";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { SvgIconTypeMap } from "@mui/material";
+import { bpi_deep_green } from "@styles/theme/lightTheme";
+import { Typography } from "antd";
+
+export interface ColumnObject {
+	name: string;
+	description: string;
+}
+
+export interface GlossaryProps {
+	columnObjects: ColumnObject[];
+}
 
 interface TableDefinition {
 	source: string | React.JSX.Element;
@@ -20,47 +30,67 @@ interface TableDefinition {
 }
 
 interface GlossaryTotalProps {
-	tableDefinitions: TableDefinition[];
+	tableDefinitions?: TableDefinition[];
+	columnObjects?: ColumnObject[];
+	total: boolean;
 }
 
-const gatherAllDefinitions = (data: GlossaryTotalProps) => {
+export const gatherAllDefinitions = (data: TableDefinition[]) => {
 	var currTable;
 	const definitions = [];
 
-	for (const [key, dataset] of Object.entries(data.tableDefinitions)) {
-		
+	for (const [key, dataset] of Object.entries(data)) {
 		currTable = functionMapping[dataset.query];
 		if (!dataset.isFake) {
 			console.log(dataset.query);
 			definitions.push(...getHeaderWithDescription(currTable));
 		}
-		
 	}
 	return definitions.sort((a, b) => a.name.localeCompare(b.name));
 };
 
-const GlossaryItem: React.FC<{ columnObject: ColumnObject; isEven: boolean }> = ({ columnObject, isEven }) => {
+const GlossaryItem: React.FC<{ columnObject: ColumnObject; isEven: boolean; last: boolean; firstAppearance: boolean }> = ({ columnObject, isEven, last, firstAppearance }) => {
 	return (
-		<div className={`flex p-4 ${isEven ? "bg-gray-100" : "bg-white"}`}>
-			<div className="w-1/3 font-bold pr-4">{columnObject.name}</div>
-			<div className="w-2/3">{columnObject.description}</div>
+		<div className={`grid grid-cols-[1fr_4fr_8fr] min-h-[50px] ${isEven ? "bg-gray-100" : "bg-white"} border border-black border-b-${!last ? 0 : 1}`}>
+			<div className={`flex items-center font-bold px-4 py-2 border-r border-black min-h-full`}>{firstAppearance ? columnObject.name.substring(0, 1) : ""}</div>
+			<div className="flex items-center font-bold px-4 py-2 border-r border-black min-h-full">{columnObject.name}</div>
+			<div className="flex items-center px-4 py-2 min-h-full">{columnObject.description}</div>
 		</div>
 	);
 };
 
-const GlossaryTotal: React.FC<GlossaryTotalProps> = (tableDefinitions) => {
-	if (!tableDefinitions) {
+const GlossaryTotal: React.FC<GlossaryTotalProps> = ({ tableDefinitions, columnObjects, total }) => {
+	if ((total && !tableDefinitions) || (!total && !columnObjects)) {
 		return <div className="text-xl">No glossary items available.</div>;
 	}
 
-	const orderedRows = gatherAllDefinitions(tableDefinitions);
-
+	var rows = [];
+	if (total) {
+		rows = gatherAllDefinitions(tableDefinitions);
+	} else {
+		rows = columnObjects;
+	}
+	let seenLetters = {};
 	return (
-		<div className="max-w-5xl mx-auto bg-white shadow-lg mb-[2rem]">
+		<div className="max-w-5xl mx-auto bg-white mb-[2rem] p-[7rem]" style={{ boxShadow: "0px 0px 10px 2px rgba(0, 0, 0, 0.2)" }}>
+			{total ? (
+				<Typography.Title style={{ color: bpi_deep_green, fontWeight: "600" }} level={1}>
+					BPI Glossary
+				</Typography.Title>
+			) : (
+				<></>
+			)}
 			<div className="text-xl">
-				{orderedRows.map((col, index) => (
-					<GlossaryItem key={index} columnObject={col} isEven={index % 2 === 0} />
-				))}
+				{rows.map((col, index) => {
+					// check if first letter has been seen before
+					let firstAppearance: boolean = false;
+					if (!seenLetters[col.name.substring(0, 1)]) {
+						firstAppearance = true;
+						seenLetters[col.name.substring(0, 1)] = 1;
+					}
+
+					return <GlossaryItem key={index} columnObject={col} isEven={index % 2 === 0} last={rows.length === index + 1} firstAppearance={firstAppearance} />;
+				})}
 			</div>
 		</div>
 	);

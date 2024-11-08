@@ -45,6 +45,16 @@ export function formatDateShort(params: GridValueFormatterParams) {
 	formatted += `${day}`;
 	return formatted;
 }
+
+export const formatTextDate = (timestamp: number) => {
+	const date = new Date(timestamp);
+	return date.toLocaleDateString("en-US", {
+		month: "2-digit",
+		day: "2-digit",
+		year: "numeric",
+	});
+};
+
 export function formatDate(params: GridValueFormatterParams) {
 	const date = new Date(params.value as string);
 	const hour = date.getHours();
