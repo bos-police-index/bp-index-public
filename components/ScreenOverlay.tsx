@@ -14,7 +14,7 @@ interface ScreenOverlayProps {
 
 const ExportIcon = createSvgIcon(<path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z" />, "SaveAlt");
 
-const generatePdfAndDownload = async (columnObjects: any[]) => {
+const generatePdfAndDownload = async (columnObjects: any[], title: string) => {
 	const seenLetters: Record<string, boolean> = {};
 	let rows = [];
 	if (columnObjects[0].name) {
@@ -33,10 +33,10 @@ const generatePdfAndDownload = async (columnObjects: any[]) => {
 		rows = gatherAllDefinitions(columnObjects);
 	}
 
-	const blob = await pdf(<PdfDownloadGlossary rows={rows} />).toBlob();
+	const blob = await pdf(<PdfDownloadGlossary rows={rows} title={title} />).toBlob();
 	const link = document.createElement("a");
 	link.href = URL.createObjectURL(blob);
-	link.download = "BPI-Glossary.pdf";
+	link.download = title.includes("Total") ? "BPI-Glossary.pdf" : `${title}.pdf`;
 	link.click();
 
 	URL.revokeObjectURL(link.href);
@@ -53,7 +53,7 @@ export default function ScreenOverlay({ title, children }: ScreenOverlayProps) {
 					</p>
 					<div className="flex space-x-4">
 						{title?.includes("Glossary") ? (
-							<button onClick={() => generatePdfAndDownload(children.props.columnObjects || children.props.tableDefinitions)} className="rounded-lg p-2 w-32 flex items-center justify-center active:scale-90 transition duration-300" style={{ color: bpi_deep_green }}>
+							<button onClick={() => generatePdfAndDownload(children.props.columnObjects || children.props.tableDefinitions, title)} className="rounded-lg p-2 w-32 flex items-center justify-center active:scale-90 transition duration-300" style={{ color: bpi_deep_green }}>
 								{false ? "Preparing..." : <ExportIcon className="text-4xl" style={{ color: bpi_deep_green }} />}
 							</button>
 						) : (

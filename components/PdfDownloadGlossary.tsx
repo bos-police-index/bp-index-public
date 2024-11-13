@@ -34,11 +34,11 @@ const styles = StyleSheet.create({
 	},
 });
 
-const PdfDownloadGlossary = ({ rows }: { rows: any[] }) => (
+const PdfDownloadGlossary = ({ rows, title }: { rows: any[]; title: string }) => (
 	<Document>
 		<Page size="A4" style={styles.page}>
 			{/* Title */}
-			<Text style={styles.title}>BPI Glossary</Text>
+			<Text style={styles.title}>{title.includes("Total") ? "BPI Glossary" : title}</Text>
 			<Text style={{ fontSize: "12px" }}>Downloaded: {formatTextDate(Date.now())}</Text>
 
 			{/* Table */}

@@ -15,6 +15,15 @@ export interface GlossaryProps {
 	columnObjects: ColumnObject[];
 }
 
+export interface ColumnObject {
+	name: string;
+	description: string;
+}
+
+export interface GlossaryProps {
+	columnObjects: ColumnObject[];
+}
+
 interface TableDefinition {
 	source: string | React.JSX.Element;
 	table: string;
@@ -49,13 +58,24 @@ export const gatherAllDefinitions = (data: TableDefinition[]) => {
 	return definitions.sort((a, b) => a.name.localeCompare(b.name));
 };
 
-const GlossaryItem: React.FC<{ columnObject: ColumnObject; isEven: boolean; last: boolean; firstAppearance: boolean }> = ({ columnObject, isEven, last, firstAppearance }) => {
+const GlossaryItem: React.FC<{ columnObject: ColumnObject; isTotal: boolean; last: boolean; firstAppearance: boolean }> = ({ columnObject, isTotal, last, firstAppearance }) => {
 	return (
-		<div className={`grid grid-cols-[1fr_4fr_8fr] min-h-[50px] ${isEven ? "bg-gray-100" : "bg-white"} border border-black border-b-${!last ? 0 : 1}`}>
-			<div className={`flex items-center font-bold px-4 py-2 border-r border-black min-h-full`}>{firstAppearance ? columnObject.name.substring(0, 1) : ""}</div>
-			<div className="flex items-center font-bold px-4 py-2 border-r border-black min-h-full">{columnObject.name}</div>
-			<div className="flex items-center px-4 py-2 min-h-full">{columnObject.description}</div>
-		</div>
+		<tr className="border-black">
+			{isTotal ? (
+				<td className="border border-black p-2 font-bold text-center" style={{ width: "5%", borderTopWidth: firstAppearance ? "1px" : 0, borderBottomWidth: last ? "1px" : 0, borderRightWidth: 0, borderColor: "black" }}>
+					{firstAppearance ? columnObject.name.substring(0, 1) : ""}
+				</td>
+			) : (
+				""
+			)}
+
+			<td className="border border-black p-2 font-bold bg-gray-100 pl-[5%]" style={{ width: "37.5%" }}>
+				{columnObject.name}
+			</td>
+			<td className="border border-black p-2 pl-[5%]" style={{ width: "50%" }}>
+				{columnObject.description}
+			</td>
+		</tr>
 	);
 };
 
@@ -80,18 +100,20 @@ const GlossaryTotal: React.FC<GlossaryTotalProps> = ({ tableDefinitions, columnO
 			) : (
 				<></>
 			)}
-			<div className="text-xl">
-				{rows.map((col, index) => {
-					// check if first letter has been seen before
-					let firstAppearance: boolean = false;
-					if (!seenLetters[col.name.substring(0, 1)]) {
-						firstAppearance = true;
-						seenLetters[col.name.substring(0, 1)] = 1;
-					}
+			<table className="border-collapse table-fixed w-full border border-black ">
+				<tbody>
+					{rows.map((col, index) => {
+						// check if first letter has been seen before
+						let firstAppearance: boolean = false;
+						if (!seenLetters[col.name.substring(0, 1)]) {
+							firstAppearance = true;
+							seenLetters[col.name.substring(0, 1)] = 1;
+						}
 
-					return <GlossaryItem key={index} columnObject={col} isEven={index % 2 === 0} last={rows.length === index + 1} firstAppearance={firstAppearance} />;
-				})}
-			</div>
+						return <GlossaryItem key={index} columnObject={col} isTotal={total} last={rows.length === index + 1} firstAppearance={firstAppearance} />;
+					})}
+				</tbody>
+			</table>
 		</div>
 	);
 };
