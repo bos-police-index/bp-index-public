@@ -46,7 +46,8 @@ const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData }: Hi
 				.map(Number); // Cast to numbers
 
 			setValidYears(validYears);
-			setSelectedYearIndex(i);
+			console.log(validYears[validYears.length - 1]);
+			setSelectedYearIndex(validYears.length - 1);
 		};
 		fetchData();
 		setSelectedCategory(PayCategories.totalPay);
@@ -183,14 +184,14 @@ const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData }: Hi
 	};
 
 	return selectedData ? (
-		<div>
+		<div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
 			<ButtonGroup />
 			<YearToggle />
 
 			<Histogram mode={selectedCategory} width={width} height={height - BUTTONS_HEIGHT} data={selectedData} verticalLineX={specificOfficerPayValue || 0} />
 		</div>
 	) : (
-		<></>
+		<div style={{ width: 860, height: 450, backgroundColor: "white" }}></div>
 	);
 };
 
