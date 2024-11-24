@@ -100,3 +100,22 @@ export const GET_REST_DETAIL_RECORDS = gql`
 		}
 	}
 `;
+
+
+export const GET_ALL_OFFICER_FINANCIAL_DATA = gql`
+	query MyQuery {
+		allLinkSu24EmployeeFinancials {
+			nodes {
+				totalPay
+				injuredPay
+				otPay
+				otherPay
+				quinnPay
+				regularPay
+				retroPay
+				detailPay
+				year
+			}
+		}
+	}
+`;

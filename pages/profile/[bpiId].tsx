@@ -5,8 +5,10 @@ import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import FullWidthTabs from "./TabTables";
 import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
+import { PayStackedBarChart } from "./StackedBarChartOfficerFinancial";
+import FinancialHistogram from "./(histogram)/FinancialHistogram";
 
-interface Table {
+export interface Table {
 	title: string;
 	tables: DataTables;
 }
@@ -333,10 +335,6 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 	const [tablesArr, setTablesArr] = useState<Table[]>([]);
 	const [officerData, setOfficerData] = useState<OfficerData>();
 	const [tableFilters] = useState({
-		alpha_listing: {
-			includesOnly: [],
-			excludes: [],
-		},
 		detail_record: {
 			includesOnly: [
 				"adminFeeFlag",
@@ -370,38 +368,42 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 			excludes: [],
 		},
 
-		personnel_roaster: {
-			includesOnly: ["position", "location", "employee_record", "eff_date", "reason"],
-			excludes: [],
-		},
 		police_financial: {
 			includesOnly: ["year", "rank", "otPay", "otherPay", "quinnPay", "regularPay", "retroPay", "totalPay", "detailPay", "injuredPay"],
 			excludes: [],
 		},
-		police_overtime: {
-			includesOnly: ["hours_worked", "ot_hours", "ot_desc", "assigned_desc", "charged_code", "charged_desc"],
-			excludes: [],
-		},
-		post_decertified: {
-			includesOnly: [],
-			excludes: [],
-		},
-		post_certified: {
-			includesOnly: [],
-			excludes: ["certified_expiration_date"],
-		},
-		crime_incident: {
-			includesOnly: ["incident_no", "offense_code", "offense_desc", "reporting_area", "incident_date", "shooting"],
-			excludes: [],
-		},
-		fio_record: {
-			includesOnly: ["contact_date", "key_situation", "zip_code", "circumstance", "basis"],
-			excludes: [],
-		},
-		parking_ticket: {
-			includesOnly: [],
-			excludes: [],
-		},
+		// alpha_listing: {
+		// 	includesOnly: [],
+		// 	excludes: [],
+		// },
+		// personnel_roaster: {
+		// 	includesOnly: ["position", "location", "employee_record", "eff_date", "reason"],
+		// 	excludes: [],
+		// },
+		// police_overtime: {
+		// 	includesOnly: ["hours_worked", "ot_hours", "ot_desc", "assigned_desc", "charged_code", "charged_desc"],
+		// 	excludes: [],
+		// },
+		// post_decertified: {
+		// 	includesOnly: [],
+		// 	excludes: [],
+		// },
+		// post_certified: {
+		// 	includesOnly: [],
+		// 	excludes: ["certified_expiration_date"],
+		// },
+		// crime_incident: {
+		// 	includesOnly: ["incident_no", "offense_code", "offense_desc", "reporting_area", "incident_date", "shooting"],
+		// 	excludes: [],
+		// },
+		// fio_record: {
+		// 	includesOnly: ["contact_date", "key_situation", "zip_code", "circumstance", "basis"],
+		// 	excludes: [],
+		// },
+		// parking_ticket: {
+		// 	includesOnly: [],
+		// 	excludes: [],
+		// },
 	});
 
 	useEffect(() => {
@@ -435,6 +437,10 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 			minimumFractionDigits: 2,
 			maximumFractionDigits: 2,
 		}).format(number);
+	}
+
+	if (tablesArr[2]?.tables) {
+		console.log("table", tablesArr[2].tables.fullTable.props);
 	}
 
 	return officerData ? (
@@ -499,7 +505,45 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 				</div>
 			</section>{" "}
 			: <></>
-			<div style={{ backgroundColor: bpi_light_gray, paddingTop: "1.25rem", paddingBottom: ".25rem" }}>{tablesArr ? <FullWidthTabs tables={tablesArr} /> : <></>}</div>
+			<section>
+				<div style={{ backgroundColor: bpi_light_gray, paddingTop: "1.25rem", paddingBottom: ".25rem" }}>
+					{tablesArr ? <FullWidthTabs tables={tablesArr} /> : <></>}
+					{tablesArr[2].tables.fullTable ? (
+						<div
+							style={{
+								display: "flex",
+								flexDirection: "column",
+								alignItems: "flex-start",
+								justifyContent: "center",
+								width: "100%",
+								backgroundColor: bpi_light_gray,
+							}}
+						>
+							<div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+								<p className="text-lg ml-[-40rem] mb-[1.5rem]" style={{ color: bpi_deep_green, fontWeight: 500 }}>
+									Officer Earnings Visualization
+								</p>
+								<PayStackedBarChart data={tablesArr[2].tables.fullTable} />
+							</div>
+
+							<div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", marginTop: "5rem" }}>
+								<div className="ml-[-40rem] mb-[1.5rem]">
+									<p style={{ color: bpi_deep_green, fontWeight: 500 }} className="text-lg">
+										Percentile Benchmarking
+									</p>
+									<p style={{ color: bpi_deep_green, fontWeight: 300 }} className="text-md">
+										Individual Officer Pay Distribution
+									</p>
+								</div>
+
+								<FinancialHistogram officerPayData={tablesArr[2].tables.fullTable.props} mode={"total"} />
+							</div>
+						</div>
+					) : (
+						<></>
+					)}{" "}
+				</div>
+			</section>
 		</>
 	) : (
 		<></>

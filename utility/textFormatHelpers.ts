@@ -102,12 +102,19 @@ export function formatTime(number: number): string {
 }
 
 export function formatMoney(number: number): string {
-	if (number < 0.01) {
+	const negative = number < 0.01;
+	if (negative) {
+		number *= -1;
+	}
+	if (number == 0) {
 		return "0";
 	}
 	const formatted = new Intl.NumberFormat("en-US", {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
 	}).format(number);
+	if (negative) {
+		return `-$${formatted}`;
+	}
 	return `$${formatted}`;
 }
