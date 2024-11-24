@@ -15,24 +15,41 @@ type HistogramProps = {
 	mode: PayCategories;
 };
 
+
+
 export const Histogram = ({ width, height, data, verticalLineX, mode }: HistogramProps) => {
 	const axesRef = useRef(null);
 	const boundsWidth = width - MARGIN.right - MARGIN.left;
 	const boundsHeight = height - MARGIN.top - MARGIN.bottom;
 
-	const domain: [number, number] = [0, Math.max(...data)];
+	if (!data) {
+		data = [];
+	}
+
+	const domain: [number, number] = useMemo(() => {
+		if (!data || !data.length) {
+			console.error("Histogram data is missing or invalid.");
+			return [0, 0];
+		}
+		return [0, Math.max(...data)];
+	}, [data]);
+
 	const xScale = useMemo(() => {
 		return d3.scaleLinear().domain(domain).range([10, boundsWidth]);
 	}, [data, width]);
 
 	const buckets = useMemo(() => {
+		if (!data || !Array.isArray(data)) {
+			console.error("Invalid data passed to Histogram.");
+			return [];
+		}
 		const bucketGenerator = d3
 			.bin()
 			.value((d) => d)
 			.domain(domain)
 			.thresholds(xScale.ticks(BUCKET_NUMBER));
 		return bucketGenerator(data);
-	}, [xScale]);
+	}, [data, xScale]);
 
 	// Calculate total frequency and normalized heights
 	const normalizedBuckets = useMemo(() => {

@@ -29,7 +29,10 @@ interface EmployeeFinancial {
 }
 
 function PayStackedBarChart(data) {
-	const tableData: EmployeeFinancial[] = data?.data.props.table;
+	const tableData: EmployeeFinancial[] = data?.data?.props?.table || [];
+	if (!tableData || !tableData.length) {
+		return <div>No financial data available</div>;
+	}
 
 	// Mapping the data to extract relevant pay fields for each year
 	const financialYearsPay = tableData.map((table: EmployeeFinancial) => ({
@@ -114,8 +117,9 @@ function PayStackedBarChart(data) {
 		datasets: datasets,
 	};
 
-	if (!data || !Array.isArray(data)) {
-		return <div>No data available</div>;
+	if (!data || !data.data || !data.data.props) {
+		console.error("Invalid data format passed to PayStackedBarChart.", data);
+		return <div>Invalid data format</div>;
 	}
 
 	return (
