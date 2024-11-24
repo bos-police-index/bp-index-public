@@ -1,6 +1,6 @@
 import { EmployeeFinancial, fetchFinancialsHistogram } from "@utility/dataUtils";
 import { useEffect, useState } from "react";
-import { HistogramDataFeeder } from "./HistogramDataFeeder";
+import HistogramDataFeeder from "./HistogramDataFeeder";
 
 interface FinancialHistogramProps {
 	officerPayData: any;

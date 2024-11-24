@@ -23,7 +23,7 @@ const buttonStyle = {
 	opacity: 0.7,
 };
 
-export const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData }: HistogramDataFeederProps) => {
+const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData }: HistogramDataFeederProps) => {
 	const [allOfficerFinancialData, setAllOfficerFinancialData] = useState<PayTypeBuckets>();
 	const [selectedData, setSelectedData] = useState<number[]>();
 	const [selectedCategory, setSelectedCategory] = useState<PayCategories>();
@@ -193,3 +193,5 @@ export const HistogramDataFeeder = ({ width, height, specificOfficerFinancialDat
 		<></>
 	);
 };
+
+export default HistogramDataFeeder;

@@ -5,7 +5,7 @@ import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import FullWidthTabs from "./TabTables";
 import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
-import { PayStackedBarChart } from "./StackedBarChartOfficerFinancial";
+import PayStackedBarChart from "./StackedBarChartOfficerFinancial";
 import FinancialHistogram from "./(histogram)/FinancialHistogram";
 
 export interface Table {

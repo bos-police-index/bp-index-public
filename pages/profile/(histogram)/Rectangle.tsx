@@ -21,7 +21,7 @@ type RectangleProps = {
 	mode: PayCategories;
 };
 
-export const HistogramRectangle = (props: RectangleProps) => {
+const HistogramRectangle = (props: RectangleProps) => {
 	const { x, y, width, height, mode } = props;
 
 	const springProps = useSpring({
@@ -38,3 +38,5 @@ export const HistogramRectangle = (props: RectangleProps) => {
 
 	return <animated.rect x={springProps.x} y={springProps.y} width={springProps.width} height={springProps.height} opacity={0.7} stroke={payCategoryColorMap[mode]} fill={payCategoryColorMap[mode]} fillOpacity={1} strokeWidth={1} rx={1} />;
 };
+
+export default HistogramRectangle;

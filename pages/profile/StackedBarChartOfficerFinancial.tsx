@@ -27,7 +27,7 @@ interface EmployeeFinancial {
 	injuredPay: number;
 }
 
-export function PayStackedBarChart(data) {
+function PayStackedBarChart(data) {
 	const tableData: EmployeeFinancial[] = data.data.props.table;
 
 	// Mapping the data to extract relevant pay fields for each year
@@ -119,3 +119,5 @@ export function PayStackedBarChart(data) {
 		</div>
 	);
 }
+
+export default PayStackedBarChart;
