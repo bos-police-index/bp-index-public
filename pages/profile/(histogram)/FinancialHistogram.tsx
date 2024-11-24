@@ -21,6 +21,9 @@ export interface PayTypeMap {
 
 export default function FinancialHistogram({ officerPayData, mode }: FinancialHistogramProps) {
 	function reshapeFinancialDataInput(data) {
+		if (!data) {
+			return;
+		}
 		const { table } = data;
 
 		// Initialize the payTypeMap structure
