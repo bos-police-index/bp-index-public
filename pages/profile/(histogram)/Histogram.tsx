@@ -1,6 +1,6 @@
+"use client";
 import { useEffect, useMemo, useRef } from "react";
 import * as d3 from "d3";
-import { bpi_deep_green, payCategoryColorMap } from "@styles/theme/lightTheme";
 import HistogramRectangle, { PayCategories } from "./Rectangle";
 
 const MARGIN = { top: 30, right: 30, bottom: 40, left: 50 };

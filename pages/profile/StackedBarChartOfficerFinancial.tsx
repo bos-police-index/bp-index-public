@@ -1,3 +1,4 @@
+"use client";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { payCategoryColorMap } from "@styles/theme/lightTheme";
@@ -28,7 +29,7 @@ interface EmployeeFinancial {
 }
 
 function PayStackedBarChart(data) {
-	const tableData: EmployeeFinancial[] = data.data.props.table;
+	const tableData: EmployeeFinancial[] = data?.data.props.table;
 
 	// Mapping the data to extract relevant pay fields for each year
 	const financialYearsPay = tableData.map((table: EmployeeFinancial) => ({
@@ -112,6 +113,10 @@ function PayStackedBarChart(data) {
 		labels: years,
 		datasets: datasets,
 	};
+
+	if (!data || !Array.isArray(data)) {
+		return <div>No data available</div>;
+	}
 
 	return (
 		<div className="w-full max-w-4xl flex justify-center items-center bg-white p-6 rounded-md">
