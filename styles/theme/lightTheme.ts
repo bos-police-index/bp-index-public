@@ -15,7 +15,7 @@ export const payCategoryColorMap = {
 	regularPay: "#163F79",
 	detailPay: "#F1A150",
 	otherPay: "#C1C1C1",
-	injuredPay: "#F5EB6F",
+	injuredPay: "#F9DB48",
 	retroPay: "#83D391",
 	quinnPay: "#B726F6",
 	otPay: "#C8403B",

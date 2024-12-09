@@ -2,6 +2,7 @@
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { payCategoryColorMap } from "@styles/theme/lightTheme";
+import { formatMoney } from "@utility/textFormatHelpers";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -88,7 +89,6 @@ function PayStackedBarChart(data) {
 		},
 	];
 
-	// Options for the stacked bar chart
 	const options = {
 		responsive: true,
 		plugins: {
@@ -98,6 +98,20 @@ function PayStackedBarChart(data) {
 			title: {
 				display: true,
 				text: "Annual Earnings Breakdown",
+			},
+			tooltip: {
+				callbacks: {
+					label: (tooltipItem) => {
+						const dataset = datasets[tooltipItem.datasetIndex];
+						const value = tooltipItem.raw; // Access the value of the bar segment
+						const label = dataset.label; // Access the label of the dataset
+						const yearIndex = tooltipItem.dataIndex;
+						const totalPay = datasets.reduce((sum, ds) => sum + ds.data[yearIndex], 0);
+						const percentage = ((value / totalPay) * 100).toFixed(1);
+
+						return [`${label}: ${formatMoney(value)} (${percentage}%)`, `Total: ${formatMoney(totalPay)}`];
+					},
+				},
 			},
 		},
 		scales: {

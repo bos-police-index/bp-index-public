@@ -119,3 +119,45 @@ export const GET_ALL_OFFICER_FINANCIAL_DATA = gql`
 		}
 	}
 `;
+
+export const GET_FIRST_1000_COURT_OVERTIMES = gql`
+	query MyQuery {
+		allLinkSu24CourtOvertimes(first: 1000) {
+			nodes {
+				assignedDesc
+				chargedDesc
+				description
+				endTime
+				name
+				otCode
+				otDate
+				race
+				rank
+				sex
+				startTime
+				workedHours
+			}
+		}
+	}
+`;
+
+export const GET_REST_COURT_OVERTIMES = gql`
+	query MyQuery {
+		allLinkSu24CourtOvertimes(offset: 1000) {
+			nodes {
+				assignedDesc
+				chargedDesc
+				description
+				endTime
+				name
+				otCode
+				otDate
+				race
+				rank
+				sex
+				startTime
+				workedHours
+			}
+		}
+	}
+`;

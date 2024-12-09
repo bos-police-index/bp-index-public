@@ -29,6 +29,7 @@ interface OfficerData {
 	totalEarnings: number;
 	ia_num: number;
 	detail_num: number;
+	year: number;
 }
 
 interface FinancialEmployeeData {
@@ -106,7 +107,7 @@ export const getData = async (keyword: string, bpiId: string) => {
 				rank: node.rank || mostRecentEmployeeData.rank,
 				sex: node.sex || mostRecentEmployeeData.sex,
 				unit: node.unit || mostRecentEmployeeData.unit,
-				year: node.year,
+				year: node.year || mostRecentEmployeeData.year,
 				zipCode: node.zipCode || mostRecentEmployeeData.zipCode,
 				unionCode: node.unionCode || mostRecentEmployeeData.unionCode,
 				badgeNo: node.badgeNo || mostRecentEmployeeData.badgeNo,
@@ -137,8 +138,8 @@ export const getData = async (keyword: string, bpiId: string) => {
 		totalEarnings: mostRecentEmployeeData.totalPay,
 		ia_num: 0,
 		detail_num: 0,
+		year: mostRecentEmployeeData.year,
 	};
-	// console.log(officerData);
 
 	let detail_record_rows = [];
 	let officer_IA_rows = [];
@@ -409,7 +410,6 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 	useEffect(() => {
 		const fetchData = async () => {
 			const { props } = await getData(keyword as string, bpiId as string);
-			// console.log("props", props);
 			let tablesArr: Table[] = [];
 			for (let table of props.tables) {
 				let rows = table.rows;
@@ -496,7 +496,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 							</div>
 
 							<div className="text-lg" style={{ display: "flex", justifyContent: "space-between" }}>
-								<strong style={{ cursor: "pointer" }}>Earnings</strong> {`$${formatMoney(officerData.totalEarnings)}`}
+								<strong style={{ cursor: "pointer" }}>{officerData.year} Earnings</strong> {`$${formatMoney(officerData.totalEarnings)}`}
 							</div>
 							<p className="text-lg">{/* <strong style={{ cursor: "pointer" }}>FIO:</strong> {officerData.fio_record} */}</p>
 							<p className="text-lg">{/* <strong style={{ cursor: "pointer" }}>Traffic Tickets:</strong> {officerData.traffic_no} */}</p>

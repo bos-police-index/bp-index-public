@@ -92,7 +92,7 @@ export default function Home() {
 					))}
 
 					{/* dummy cards */}
-					{[...Array(5)].map((_, index) => (
+					{[...Array(4)].map((_, index) => (
 						<Card
 							key={`dummy-${index}`}
 							style={{

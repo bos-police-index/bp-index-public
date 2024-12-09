@@ -93,7 +93,7 @@ export function formatHours(number: number): string {
 export function formatTime(number: number): string {
 	const isPm = number / 1200 >= 1;
 	let hours = number / 100;
-	hours = isPm ? hours - 12 : hours;
+	hours = isPm && hours >= 13 ? hours - 12 : hours;
 	hours = Math.floor(hours);
 	const minutes = number.toString().padStart(4, "0").slice(-2);
 	let total = hours.toString() + ":" + minutes;

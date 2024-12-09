@@ -6,6 +6,8 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import CrisisAlertIcon from "@mui/icons-material/CrisisAlert";
 import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import EventNoteIcon from "@mui/icons-material/EventNote";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
+
 import { CSSProperties } from "react";
 import { bpi_deep_green } from "@styles/theme/lightTheme";
 
@@ -26,27 +28,27 @@ const IconWrapper = ({ Icon, fontSize = "48px", color = bpi_deep_green }: IconWr
 
 // IMPORTANT! As more data is added be sure to add the source they are from to this
 const tablesFromAnalyzeBoston = [];
-const tablesFromPublicRecordsRequests = ["detail_record"];
+const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime"];
 
 const rawTableDefinitions = [
 	{
-		table: "Officer Earnings",
-		query: "police_financial",
-		image: { component: <IconWrapper Icon={AttachMoneyIcon} />, src: AttachMoneyIcon },
+		table: "BPD Employees",
+		query: "employee",
+		image: { component: <IconWrapper Icon={LocalPoliceIcon} />, src: LocalPoliceIcon },
 		isFake: true,
-		shortDescription: "This dataset includes detailed records of officers' hourly earnings and various earning types such as regular pay and overtime.",
+		shortDescription: "Information about all employees of the Boston Police Department.",
 		longDescription:
-			"The Officer Earnings dataset provides comprehensive information on the earnings of police officers. It includes hourly wage data and categorizes earnings into various types, including but not limited to regular pay, overtime, and other compensations. This dataset is crucial for analyzing the financial aspects of police officer employment and understanding the distribution of earnings within the department.",
+			"Detailed records of all employees working within the Boston Police Department (BPD). This includes information such as employee names, roles, ranks, and other pertinent employment details. This dataset is valuable for understanding the workforce composition and organizational structure of the BPD.",
 		years: "Unknown",
 	},
 	{
-		table: "Detail Record",
-		query: "detail_record",
-		image: { component: <IconWrapper Icon={DescriptionIcon} />, src: DescriptionIcon },
+		table: "Court Overtime",
+		query: "court_overtime",
+		image: { component: <IconWrapper Icon={BalanceIcon} />, src: BalanceIcon },
 		isFake: false,
-		shortDescription: "Detailed information about police detail assignments, which are special duty assignments outside regular police work",
+		shortDescription: "Detailed information about police overtime related to court appearances, including tasks performed outside regular duty hours.",
 		longDescription:
-			"A police detail is typically present at any road work where traffic must be diverted or events with special safety or security concerns. The Police Detail Records dataset captures detailed information about police detail assignments, which are special duty assignments outside regular police work. Paid details offer a temporary police and security detail for public events and worksites, such as those that take place on roadways, to ensure public and personnel safety. It includes data on the locations, times, and nature of these assignments, providing insight into how police resources are allocated for special events and other non-routine activities.",
+			"The Court Overtime dataset captures detailed information about police officers’ overtime associated with court-related activities. These activities include attending trials, hearings, and case preparation sessions, which are typically required outside an officer’s standard duty schedule. This dataset provides insights into the allocation of police resources for judicial proceedings, capturing data on officers’ roles, case types, time worked, and associated overtime costs. It reflects how police personnel are utilized to fulfill judicial obligations while maintaining public safety and accountability.",
 		years: "Unknown",
 	},
 	{
@@ -60,25 +62,37 @@ const rawTableDefinitions = [
 		years: "Unknown",
 	},
 	{
-		table: "BPD Employees",
-		query: "employee",
-		image: { component: <IconWrapper Icon={LocalPoliceIcon} />, src: LocalPoliceIcon },
-		isFake: true,
-		shortDescription: "Information about all employees of the Boston Police Department.",
+		table: "Detail Record",
+		query: "detail_record",
+		image: { component: <IconWrapper Icon={DescriptionIcon} />, src: DescriptionIcon },
+		isFake: false,
+		shortDescription: "Detailed information about police detail assignments, which are special duty assignments outside regular police work",
 		longDescription:
-			"Detailed records of all employees working within the Boston Police Department (BPD). This includes information such as employee names, roles, ranks, and other pertinent employment details. This dataset is valuable for understanding the workforce composition and organizational structure of the BPD.",
+			"A police detail is typically present at any road work where traffic must be diverted or events with special safety or security concerns. The Police Detail Records dataset captures detailed information about police detail assignments, which are special duty assignments outside regular police work. Paid details offer a temporary police and security detail for public events and worksites, such as those that take place on roadways, to ensure public and personnel safety. It includes data on the locations, times, and nature of these assignments, providing insight into how police resources are allocated for special events and other non-routine activities.",
+		years: "Unknown",
+	},
+
+	{
+		table: "Officer Earnings",
+		query: "police_financial",
+		image: { component: <IconWrapper Icon={AttachMoneyIcon} />, src: AttachMoneyIcon },
+		isFake: true,
+		shortDescription: "This dataset includes detailed records of officers' hourly earnings and various earning types such as regular pay and overtime.",
+		longDescription:
+			"The Officer Earnings dataset provides comprehensive information on the earnings of police officers. It includes hourly wage data and categorizes earnings into various types, including but not limited to regular pay, overtime, and other compensations. This dataset is crucial for analyzing the financial aspects of police officer employment and understanding the distribution of earnings within the department.",
 		years: "Unknown",
 	},
 	{
 		table: "Officer Misconduct (IAs)",
 		query: "officer_misconduct",
-		image: { component: <IconWrapper Icon={BalanceIcon} />, src: BalanceIcon },
+		image: { component: <IconWrapper Icon={ReportProblemIcon} />, src: ReportProblemIcon },
 		isFake: true,
 		shortDescription: "Records of internal affair complaints against Boston Police Department officers, detailing allegation types and final dispositions",
 		longDescription:
 			"The Officer Misconduct (IAs) dataset provides detailed records of all internal affair complaints filed against officers of the Boston Police Department. It includes information on the types of allegations made, the investigative process, and the final disposition of each complaint. This dataset is crucial for transparency and accountability, offering insights into the nature and outcomes of misconduct allegations within the police force.",
 		years: "Unknown",
 	},
+
 	{
 		table: "Parking Tickets",
 		query: "parking_ticket",

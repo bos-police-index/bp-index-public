@@ -2,7 +2,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { functionMapping, getMUIGrid } from "@utility/createMUIGrid";
 import { tableExists } from "@utility/utility";
 import apolloClient from "@lib/apollo-client";
-import { GET_FIRST_1000_DETAIL_RECORDS, GET_REST_DETAIL_RECORDS } from "@lib/graphql/queries";
+import { GET_FIRST_1000_COURT_OVERTIMES, GET_FIRST_1000_DETAIL_RECORDS, GET_REST_COURT_OVERTIMES, GET_REST_DETAIL_RECORDS } from "@lib/graphql/queries";
 import IconWrapper, { tableDefinitions } from "@utility/tableDefinitions";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -52,30 +52,62 @@ interface DetailRecordsResponse {
 	};
 }
 
+interface CourtOvertime {
+	assignedDesc: string; // Description of the assignment
+	chargedDesc: string; // Description of the charge
+	description: string; // Additional description (e.g., court hearing type)
+	endTime: number; // End time in 24-hour format (e.g., 1115 for 11:15 AM)
+	name: string; // Full name of the person
+	otCode: number; // Overtime code
+	otDate: string; // Date of the overtime in YYYY-MM-DD format
+	race: string; // Race of the individual (e.g., "HISPA" for Hispanic)
+	rank: string; // Rank of the individual (e.g., "Ptl" for Patrol)
+	sex: string; // Sex of the individual (e.g., "M" for Male)
+	startTime: number; // Start time in 24-hour format (e.g., 915 for 9:15 AM)
+	workedHours: number; // Total worked hours
+}
+
+interface CourtOvertimeResponse {
+	allLinkSu24CourtOvertimes: {
+		nodes: CourtOvertime[];
+	};
+}
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const table_name = context.params?.table_name as string;
 
-	if (!tableExists(table_name)) {
-		// throw a 404, with a custom message : "Table not found"
-		return {
-			notFound: true,
-		};
-	}
+	// if (!tableExists(table_name)) {
+	// 	console.log(`table does not exist ${table_name}`);
+	// 	// throw a 404, with a custom message : "Table not found"
+	// 	return {
+	// 		notFound: true,
+	// 	};
+	// }
 
-	var query: DocumentNode = null;
+	let query: DocumentNode = null;
+	let data: any;
 
 	// ADDING NEW DATA? Add switch statement for each new data table
+	console.log("TABLE NAME: ", table_name);
 	switch (table_name) {
 		case "detail_record":
 			query = GET_FIRST_1000_DETAIL_RECORDS;
+			data = (await apolloClient.query<DetailRecordsResponse>({ query: query })).data;
+		case "court_overtime":
+			query = GET_FIRST_1000_COURT_OVERTIMES;
+			data = (await apolloClient.query<CourtOvertimeResponse>({ query: query })).data;
 	}
-
-	const { data } = await apolloClient.query<DetailRecordsResponse>({ query: query });
 
 	let dataArr: any[] = [];
 
-	if (data && data.allLinkSu24DetailRecords && data.allLinkSu24DetailRecords.nodes) {
+	if (data && data.allLinkSu24DetailRecords?.nodes) {
 		dataArr = data.allLinkSu24DetailRecords.nodes.map((item, index) => ({
+			id: index + 1,
+			...item,
+		}));
+	}
+	if (data && data.allLinkSu24CourtOvertimes?.nodes) {
+		dataArr = data.allLinkSu24CourtOvertimes.nodes.map((item, index) => ({
 			id: index + 1,
 			...item,
 		}));
@@ -113,7 +145,18 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 	//fetch the rest of the rows once loaded
 	useEffect(() => {
 		const fetchRestRecords = async () => {
-			const { data } = await apolloClient.query<DetailRecordsResponse>({ query: GET_REST_DETAIL_RECORDS });
+			let query: DocumentNode = null;
+			let data: any;
+
+			// ADDING NEW DATA? Add switch statement for each new data table
+			switch (props.table_name) {
+				case "detail_record":
+					query = GET_REST_DETAIL_RECORDS;
+					data = (await apolloClient.query<DetailRecordsResponse>({ query: query })).data;
+				case "court_overtime":
+					query = GET_REST_COURT_OVERTIMES;
+					data = (await apolloClient.query<CourtOvertimeResponse>({ query: query })).data;
+			}
 
 			let dataArr: any[] = [];
 

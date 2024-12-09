@@ -151,14 +151,14 @@ const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData }: Hi
 
 	const ButtonGroup = () => {
 		const buttonLabels = {
-			[PayCategories.totalPay]: "Total Pay",
-			[PayCategories.regularPay]: "Regular Pay",
-			[PayCategories.detailPay]: "Detail Pay",
-			[PayCategories.otPay]: "Overtime Pay",
-			[PayCategories.retroPay]: "Retroactive Pay",
-			[PayCategories.injuredPay]: "Injured Pay",
-			[PayCategories.quinnPay]: "Quinn Pay",
-			[PayCategories.otherPay]: "Other Pay",
+			[PayCategories.totalPay]: "Total",
+			[PayCategories.regularPay]: "Regular",
+			[PayCategories.detailPay]: "Detail",
+			[PayCategories.otPay]: "Overtime",
+			[PayCategories.retroPay]: "Retroactive",
+			[PayCategories.injuredPay]: "Injured",
+			[PayCategories.quinnPay]: "Quinn",
+			[PayCategories.otherPay]: "Other",
 		};
 
 		return (

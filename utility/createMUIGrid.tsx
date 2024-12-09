@@ -242,7 +242,7 @@ const detail_record_columns = () => {
 		{
 			field: "trackingNo",
 			headerName: "Tracking #",
-			description: "",
+			description: "Unique tracking number assigned to each detail or request.",
 			type: "number",
 			valueFormatter: (params) => {
 				return params.value;
@@ -252,7 +252,7 @@ const detail_record_columns = () => {
 		{
 			field: "customerNo",
 			headerName: "Customer #",
-			description: "",
+			description: "Unique number assigned to the customer requesting the detail or service.",
 			type: "number",
 			valueFormatter: (params) => {
 				return params.value;
@@ -416,7 +416,7 @@ const detail_record_columns = () => {
 		{
 			field: "payTrcCode",
 			headerName: "Pay TRC Code",
-			description: "",
+			description: "Transaction code for payment processing.",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -438,7 +438,7 @@ const detail_record_columns = () => {
 		{
 			field: "adminFeeFlag",
 			headerName: "Admin Fee",
-			description: "",
+			description: "Rate for administrative fees (percentage or fixed amount).",
 			type: "boolean",
 			valueFormatter: (params) => {
 				return params.value;
@@ -449,10 +449,125 @@ const detail_record_columns = () => {
 	return cols;
 };
 
+const court_overtime_columns = () => {
+	const cols: GridColDef[] = [
+		{
+			field: "name",
+			headerName: "Officer Name",
+			description: "Name of officer",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+		},
+		{
+			field: "rank",
+			headerName: "Rank",
+			description: "Rank of the officer (e.g., Detective, Sergeant, Patrol Officer).",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 75,
+		},
+		{
+			field: "sex",
+			headerName: "Sex",
+			description: "Officer's sex",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 50,
+		},
+		{
+			field: "otDate",
+			headerName: "Date",
+			description: "Date of the overtime detail.",
+			type: "date",
+			valueFormatter: formatDateShort,
+			width: 100,
+		},
+		{
+			field: "assignedDesc",
+			headerName: "Assigned Description",
+			description: "Description of the unit or department the officer is assigned to.",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 250,
+		},
+		{
+			field: "chargedDesc",
+			headerName: "Charged Description",
+			description: "Description of the unit or department where overtime hours were charged.",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 250,
+		},
+		{
+			field: "description",
+			headerName: "Description",
+			description: "General description of the overtime purpose or type.",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "workedHours",
+			headerName: "Hours Worked",
+			description: "Total number of hours worked during the overtime detail.",
+			type: "number",
+			// valueFormatter: (params) => {
+			// 	return formatHours(params.value);
+			// },
+			width: 125,
+		},
+		{
+			field: "startTime",
+			headerName: "Start Time",
+			description: "Start time of the overtime detail.",
+			type: "string",
+			valueFormatter: (params) => {
+				return formatTime(params.value);
+			},
+			width: 100,
+		},
+		{
+			field: "endTime",
+			headerName: "End Time",
+			description: "End time of the overtime detail.",
+			type: "string",
+			valueFormatter: (params) => {
+				return formatTime(params.value);
+			},
+			width: 100,
+		},
+		{
+			field: "otCode",
+			headerName: "Code",
+			description: "Code representing the specific court-related overtime activity.",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 50,
+		},
+	];
+	return cols;
+};
+
 export const functionMapping = {
 	detail_record: detail_record_columns(),
 	officer_ia: officer_ia_columns(),
 	police_financial: police_financial_columns(),
+	court_overtime: court_overtime_columns(),
 };
 
 // THE BELOW TABLE DEFINITIONS ARE DEPRECATED BUT **may be helpful** later
