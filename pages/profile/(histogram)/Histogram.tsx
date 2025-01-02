@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import * as d3 from "d3";
 import HistogramRectangle, { PayCategories } from "./Rectangle";
+import { bpi_deep_green } from "@styles/theme/lightTheme";
 
 const MARGIN = { top: 30, right: 30, bottom: 40, left: 50 };
 const BUCKET_NUMBER = 20;
@@ -14,8 +15,6 @@ type HistogramProps = {
 	verticalLineX: number;
 	mode: PayCategories;
 };
-
-
 
 export const Histogram = ({ width, height, data, verticalLineX, mode }: HistogramProps) => {
 	const axesRef = useRef(null);
@@ -103,13 +102,16 @@ export const Histogram = ({ width, height, data, verticalLineX, mode }: Histogra
 	const verticalLinePosition = verticalLineX != null && verticalLineX != 0 ? xScale(verticalLineX) : null;
 
 	return (
-		<svg width={width} height={height}>
-			<g width={boundsWidth} height={boundsHeight} transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}>
-				{allRects}
-				{verticalLinePosition != null && <line x1={verticalLinePosition} y1={0} x2={verticalLinePosition} y2={boundsHeight} stroke={"red"} strokeWidth={2} />}
-			</g>
-			<g width={boundsWidth} height={boundsHeight} ref={axesRef} transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`} />
-		</svg>
+		<div style={{ display: "flex", alignItems: "center", justifyContent: "center", color: bpi_deep_green, fontSize: "small", flexDirection: "column" }}>
+			<svg width={width} height={height}>
+				<g width={boundsWidth} height={boundsHeight} transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}>
+					{allRects}
+					{verticalLinePosition != null && <line x1={verticalLinePosition} y1={0} x2={verticalLinePosition} y2={boundsHeight} stroke={"red"} strokeWidth={2} />}
+				</g>
+				<g width={boundsWidth} height={boundsHeight} ref={axesRef} transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`} />
+			</svg>
+			<p>*No red line means the officer did not receive pay in that category that year*</p>
+		</div>
 	);
 };
 

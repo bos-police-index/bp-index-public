@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Histogram } from "./Histogram";
-import { EmployeeFinancial, fetchFinancialsHistogram, PayTypeBuckets } from "@utility/dataUtils";
+import { fetchFinancialsHistogram, PayTypeBuckets } from "@utility/dataUtils";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import { PayTypeMap } from "./FinancialHistogram";
-import { bpi_deep_green, payCategoryColorMap } from "@styles/theme/lightTheme";
+import { bpi_deep_green, bpi_light_green, payCategoryColorMap } from "@styles/theme/lightTheme";
 import { PayCategories } from "./Rectangle";
+import { FormControlLabel, Switch } from "@mui/material";
 
 const BUTTONS_HEIGHT = 50;
 
@@ -13,7 +14,20 @@ type HistogramDataFeederProps = {
 	width: number;
 	height: number;
 	specificOfficerFinancialData: PayTypeMap;
+	officerDetailData: Filter;
 };
+
+export type Filter = {
+	rank: String;
+	unit: String;
+	zipCode: number;
+	sex: String;
+	race: String;
+};
+
+interface FinancialDataSplit {
+	[filter: string]: PayTypeBuckets;
+}
 
 const buttonStyle = {
 	borderRadius: "3px",
@@ -23,27 +37,29 @@ const buttonStyle = {
 	opacity: 0.7,
 };
 
-const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData }: HistogramDataFeederProps) => {
-	const [allOfficerFinancialData, setAllOfficerFinancialData] = useState<PayTypeBuckets>();
+const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData, officerDetailData }: HistogramDataFeederProps) => {
+	const [officerFinancialDataSplit, setOfficerFinancialDataSplit] = useState<FinancialDataSplit>();
 	const [selectedData, setSelectedData] = useState<number[]>();
 	const [selectedCategory, setSelectedCategory] = useState<PayCategories>();
+	const [selectedFilter, setSelectedFilter] = useState<string>("rank");
 	const [selectedYearIndex, setSelectedYearIndex] = useState<number>();
 	const [validYears, setValidYears] = useState<number[]>();
 	const [specificOfficerPayValue, setSpecificOfficerPayValue] = useState<number>();
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const data: PayTypeBuckets = await fetchFinancialsHistogram();
-			setAllOfficerFinancialData(data);
+			// get data split by filter attribute and add them to the map that works with selectedFilter
+			const [matching, nonMatching]: PayTypeBuckets[] = await fetchFinancialsHistogram(officerDetailData.rank);
+			setOfficerFinancialDataSplit({ rank: matching, none: nonMatching });
 
 			// set to the most recent year in the data
 			let i = 1;
-			while (data[Number(Object.keys(data)[Object.keys(data).length - i])].regularPay.length == 0) {
+			while (matching[Number(Object.keys(matching)[Object.keys(matching).length - i])].regularPay.length == 0) {
 				i++;
 			}
 			const validYears = Object.keys(specificOfficerFinancialData)
-				.slice(0, Object.keys(data).length - i + 1)
-				.map(Number); // Cast to numbers
+				.slice(0, Object.keys(matching).length - i + 1)
+				.map(Number);
 
 			setValidYears(validYears);
 			console.log(validYears[validYears.length - 1]);
@@ -54,53 +70,34 @@ const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData }: Hi
 	}, []);
 
 	useEffect(() => {
+		// helper to get data by filter and category
+		const getChosenData = (year): [number[], number] => {
+			var payTypeBucketRow: number[] = officerFinancialDataSplit[selectedFilter][year][selectedCategory] || [];
+			var specificOfficerValue: number = specificOfficerFinancialData[year]?.[selectedCategory] || 0;
+
+			// if no filter get all values
+			if (selectedFilter == "none") {
+				payTypeBucketRow = [...payTypeBucketRow, ...officerFinancialDataSplit["rank"][year][selectedCategory]];
+			}
+
+			return [payTypeBucketRow, specificOfficerValue];
+		};
+
 		// Ensure all data is available before proceeding
-		if (!allOfficerFinancialData || !selectedYearIndex || !selectedCategory) {
+		if (!officerFinancialDataSplit || !selectedYearIndex || !selectedCategory || !selectedFilter) {
 			return;
 		}
 
-		let chosenData: number[];
 		let year: number = validYears[selectedYearIndex];
 		let specificOfficerValue: number;
+		let filteredData: number[];
 
-		// normalize the values
-		switch (selectedCategory) {
-			case PayCategories.totalPay:
-				chosenData = allOfficerFinancialData[year].totalPay;
-				specificOfficerValue = specificOfficerFinancialData[year].totalPay;
-				break;
-			case PayCategories.otPay:
-				chosenData = allOfficerFinancialData[year].otPay;
-				specificOfficerValue = specificOfficerFinancialData[year].otPay;
-				break;
-			case PayCategories.detailPay:
-				chosenData = allOfficerFinancialData[year].detailPay;
-				specificOfficerValue = specificOfficerFinancialData[year].detailPay;
-				break;
-			case PayCategories.otherPay:
-				chosenData = allOfficerFinancialData[year].otherPay;
-				specificOfficerValue = specificOfficerFinancialData[year].otherPay;
-				break;
-			case PayCategories.retroPay:
-				chosenData = allOfficerFinancialData[year].retroPay;
-				specificOfficerValue = specificOfficerFinancialData[year].retroPay;
-				break;
-			case PayCategories.regularPay:
-				chosenData = allOfficerFinancialData[year].regularPay;
-				specificOfficerValue = specificOfficerFinancialData[year].regularPay;
-				break;
-			case PayCategories.injuredPay:
-				chosenData = allOfficerFinancialData[year].injuredPay;
-				specificOfficerValue = specificOfficerFinancialData[year].injuredPay;
-				break;
-			case PayCategories.quinnPay:
-				chosenData = allOfficerFinancialData[year].quinnPay;
-				specificOfficerValue = specificOfficerFinancialData[year].quinnPay;
-				break;
-		}
+		[filteredData, specificOfficerValue] = getChosenData(year);
+
+		// get the values of a specific category
 		setSpecificOfficerPayValue(specificOfficerValue);
-		setSelectedData(chosenData);
-	}, [selectedCategory, allOfficerFinancialData, selectedYearIndex]);
+		setSelectedData(filteredData || []);
+	}, [selectedCategory, officerFinancialDataSplit, selectedYearIndex, selectedFilter]);
 
 	function handleYearChange(option: string) {
 		if (option == "increase") {
@@ -129,7 +126,7 @@ const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData }: Hi
 		} else if (option === "decrease") {
 			return selectedYearIndex - 1 > -1;
 		} else {
-			return false; // Invalid option
+			return false;
 		}
 	}
 
@@ -146,6 +143,85 @@ const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData }: Hi
 			</div>
 		) : (
 			<></>
+		);
+	};
+
+	// UNCOMMENT TO USE THIS LATER IF YOU ADD MORE FILTER OPTIONS
+	// const FilterButton: React.FC = () => {
+	// 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+	// 	const open = Boolean(anchorEl);
+
+	// 	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+	// 		setAnchorEl(event.currentTarget);
+	// 	};
+
+	// 	const handleClose = () => {
+	// 		setAnchorEl(null);
+	// 	};
+
+	// 	const filters = ["Rank", "Unit", "Zip Code", "Sex", "Race"];
+
+	// 	const handleMenuItemClick = (filter: string) => {
+	// 		setSelectedFilter(filter);
+	// 		handleClose();
+	// 	};
+
+	// 	return (
+	// 		<div>
+	// 			<Button
+	// 				onClick={handleClick}
+	// 				style={{
+	// 					color: bpi_deep_green,
+	// 					fontSize: "small",
+	// 					display: "flex",
+	// 					alignItems: "center",
+	// 					gap: "0.5rem",
+	// 					width: "10rem",
+	// 				}}
+	// 			>
+	// 				<FilterAltIcon fontSize="medium" />
+	// 				FILTER {selectedFilter ? selectedFilter.toUpperCase() : "NONE"}
+	// 			</Button>
+	// 			<Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+	// 				{filters.map((filter, index) => (
+	// 					<MenuItem key={index} onClick={() => handleMenuItemClick(filter)}>
+	// 						{filter}
+	// 					</MenuItem>
+	// 				))}
+	// 			</Menu>
+	// 		</div>
+	// 	);
+	// };
+
+	const FilterToggle = () => {
+		const toggleFunction = () => {
+			if (selectedFilter == "rank") setSelectedFilter("none");
+			else setSelectedFilter("rank");
+		};
+
+		return (
+			<FormControlLabel
+				control={
+					<Switch
+						checked={selectedFilter == "rank"}
+						onClick={toggleFunction}
+						sx={{
+							"& .MuiSwitch-colorPrimary": {
+								color: `${bpi_deep_green} !important`,
+							},
+							"& .MuiSwitch-track": {
+								backgroundColor: selectedFilter == "rank" ? `${bpi_light_green} !important` : "grey !important",
+							},
+
+							"& .MuiSwitch-input": {
+								color: bpi_deep_green,
+								backgroundColor: bpi_deep_green,
+							},
+						}}
+					/>
+				}
+				label="Filter by Rank"
+			/>
 		);
 	};
 
@@ -183,9 +259,18 @@ const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData }: Hi
 		);
 	};
 
+	console.log(`specificOfficerPayValue: ${specificOfficerPayValue}`);
+
 	return selectedData ? (
-		<div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+		<div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "1rem 1rem" }}>
+			<div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+				<p style={{ color: "black", fontSize: "large", textAlign: "center", flexGrow: 1 }}>Individual Officer Pay Distribution</p>
+				<div style={{ marginLeft: "auto" }}>
+					<FilterToggle />
+				</div>
+			</div>
 			<ButtonGroup />
+
 			<YearToggle />
 
 			<Histogram mode={selectedCategory} width={width} height={height - BUTTONS_HEIGHT} data={selectedData} verticalLineX={specificOfficerPayValue || 0} />

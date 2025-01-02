@@ -7,6 +7,7 @@ import FullWidthTabs from "./TabTables";
 import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
 import PayStackedBarChart from "./StackedBarChartOfficerFinancial";
 import FinancialHistogram from "./(histogram)/FinancialHistogram";
+import { Filter } from "./(histogram)/HistogramDataFeeder";
 
 export interface Table {
 	title: string;
@@ -29,7 +30,6 @@ interface OfficerData {
 	totalEarnings: number;
 	ia_num: number;
 	detail_num: number;
-	year: number;
 }
 
 interface FinancialEmployeeData {
@@ -107,7 +107,7 @@ export const getData = async (keyword: string, bpiId: string) => {
 				rank: node.rank || mostRecentEmployeeData.rank,
 				sex: node.sex || mostRecentEmployeeData.sex,
 				unit: node.unit || mostRecentEmployeeData.unit,
-				year: node.year || mostRecentEmployeeData.year,
+				year: node.year,
 				zipCode: node.zipCode || mostRecentEmployeeData.zipCode,
 				unionCode: node.unionCode || mostRecentEmployeeData.unionCode,
 				badgeNo: node.badgeNo || mostRecentEmployeeData.badgeNo,
@@ -138,8 +138,8 @@ export const getData = async (keyword: string, bpiId: string) => {
 		totalEarnings: mostRecentEmployeeData.totalPay,
 		ia_num: 0,
 		detail_num: 0,
-		year: mostRecentEmployeeData.year,
 	};
+	// console.log(officerData);
 
 	let detail_record_rows = [];
 	let officer_IA_rows = [];
@@ -335,6 +335,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 	const { bpiId, keyword } = router.query;
 	const [tablesArr, setTablesArr] = useState<Table[]>([]);
 	const [officerData, setOfficerData] = useState<OfficerData>();
+	const [officerDetailData, setOfficerDetailData] = useState<Filter>();
 	const [tableFilters] = useState({
 		detail_record: {
 			includesOnly: [
@@ -410,6 +411,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 	useEffect(() => {
 		const fetchData = async () => {
 			const { props } = await getData(keyword as string, bpiId as string);
+			// console.log("props", props);
 			let tablesArr: Table[] = [];
 			for (let table of props.tables) {
 				let rows = table.rows;
@@ -423,6 +425,14 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 				tablesArr.push(tableEntry);
 			}
 			setOfficerData(props.officerData);
+			const officerDetails: Filter = {
+				sex: props.officerData.sex,
+				race: props.officerData.race,
+				rank: props.officerData.rank,
+				zipCode: Number(props.officerData.residence),
+				unit: props.officerData.unit,
+			};
+			setOfficerDetailData(officerDetails);
 			setTablesArr(tablesArr);
 		};
 		if (keyword && bpiId) {
@@ -496,7 +506,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 							</div>
 
 							<div className="text-lg" style={{ display: "flex", justifyContent: "space-between" }}>
-								<strong style={{ cursor: "pointer" }}>{officerData.year} Earnings</strong> {`$${formatMoney(officerData.totalEarnings)}`}
+								<strong style={{ cursor: "pointer" }}>Earnings</strong> {`$${formatMoney(officerData.totalEarnings)}`}
 							</div>
 							<p className="text-lg">{/* <strong style={{ cursor: "pointer" }}>FIO:</strong> {officerData.fio_record} */}</p>
 							<p className="text-lg">{/* <strong style={{ cursor: "pointer" }}>Traffic Tickets:</strong> {officerData.traffic_no} */}</p>
@@ -508,7 +518,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 			<section>
 				<div style={{ backgroundColor: bpi_light_gray, paddingTop: "1.25rem", paddingBottom: ".25rem" }}>
 					{tablesArr ? <FullWidthTabs tables={tablesArr} /> : <></>}
-					{tablesArr[2].tables.fullTable ? (
+					{tablesArr[2]?.tables?.fullTable ? (
 						<div
 							style={{
 								display: "flex",
@@ -536,7 +546,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 									</p>
 								</div>
 
-								<FinancialHistogram officerPayData={tablesArr[2].tables.fullTable.props} mode={"total"} />
+								<FinancialHistogram officerPayData={tablesArr[2]?.tables?.fullTable?.props} officerDetailData={officerDetailData} mode={"total"} />
 							</div>
 						</div>
 					) : (

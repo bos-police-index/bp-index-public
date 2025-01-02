@@ -1,6 +1,5 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { functionMapping, getMUIGrid } from "@utility/createMUIGrid";
-import { tableExists } from "@utility/utility";
 import apolloClient from "@lib/apollo-client";
 import { GET_FIRST_1000_COURT_OVERTIMES, GET_FIRST_1000_DETAIL_RECORDS, GET_REST_COURT_OVERTIMES, GET_REST_DETAIL_RECORDS } from "@lib/graphql/queries";
 import IconWrapper, { tableDefinitions } from "@utility/tableDefinitions";

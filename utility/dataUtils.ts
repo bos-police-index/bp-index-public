@@ -17,6 +17,7 @@ export interface EmployeeFinancial {
 	retroPay: number;
 	detailPay: number;
 	year: number;
+	rank: String;
 }
 
 interface HomepageData {
@@ -39,17 +40,29 @@ interface SearchResponseData {
 	sex: string | null;
 }
 
+interface PayTypeBucketRow {
+	totalPay: number[];
+	detailPay: number[];
+	injuredPay: number[];
+	otherPay: number[];
+	regularPay: number[];
+	quinnPay: number[];
+	retroPay: number[];
+	otPay: number[];
+}
+
 export interface PayTypeBuckets {
-	[year: number]: {
-		totalPay: number[];
-		detailPay: number[];
-		injuredPay: number[];
-		otherPay: number[];
-		regularPay: number[];
-		quinnPay: number[];
-		retroPay: number[];
-		otPay: number[];
-	};
+	[year: number]: PayTypeBucketRow;
+}
+
+enum PoliceOfficerRanks {
+	Captain,
+	Command,
+	Detective,
+	Lieutenant,
+	Officer,
+	Other,
+	Sergeant,
 }
 
 async function fetchHomepageData(): Promise<SearchResponseData[]> {
@@ -107,19 +120,57 @@ export const fetchHompage = async ({ keyword }: { keyword: string | string[] | n
 const fetchFinancialsHistogramData = async () => {
 	try {
 		const { data } = await apolloClient.query<EmployeeFinancialsResponse>({ query: GET_ALL_OFFICER_FINANCIAL_DATA });
-		return data;
+		return data.allLinkSu24EmployeeFinancials.nodes;
 	} catch (error) {
 		console.error("Error fetching data: ", error);
 		throw new Error("Error fetching data");
 	}
 };
 
-export const fetchFinancialsHistogram = async () => {
+export const fetchFinancialsHistogram = async (rank: String) => {
+	const addNewRecord = (payBucket: PayTypeBuckets, row: any) => {
+		if (!payBucket[row.year] && row.regularPay) {
+			payBucket[row.year] = {
+				totalPay: [],
+				detailPay: [],
+				injuredPay: [],
+				otherPay: [],
+				regularPay: [],
+				quinnPay: [],
+				retroPay: [],
+				otPay: [],
+			};
+		}
+		if (row.totalPay) payBucket[row.year].totalPay.push(row.totalPay);
+		if (row.detailPay) payBucket[row.year].detailPay.push(row.detailPay);
+		if (row.injuredPay) payBucket[row.year].injuredPay.push(row.injuredPay);
+		if (row.otherPay) payBucket[row.year].otherPay.push(row.otherPay);
+		if (row.regularPay) payBucket[row.year].regularPay.push(row.regularPay);
+		if (row.quinnPay) payBucket[row.year].quinnPay.push(row.quinnPay);
+		if (row.retroPay) payBucket[row.year].retroPay.push(row.retroPay);
+		if (row.otPay) payBucket[row.year].otPay.push(row.otPay);
+
+		return payBucket;
+	};
+
 	try {
-		const allFinancials = (await fetchFinancialsHistogramData()).allLinkSu24EmployeeFinancials.nodes;
+		const allFinancials = await fetchFinancialsHistogramData();
 
 		// organize values into pay types
-		const payTypeBuckets: PayTypeBuckets = {
+		var rankMatchingPayTypeBuckets: PayTypeBuckets = {
+			[2023]: {
+				totalPay: [],
+				detailPay: [],
+				injuredPay: [],
+				otherPay: [],
+				regularPay: [],
+				quinnPay: [],
+				retroPay: [],
+				otPay: [],
+			},
+		};
+
+		var nonRankMatchingPayTypeBuckets: PayTypeBuckets = {
 			[2023]: {
 				totalPay: [],
 				detailPay: [],
@@ -133,33 +184,18 @@ export const fetchFinancialsHistogram = async () => {
 		};
 
 		if (!allFinancials) {
-			return payTypeBuckets;
+			return [rankMatchingPayTypeBuckets, nonRankMatchingPayTypeBuckets];
 		}
 
 		allFinancials.forEach((row) => {
-			if (!payTypeBuckets[row.year] && row.regularPay) {
-				payTypeBuckets[row.year] = {
-					totalPay: [],
-					detailPay: [],
-					injuredPay: [],
-					otherPay: [],
-					regularPay: [],
-					quinnPay: [],
-					retroPay: [],
-					otPay: [],
-				};
+			if (row.rank == rank) {
+				rankMatchingPayTypeBuckets = addNewRecord(rankMatchingPayTypeBuckets, row);
+			} else {
+				nonRankMatchingPayTypeBuckets = addNewRecord(nonRankMatchingPayTypeBuckets, row);
 			}
-			if (row.totalPay) payTypeBuckets[row.year].totalPay.push(row.totalPay);
-			if (row.detailPay) payTypeBuckets[row.year].detailPay.push(row.detailPay);
-			if (row.injuredPay) payTypeBuckets[row.year].injuredPay.push(row.injuredPay);
-			if (row.otherPay) payTypeBuckets[row.year].otherPay.push(row.otherPay);
-			if (row.regularPay) payTypeBuckets[row.year].regularPay.push(row.regularPay);
-			if (row.quinnPay) payTypeBuckets[row.year].quinnPay.push(row.quinnPay);
-			if (row.retroPay) payTypeBuckets[row.year].retroPay.push(row.retroPay);
-			if (row.otPay) payTypeBuckets[row.year].otPay.push(row.otPay);
 		});
 
-		return payTypeBuckets;
+		return [rankMatchingPayTypeBuckets, nonRankMatchingPayTypeBuckets];
 	} catch (error) {
 		console.error("Error fetching data: ", error);
 		throw new Error("Error fetching data");

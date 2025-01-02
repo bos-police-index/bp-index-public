@@ -115,6 +115,7 @@ export const GET_ALL_OFFICER_FINANCIAL_DATA = gql`
 				retroPay
 				detailPay
 				year
+				rank
 			}
 		}
 	}

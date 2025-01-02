@@ -1,8 +1,9 @@
 "use client";
-import HistogramDataFeeder from "./HistogramDataFeeder";
+import HistogramDataFeeder, { Filter } from "./HistogramDataFeeder";
 
 interface FinancialHistogramProps {
 	officerPayData: any;
+	officerDetailData: Filter;
 	mode: string; // use this later if you want to make different charts with set views
 }
 
@@ -19,7 +20,7 @@ export interface PayTypeMap {
 	};
 }
 
-export default function FinancialHistogram({ officerPayData, mode }: FinancialHistogramProps) {
+export default function FinancialHistogram({ officerPayData, officerDetailData, mode }: FinancialHistogramProps) {
 	function reshapeFinancialDataInput(data) {
 		if (!data) {
 			return;
@@ -62,7 +63,7 @@ export default function FinancialHistogram({ officerPayData, mode }: FinancialHi
 
 	return (
 		<div className="bg-white p-4 rounded-md">
-			<HistogramDataFeeder width={860} height={450} specificOfficerFinancialData={reshapeFinancialDataInput(officerPayData)} />
+			<HistogramDataFeeder width={860} height={450} specificOfficerFinancialData={reshapeFinancialDataInput(officerPayData)} officerDetailData={officerDetailData} />
 		</div>
 	);
 }

@@ -1,5 +1,4 @@
 import { useSpring, animated } from "@react-spring/web";
-import { bpi_deep_green } from "@styles/theme/lightTheme";
 import { payCategoryColorMap } from "@styles/theme/lightTheme";
 
 export enum PayCategories {
