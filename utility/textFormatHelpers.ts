@@ -1,5 +1,11 @@
 import { GridValueFormatterParams } from "@mui/x-data-grid";
 
+export function yAndNToBoolean(value) {
+	value = value.toUpperCase();
+	const returnValue = value == "N" ? false : value == "Y" ? true : null;
+	return returnValue;
+}
+
 //fixed casing
 export function properCaseName(name) {
 	const capitalize = (word) => {

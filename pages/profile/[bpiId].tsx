@@ -1,13 +1,14 @@
 import React, { FunctionComponentElement, useEffect, useState } from "react";
 import { getMUIGrid } from "@utility/createMUIGrid";
 import apolloClient from "@lib/apollo-client";
-import { gql } from "@apollo/client";
 import { useRouter } from "next/router";
 import FullWidthTabs from "./TabTables";
 import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
 import PayStackedBarChart from "./StackedBarChartOfficerFinancial";
 import FinancialHistogram from "./(histogram)/FinancialHistogram";
 import { Filter } from "./(histogram)/HistogramDataFeeder";
+import { INDIVIDUAL_OFFICER_DETAIL_RECORDS, INDIVIDUAL_OFFICER_FINANCIAL_AND_EMPLOYEE, INDIVIDUAL_OFFICER_IA } from "@lib/graphql/queries";
+import { detail_alias_name } from "@utility/dataViewAliases";
 
 export interface Table {
 	title: string;
@@ -62,32 +63,7 @@ export const getData = async (keyword: string, bpiId: string) => {
 			notFound: true,
 		};
 	}
-	const financial_and_employee_query = gql`query MyQuery {
-		allLinkSu24EmployeeFinancials(condition: {bpiId: "${bpiId}" }) {
-		  nodes {
-			race
-				  rank
-				  sex
-				  unit
-				  year
-				  zipCode
-				  unionCode
-				  badgeNo
-				  firstName
-				  lastName
-				  otPay
-				  otherPay
-				  quinnPay
-				  regularPay
-				  retroPay
-				  totalPay
-				  detailPay
-				  injuredPay
-				  year
-		  }
-		}
-	  }`;
-	// console.log("bpiID", bpiId);
+	const financial_and_employee_query = INDIVIDUAL_OFFICER_FINANCIAL_AND_EMPLOYEE(bpiId);
 	const financialAndEmployeeResponse: any = await apolloClient.query({ query: financial_and_employee_query });
 	const financeEmployeeData = financialAndEmployeeResponse.data.allLinkSu24EmployeeFinancials.nodes;
 	// if not found, return 404s
@@ -180,42 +156,12 @@ export const getData = async (keyword: string, bpiId: string) => {
 
 	police_financial_rows = newFinancialRows;
 
-	const detail_record_query = gql`
-	query MyQuery {
-		allLinkSu24DetailRecords(condition: {bpiId: "${bpiId}"}) {
-		  nodes {
-			adminFeeFlag
-			bpdCustomerNo
-			customerNo
-			customerNoAndSeq
-			customerSeq
-			detailRank
-			detailType
-			districtWorked
-			endTime
-			fbkPayDate
-			location
-			hoursWorked
-			payAmount
-			payHours
-			payRate
-			payTrcCode
-			rowId
-			startDate
-			startTime
-			street
-			xStreet
-			trackingNo
-			streetNo
-		  }
-		}
-	  }
-	  `;
+	const detail_record_query = INDIVIDUAL_OFFICER_DETAIL_RECORDS(bpiId);
 	const detail_response = await apolloClient.query({ query: detail_record_query });
 
 	//add artificial id for MUI purposes
 	let detailRowId = 1;
-	const newDetailRows = detail_response.data.allLinkSu24DetailRecords.nodes.map((node) => {
+	const newDetailRows = detail_response.data[detail_alias_name].nodes.map((node) => {
 		return { id: detailRowId++, ...node };
 	});
 	detail_record_rows = newDetailRows;
@@ -223,22 +169,7 @@ export const getData = async (keyword: string, bpiId: string) => {
 	officerData.detail_num = detail_record_rows.length;
 
 	//get IA data
-	const ia_query = gql`
-		query MyQuery {
-			allLinkSu24EmployeeIas(condition: {bpiId: "${bpiId}"}) {
-				nodes {
-					dateReceived
-					allegation
-					finding
-					actionTaken
-					adminLeave
-					daysOrHoursSuspended
-					incidentType
-					iaNo
-				}
-			}
-		}
-	`;
+	const ia_query = INDIVIDUAL_OFFICER_IA(bpiId);
 
 	const iaResponse: any = await apolloClient.query({ query: ia_query });
 	const iaData = iaResponse.data.allLinkSu24EmployeeIas.nodes;
@@ -447,10 +378,6 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 			minimumFractionDigits: 2,
 			maximumFractionDigits: 2,
 		}).format(number);
-	}
-
-	if (tablesArr[2]?.tables) {
-		console.log("table", tablesArr[2].tables.fullTable.props);
 	}
 
 	return officerData ? (

@@ -11,13 +11,25 @@ export default function SearchBar({ title, officerName }: SearchBarProps) {
 	const router = useRouter();
 	const [keyword, setKeyword] = useState<string>("");
 	const [hoveredOn, setHoveredOn] = useState<boolean>(false);
+	const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
 
 	const handleHover = () => {
+		if (hoverTimeout) {
+			clearTimeout(hoverTimeout);
+			setHoverTimeout(null);
+		}
 		setHoveredOn(true);
 	};
 
 	const handleLeave = () => {
-		setHoveredOn(false);
+		if (keyword != "") {
+			return;
+		}
+		const timeout = setTimeout(() => {
+			setHoveredOn(false);
+			setHoverTimeout(null);
+		}, 500);
+		setHoverTimeout(timeout);
 	};
 
 	const handleSearch = () => {

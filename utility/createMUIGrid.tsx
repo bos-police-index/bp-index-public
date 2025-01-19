@@ -1,8 +1,10 @@
 import { GridColDef } from "@mui/x-data-grid";
 import React from "react";
 import DataTable from "@components/DataTable";
-import { Tooltip } from "@mui/material";
-import { formatDateShort, formatDate, formatHours, formatMoney, formatTime } from "./textFormatHelpers";
+import { rgbToHex, Tooltip } from "@mui/material";
+import { formatDateShort, formatDate, formatHours, formatMoney, formatTime, yAndNToBoolean } from "./textFormatHelpers";
+import CheckIcon from "@mui/icons-material/Check";
+import ClearIcon from "@mui/icons-material/Clear";
 
 export const getMUIGrid = (table: string, rows: any[], officerName: string, includesOnly = [], excludes = []) => {
 	const cols: GridColDef[] = functionMapping[table];
@@ -100,8 +102,10 @@ const officer_ia_columns = () => {
 			field: "adminLeave",
 			headerName: "Administrative Leave",
 			type: "boolean",
+			valueGetter: (params) => yAndNToBoolean(params.value),
 			renderCell: (params) => {
-				return params.value == "Y";
+				if (params.value === null) return "";
+				return params.value ? <CheckIcon fontSize="small" htmlColor="#00000099" /> : <ClearIcon fontSize="small" htmlColor="#00000061" />;
 			},
 			width: 200,
 		},
@@ -234,9 +238,7 @@ const detail_record_columns = () => {
 			headerName: "ID",
 			description: "An arbitrary unique identifier used for getting a specific row of data.",
 			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
+			valueFormatter: (params) => params.value,
 			width: 100,
 		},
 		{
@@ -244,9 +246,7 @@ const detail_record_columns = () => {
 			headerName: "Tracking #",
 			description: "Unique tracking number assigned to each detail or request.",
 			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
+			valueFormatter: (params) => params.value,
 			width: 100,
 		},
 		{
@@ -254,9 +254,7 @@ const detail_record_columns = () => {
 			headerName: "Customer #",
 			description: "Unique number assigned to the customer requesting the detail or service.",
 			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
+			valueFormatter: (params) => params.value,
 			width: 100,
 		},
 		{
@@ -264,20 +262,15 @@ const detail_record_columns = () => {
 			headerName: "Officer Badge #",
 			description: "The badge number of an officer. Note that this is not necessarily unique.",
 			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
+			valueFormatter: (params) => params.value,
 			width: 150,
 		},
-
 		{
 			field: "streetNo",
 			headerName: "Street #",
 			description: "The address of the detail done.",
 			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
+			valueFormatter: (params) => params.value,
 			width: 75,
 		},
 		{
@@ -285,19 +278,15 @@ const detail_record_columns = () => {
 			headerName: "Street Name",
 			description: "The name of the street where the detail was done.",
 			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
+			valueFormatter: (params) => params.value,
 			width: 150,
 		},
 		{
-			field: "xStreet",
+			field: "xstreet",
 			headerName: "Cross Street",
-			description: "The cross street of where the detail was done",
-			type: "number",
-			valueFormatter: (params) => {
-				return params.value;
-			},
+			description: "TO DO",
+			type: "string",
+			valueFormatter: (params) => params.value,
 			width: 170,
 		},
 		{
@@ -306,16 +295,14 @@ const detail_record_columns = () => {
 			description: "The day that the detail work took place",
 			type: "date",
 			valueFormatter: formatDateShort,
-			width: 200,
+			width: 100,
 		},
 		{
 			field: "startTime",
 			headerName: "Start Time",
 			description: "The time of day it started",
 			type: "number",
-			valueFormatter: (params) => {
-				return formatTime(params.value);
-			},
+			valueFormatter: (params) => formatTime(params.value),
 			width: 100,
 		},
 		{
@@ -323,9 +310,7 @@ const detail_record_columns = () => {
 			headerName: "End Time",
 			description: "The time of day it ended",
 			type: "number",
-			valueFormatter: (params) => {
-				return formatTime(params.value);
-			},
+			valueFormatter: (params) => formatTime(params.value),
 			width: 100,
 		},
 		{
@@ -333,20 +318,15 @@ const detail_record_columns = () => {
 			headerName: "Hours Worked",
 			description: "Number of hours worked that day",
 			type: "number",
-			valueFormatter: (params) => {
-				return formatHours(params.value);
-			},
-			width: 120,
+			valueFormatter: (params) => formatHours(params.value),
+			width: 110,
 		},
-
 		{
 			field: "payHours",
 			headerName: "Pay Hours",
 			description: "Number of hours officer was paid for in detail from that job",
 			type: "number",
-			valueFormatter: (params) => {
-				return formatHours(params.value);
-			},
+			valueFormatter: (params) => formatHours(params.value),
 			width: 100,
 		},
 		{
@@ -354,29 +334,47 @@ const detail_record_columns = () => {
 			headerName: "Pay Amount",
 			description: "The amount that officer was paid for this detail work",
 			type: "number",
-			valueFormatter: (params) => {
-				return formatMoney(params.value);
-			},
-			width: 150,
+			valueFormatter: (params) => formatMoney(params.value),
+			width: 110,
 		},
 		{
 			field: "payRate",
 			headerName: "Pay Rate",
 			description: "The rate per hour that the officer was paid for this detail work",
 			type: "number",
-			valueFormatter: (params) => {
-				return formatMoney(params.value);
-			},
-			width: 170,
+			valueFormatter: (params) => formatMoney(params.value),
+			width: 90,
+		},
+		{
+			field: "nameId",
+			headerName: "Officer Name",
+			description: "TO DO",
+			type: "string",
+			valueFormatter: (params) => params.value,
+			width: 200,
+		},
+		{
+			field: "districtWorked",
+			headerName: "Work District",
+			description: "Code or identifier for the district where the employee worked.",
+			type: "number",
+			valueFormatter: (params) => params.value,
+			width: 100,
+		},
+		{
+			field: "customerName",
+			headerName: "Customer Name",
+			description: "Name of the customer or entity requesting services.",
+			type: "string",
+			valueFormatter: (params) => params.value,
+			width: 250,
 		},
 		{
 			field: "sex",
 			headerName: "Officer Sex",
 			description: "The sex of the officer",
 			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
+			valueFormatter: (params) => params.value,
 			align: "center",
 			width: 100,
 		},
@@ -385,9 +383,7 @@ const detail_record_columns = () => {
 			headerName: "Officer Race",
 			description: "The race of the officer",
 			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
+			valueFormatter: (params) => params.value,
 			align: "center",
 			width: 100,
 		},
@@ -396,9 +392,7 @@ const detail_record_columns = () => {
 			headerName: "Officer Rank",
 			description: "The rank of the officer",
 			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
+			valueFormatter: (params) => params.value,
 			align: "center",
 			width: 100,
 		},
@@ -407,9 +401,7 @@ const detail_record_columns = () => {
 			headerName: "Officer Org Code",
 			description: "5-digit code assigned to each organization within BPD",
 			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
+			valueFormatter: (params) => params.value,
 			align: "center",
 			width: 150,
 		},
@@ -418,20 +410,16 @@ const detail_record_columns = () => {
 			headerName: "Pay TRC Code",
 			description: "Transaction code for payment processing.",
 			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
+			valueFormatter: (params) => params.value,
 			align: "center",
-			width: 170,
+			width: 130,
 		},
 		{
 			field: "detailType",
 			headerName: "Detail Type",
 			description: "C is construction (traffic control + pedestrian safety). S is standard (security etc.)",
 			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
-			},
+			valueFormatter: (params) => params.value,
 			align: "center",
 			width: 100,
 		},
@@ -440,14 +428,41 @@ const detail_record_columns = () => {
 			headerName: "Admin Fee",
 			description: "Rate for administrative fees (percentage or fixed amount).",
 			type: "boolean",
-			valueFormatter: (params) => {
-				return params.value;
+			valueGetter: (params) => yAndNToBoolean(params.value),
+			renderCell: (params) => {
+				if (params.value === null) return "";
+				return params.value ? <CheckIcon fontSize="small" htmlColor="#00000099" /> : <ClearIcon fontSize="small" htmlColor="#00000061" />;
 			},
 			width: 100,
+		},
+		{
+			field: "noShowFlag",
+			headerName: "No Show",
+			description: "Flag indicating if the assigned officer failed to show up.",
+			type: "boolean",
+			valueGetter: (params) => yAndNToBoolean(params.value),
+			renderCell: (params) => {
+				if (params.value === null) return "";
+				return params.value ? <CheckIcon fontSize="small" htmlColor="#00000099" /> : <ClearIcon fontSize="small" htmlColor="#00000061" />;
+			},
+			width: 100,
+		},
+		{
+			field: "stateFunded",
+			headerName: "State Funded",
+			description: "Flag indicating if the detail is state-funded.",
+			type: "string",
+			valueGetter: (params) => yAndNToBoolean(params.value),
+			renderCell: (params) => {
+				if (params.value === null) return "";
+				return params.value ? <CheckIcon fontSize="small" htmlColor="#00000099" /> : <ClearIcon fontSize="small" htmlColor="#00000061" />;
+			},
+			width: 120,
 		},
 	];
 	return cols;
 };
+  
 
 const court_overtime_columns = () => {
 	const cols: GridColDef[] = [

@@ -62,7 +62,6 @@ const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData, offi
 				.map(Number);
 
 			setValidYears(validYears);
-			console.log(validYears[validYears.length - 1]);
 			setSelectedYearIndex(validYears.length - 1);
 		};
 		fetchData();

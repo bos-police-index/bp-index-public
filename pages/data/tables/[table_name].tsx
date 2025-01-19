@@ -12,41 +12,44 @@ import ScreenOverlay from "@components/ScreenOverlay";
 import { Button } from "antd";
 import { DocumentNode } from "graphql";
 import GlossaryTotal from "@components/GlossaryTotal";
+import { court_overtime_alias_name, detail_alias_name } from "@utility/dataViewAliases";
 
 interface DetailRecord {
-	adminFeeFlag: string;
+	adminFeeFlag: string; // e.g., "Y" or "N"
 	badgeNo: number;
 	bpdCustomerNo: number;
 	customerNo: number;
-	customerNoAndSeq: string;
 	customerSeq: number;
 	detailRank: number;
-	detailType: string;
+	detailType: string; // e.g., "A"
 	districtWorked: number;
-	endTime: number;
-	fbkPayDate: string;
-	location: string;
+	endTime: string; // e.g., "500"
 	hoursWorked: number;
-	nameId: string;
-	payAmount: number;
+	nameId: string; // e.g., "WALLACE,DANIEL A"
+	payAmount: string; // e.g., "655.92"
 	payHours: number;
 	payRate: number;
-	race: string;
-	payTrcCode: string;
-	rowId: number;
-	sex: string;
-	startDate: string;
-	startTime: number;
+	race: string; // e.g., "WHITE"
+	payTrcCode: string; // e.g., "P09S4"
+	sex: string; // e.g., "M" or "F"
+	startDate: string; // e.g., "2024-05-29"
+	startTime: string; // e.g., "2345"
 	street: string;
-	xStreet: string;
+	xstreet: string;
 	trackingNo: number;
-	streetNo: number;
+	streetNo: string; // Can be empty
 	empRank: number;
 	empOrgCode: number;
+	customerName: string; // e.g., "RJV CONSTRUCTION CORP."
+	noShowFlag: string; // e.g., "N"
+	prepaidFlag: string; // Can be empty
+	stateFunded: string; // Can be empty
 }
 
-interface DetailRecordsResponse {
-	allLinkSu24DetailRecords: {
+type DetailRecordCollection = Record<string, { nodes: DetailRecord[] }>;
+
+interface DetailRecordsResponse extends DetailRecordCollection {
+	[viewName: string]: {
 		nodes: DetailRecord[];
 	};
 }
@@ -66,11 +69,37 @@ interface CourtOvertime {
 	workedHours: number; // Total worked hours
 }
 
-interface CourtOvertimeResponse {
-	allLinkSu24CourtOvertimes: {
+type CourtOvertimeCollection = Record<string, { nodes: CourtOvertime[] }>;
+
+interface CourtOvertimeResponse extends CourtOvertimeCollection {
+	[viewName: string]: {
 		nodes: CourtOvertime[];
 	};
 }
+
+const dataToColumns = (data, table_name) => {
+	let dataArr: any[] = [];
+	if (data && data[detail_alias_name]?.nodes) {
+		dataArr = data[detail_alias_name].nodes.map((item, index) => ({
+			id: index + 1,
+			...item,
+		}));
+	}
+	if (data && data[court_overtime_alias_name]?.nodes) {
+		dataArr = data[court_overtime_alias_name].nodes.map((item, index) => ({
+			id: index + 1,
+			...item,
+		}));
+	}
+
+	if (table_name === "employee") {
+		// remove the officer_photo column
+		dataArr.forEach((item) => {
+			delete item["officer_photo"];
+		});
+	}
+	return dataArr;
+};
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const table_name = context.params?.table_name as string;
@@ -92,31 +121,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		case "detail_record":
 			query = GET_FIRST_1000_DETAIL_RECORDS;
 			data = (await apolloClient.query<DetailRecordsResponse>({ query: query })).data;
+			break;
 		case "court_overtime":
 			query = GET_FIRST_1000_COURT_OVERTIMES;
 			data = (await apolloClient.query<CourtOvertimeResponse>({ query: query })).data;
+			break;
 	}
 
-	let dataArr: any[] = [];
+	const dataArr = dataToColumns(data, table_name);
 
-	if (data && data.allLinkSu24DetailRecords?.nodes) {
-		dataArr = data.allLinkSu24DetailRecords.nodes.map((item, index) => ({
-			id: index + 1,
-			...item,
-		}));
-	}
-	if (data && data.allLinkSu24CourtOvertimes?.nodes) {
-		dataArr = data.allLinkSu24CourtOvertimes.nodes.map((item, index) => ({
-			id: index + 1,
-			...item,
-		}));
-	}
-	if (table_name === "employee") {
-		// remove the officer_photo column
-		dataArr.forEach((item) => {
-			delete item["officer_photo"];
-		});
-	}
 	return {
 		props: {
 			rows: dataArr,
@@ -152,25 +165,15 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 				case "detail_record":
 					query = GET_REST_DETAIL_RECORDS;
 					data = (await apolloClient.query<DetailRecordsResponse>({ query: query })).data;
+					break;
 				case "court_overtime":
 					query = GET_REST_COURT_OVERTIMES;
 					data = (await apolloClient.query<CourtOvertimeResponse>({ query: query })).data;
+					break;
 			}
 
-			let dataArr: any[] = [];
+			const dataArr = dataToColumns(data, props.table_name);
 
-			if (data && data.allLinkSu24DetailRecords && data.allLinkSu24DetailRecords.nodes) {
-				dataArr = data.allLinkSu24DetailRecords.nodes.map((item, index) => ({
-					id: index + 1,
-					...item,
-				}));
-			}
-			if (props.table_name === "employee") {
-				// remove the officer_photo column
-				dataArr.forEach((item) => {
-					delete item["officer_photo"];
-				});
-			}
 			setRows([...rows, ...dataArr]);
 			setLoadingMoreData(false);
 		};
