@@ -6,13 +6,14 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import BPILogo from '../public/BPI-Logo-White.png'
-import dept from '../public/department.png'
-import Image from "next/image";
-import '../public/favicon.ico'
+import { useRouter } from "next/router";
+import "../public/favicon.ico";
 import { bpi_deep_green } from "@styles/theme/lightTheme";
+import { Route } from "nextjs-routes";
 
 export default function Navbar() {
 	const HamburgerMenu = () => {
+		const router = useRouter();
 		const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 		const open = Boolean(anchorEl);
 		const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -20,6 +21,10 @@ export default function Navbar() {
 		};
 		const handleClose = () => {
 			setAnchorEl(null);
+		};
+
+		const handleNavigate = (route: Route) => {
+			router.push(route); // Navigate to the /data page
 		};
 		return (
 			<div>
@@ -43,31 +48,25 @@ export default function Navbar() {
 						"aria-labelledby": "basic-button",
 					}}
 				>
-					<MenuItem onClick={handleClose} style={{ justifyContent: "center" }}>
-						<Link href={"/data"} className="text-l hover:link" style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+					<MenuItem style={{ justifyContent: "center" }} onClick={() => handleNavigate("/data" as unknown as Route)}>
+						<div className="text-l" style={{ display: "flex", alignItems: "center", flexDirection: "column", width: "100%", height: "100%" }}>
 							Data
-						</Link>
+						</div>
 					</MenuItem>
-					<MenuItem onClick={handleClose} style={{ justifyContent: "center" }}>
-						<Link href={"/about"} className="text-l hover:link" style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+					<MenuItem style={{ justifyContent: "center" }} onClick={() => handleNavigate("/about" as unknown as Route)}>
+						<div className="text-l" style={{ display: "flex", alignItems: "center", flexDirection: "column", width: "100%", height: "100%" }}>
 							About
-						</Link>
+						</div>
 					</MenuItem>
-					<MenuItem onClick={handleClose} style={{ justifyContent: "center" }}>
-						<Link href={"/feedback"} className="text-l hover:link" style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
+					<MenuItem style={{ justifyContent: "center" }} onClick={() => handleNavigate("/feedback" as unknown as Route)}>
+						<div className="text-l" style={{ display: "flex", alignItems: "center", flexDirection: "column", width: "100%", height: "100%" }}>
 							Feedback
-						</Link>
+						</div>
 					</MenuItem>
-					<MenuItem onClick={handleClose} style={{ justifyContent: "center" }}>
-						<a
-							href={"https://boston.nxone.com/ApplicationBuilder/eFormRender.html?code=AA6693252735B48211CC5C0E68BC949D&Process=OPATPoliceAccountability"}
-							// className={"outline outline-2 font-bold bg-primary text-white text-xl rounded-lg py-2 w-32 flex items-center justify-center active:scale-90 shadow-xl transition-button duration-200 hover:bg-primary-hover"}
-							className="text-l hover:link"
-							target={"_blank"}
-							style={{ display: "flex", alignItems: "center", flexDirection: "column" }}
-						>
+					<MenuItem style={{ justifyContent: "center" }} onClick={() => handleNavigate("https://forms.boston.gov/appbuilder/eFormRender.html?code=AA6693252735B48211CC5C0E68BC949D&Process=OPATPoliceAccountability" as unknown as Route)}>
+						<div className="text-l" style={{ display: "flex", alignItems: "center", flexDirection: "column", width: "100%", height: "100%" }}>
 							File Claim
-						</a>
+						</div>
 					</MenuItem>
 				</Menu>
 			</div>

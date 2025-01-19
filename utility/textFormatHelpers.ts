@@ -6,7 +6,19 @@ export function yAndNToBoolean(value) {
 	return returnValue;
 }
 
-//fixed casing
+// Use for names like "Donahue,Ryan" or "Noel,Jacques Junior"
+export const fixNameOrdering = (name) =>{
+	let middleName = ""
+	const nameParts = name.split(" ");
+	if (nameParts.length > 1){
+		middleName = nameParts[1].replace(".", "").trim();
+	}
+	 
+	let newName = nameParts[0].split(',')
+	newName = `${newName[1]} ${middleName} ${newName[0]}`
+	return newName
+}
+
 export function properCaseName(name) {
 	const capitalize = (word) => {
 		return word
@@ -90,8 +102,7 @@ export function formatHours(number: number): string {
 	const hours = Math.floor(number / 100);
 	const minutes = (number % 100) / 60;
 
-	const total = hours + minutes;
-
+	const total = Math.round((hours + minutes + Number.EPSILON) * 100) / 100;
 	return total.toString();
 }
 
@@ -101,6 +112,7 @@ export function formatTime(number: number): string {
 	let hours = number / 100;
 	hours = isPm && hours >= 13 ? hours - 12 : hours;
 	hours = Math.floor(hours);
+	hours = hours == 0 ? 1 : hours;
 	const minutes = number.toString().padStart(4, "0").slice(-2);
 	let total = hours.toString() + ":" + minutes;
 	total += isPm ? "pm" : "am";

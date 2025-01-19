@@ -433,7 +433,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 							</div>
 
 							<div className="text-lg" style={{ display: "flex", justifyContent: "space-between" }}>
-								<strong style={{ cursor: "pointer" }}>Earnings</strong> {`$${formatMoney(officerData.totalEarnings)}`}
+								<strong style={{ cursor: "pointer" }}>Most Recent Earnings</strong> {`$${formatMoney(officerData.totalEarnings)}`}
 							</div>
 							<p className="text-lg">{/* <strong style={{ cursor: "pointer" }}>FIO:</strong> {officerData.fio_record} */}</p>
 							<p className="text-lg">{/* <strong style={{ cursor: "pointer" }}>Traffic Tickets:</strong> {officerData.traffic_no} */}</p>

@@ -2,7 +2,7 @@ import { GridColDef } from "@mui/x-data-grid";
 import React from "react";
 import DataTable from "@components/DataTable";
 import { rgbToHex, Tooltip } from "@mui/material";
-import { formatDateShort, formatDate, formatHours, formatMoney, formatTime, yAndNToBoolean } from "./textFormatHelpers";
+import { formatDateShort, formatDate, formatHours, formatMoney, formatTime, yAndNToBoolean, fixNameOrdering } from "./textFormatHelpers";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 
@@ -326,7 +326,7 @@ const detail_record_columns = () => {
 			headerName: "Pay Hours",
 			description: "Number of hours officer was paid for in detail from that job",
 			type: "number",
-			valueFormatter: (params) => formatHours(params.value),
+			valueFormatter: (params) => params.value,
 			width: 100,
 		},
 		{
@@ -462,7 +462,6 @@ const detail_record_columns = () => {
 	];
 	return cols;
 };
-  
 
 const court_overtime_columns = () => {
 	const cols: GridColDef[] = [
@@ -471,10 +470,10 @@ const court_overtime_columns = () => {
 			headerName: "Officer Name",
 			description: "Name of officer",
 			type: "string",
-			valueFormatter: (params) => {
-				return params.value;
+			valueGetter: (params) => {
+				return fixNameOrdering(params.value);
 			},
-			width: 100,
+			width: 200,
 		},
 		{
 			field: "rank",
