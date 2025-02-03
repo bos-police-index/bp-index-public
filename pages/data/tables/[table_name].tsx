@@ -1,9 +1,9 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import next, { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { functionMapping, getMUIGrid } from "@utility/createMUIGrid";
 import apolloClient from "@lib/apollo-client";
-import { GET_FIRST_1000_COURT_OVERTIMES, GET_FIRST_1000_DETAIL_RECORDS, GET_REST_COURT_OVERTIMES, GET_REST_DETAIL_RECORDS } from "@lib/graphql/queries";
+import { GET_FIRST_1000_COURT_OVERTIMES, GET_FIRST_1000_DETAIL_RECORDS, GET_NEXT_PAGE_COURT_OVERTIMES, GET_NEXT_PAGE_DETAIL_RECORDS, GET_NUMBER_OF_ROWS } from "@lib/graphql/queries";
 import IconWrapper, { tableDefinitions } from "@utility/tableDefinitions";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import getHeaderWithDescription from "@utility/columnDefinitions";
@@ -12,7 +12,7 @@ import ScreenOverlay from "@components/ScreenOverlay";
 import { Button } from "antd";
 import { DocumentNode } from "graphql";
 import GlossaryTotal from "@components/GlossaryTotal";
-import { court_overtime_alias_name, detail_alias_name } from "@utility/dataViewAliases";
+import { court_overtime_alias_name, detail_alias_name, table_name_to_alias_map } from "@utility/dataViewAliases";
 
 interface DetailRecord {
 	adminFeeFlag: string; // e.g., "Y" or "N"
@@ -46,15 +46,23 @@ interface DetailRecord {
 	stateFunded: string; // Can be empty
 }
 
-type DetailRecordCollection = Record<string, { nodes: DetailRecord[] }>;
-
-interface DetailRecordsResponse extends DetailRecordCollection {
-	[viewName: string]: {
-		nodes: DetailRecord[];
-	};
+interface DetailRecordsEdge {
+	node: CourtOvertimeRecord;
+	cursor: string;
 }
 
-interface CourtOvertime {
+interface DetailRecordsPageInfo {
+	endCursor: string;
+	hasNextPage: boolean;
+}
+
+type DetailRecordsCollection = Record<string, { edges: DetailRecordsEdge[]; pageInfo: DetailRecordsPageInfo }>;
+
+interface DetailRecordsResponse {
+	data: DetailRecordsCollection;
+}
+
+interface CourtOvertimeRecord {
 	assignedDesc: string; // Description of the assignment
 	chargedDesc: string; // Description of the charge
 	description: string; // Additional description (e.g., court hearing type)
@@ -69,30 +77,37 @@ interface CourtOvertime {
 	workedHours: number; // Total worked hours
 }
 
-type CourtOvertimeCollection = Record<string, { nodes: CourtOvertime[] }>;
-
-interface CourtOvertimeResponse extends CourtOvertimeCollection {
-	[viewName: string]: {
-		nodes: CourtOvertime[];
-	};
+interface CourtOvertimeEdge {
+	node: CourtOvertimeRecord;
+	cursor: string;
 }
 
-const dataToColumns = (data, table_name) => {
+interface CourtOvertimePageInfo {
+	endCursor: string;
+	hasNextPage: boolean;
+}
+
+type CourtOvertimeCollection = Record<string, { edges: CourtOvertimeEdge[]; pageInfo: CourtOvertimePageInfo }>;
+
+interface CourtOvertimeResponse {
+	data: CourtOvertimeCollection;
+}
+
+let id_counter = 0;
+
+const dataToColumns = (data, view_name) => {
 	let dataArr: any[] = [];
-	if (data && data[detail_alias_name]?.nodes) {
-		dataArr = data[detail_alias_name].nodes.map((item, index) => ({
-			id: index + 1,
-			...item,
-		}));
-	}
-	if (data && data[court_overtime_alias_name]?.nodes) {
-		dataArr = data[court_overtime_alias_name].nodes.map((item, index) => ({
-			id: index + 1,
-			...item,
-		}));
+	if (data && data.edges) {
+		dataArr = data.edges.map((item, index) => {
+			const { __typename, ...rest } = item.node;
+			return {
+				id: id_counter++,
+				...rest,
+			};
+		});
 	}
 
-	if (table_name === "employee") {
+	if (view_name === "employee") {
 		// remove the officer_photo column
 		dataArr.forEach((item) => {
 			delete item["officer_photo"];
@@ -103,6 +118,7 @@ const dataToColumns = (data, table_name) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const table_name = context.params?.table_name as string;
+	const viewName = table_name_to_alias_map[table_name];
 
 	// if (!tableExists(table_name)) {
 	// 	console.log(`table does not exist ${table_name}`);
@@ -116,25 +132,32 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	let data: any;
 
 	// ADDING NEW DATA? Add switch statement for each new data table
-	console.log("TABLE NAME: ", table_name);
 	switch (table_name) {
 		case "detail_record":
 			query = GET_FIRST_1000_DETAIL_RECORDS;
-			data = (await apolloClient.query<DetailRecordsResponse>({ query: query })).data;
+			data = (await apolloClient.query<DetailRecordsResponse>({ query: query })).data[viewName];
 			break;
 		case "court_overtime":
 			query = GET_FIRST_1000_COURT_OVERTIMES;
-			data = (await apolloClient.query<CourtOvertimeResponse>({ query: query })).data;
+			data = (await apolloClient.query<CourtOvertimeResponse>({ query: query })).data[viewName];
 			break;
 	}
 
-	const dataArr = dataToColumns(data, table_name);
+	const rowCount = (await apolloClient.query({ query: GET_NUMBER_OF_ROWS(table_name) })).data;
+	const endCursor = data.pageInfo.endCursor;
+	const hasNextPage = data.pageInfo.hasNextPage;
+	// endCursor = data.page
+
+	const dataArr = dataToColumns(data, viewName);
 
 	return {
 		props: {
 			rows: dataArr,
 			table_name: table_name,
 			columns: getHeaderWithDescription(functionMapping[table_name]),
+			rowCount: rowCount.totalCount,
+			endCursor: endCursor,
+			hasNextPage: hasNextPage,
 		},
 	};
 };
@@ -145,6 +168,7 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 	const router = useRouter();
 	const tableDef = tableDefinitions.find((tableDef) => tableDef.query === props.table_name);
 	const [currentOverlay, setCurrentOverlay] = useState({ table: null, title: null });
+	const viewName = table_name_to_alias_map[props.table_name];
 
 	const handleSeeAllClick = () => {
 		setCurrentOverlay({ table: <GlossaryTotal columnObjects={props.columns} total={false} />, title: `${tableDef.table} Glossary` });
@@ -154,32 +178,49 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 
 	const table = getMUIGrid(props.table_name, rows, "", [], []);
 
+	const appendRows = useCallback((newData) => {
+		setRows((prevRows) => [...prevRows, ...newData]);
+	}, []);
+
 	//fetch the rest of the rows once loaded
 	useEffect(() => {
 		const fetchRestRecords = async () => {
+			const currentTimeInSeconds = performance.now();
 			let query: DocumentNode = null;
 			let data: any;
+			let nextPage = props.hasNextPage;
+			let endCursor = props.endCursor;
+			let variables = endCursor ? { endCursor } : { endCursor: null };
 
-			// ADDING NEW DATA? Add switch statement for each new data table
-			switch (props.table_name) {
-				case "detail_record":
-					query = GET_REST_DETAIL_RECORDS;
-					data = (await apolloClient.query<DetailRecordsResponse>({ query: query })).data;
-					break;
-				case "court_overtime":
-					query = GET_REST_COURT_OVERTIMES;
-					data = (await apolloClient.query<CourtOvertimeResponse>({ query: query })).data;
-					break;
+			let count = 1;
+
+			while (nextPage) {
+				count += 1;
+				variables = endCursor ? { endCursor } : { endCursor: null };
+				// ADDING NEW DATA? Add switch statement for each new data table
+				switch (props.table_name) {
+					case "detail_record":
+						query = GET_NEXT_PAGE_DETAIL_RECORDS;
+						data = (await apolloClient.query<DetailRecordsResponse>({ query: query, variables: variables })).data[viewName];
+						break;
+					case "court_overtime":
+						query = GET_NEXT_PAGE_COURT_OVERTIMES;
+						data = (await apolloClient.query<CourtOvertimeResponse>({ query: query, variables: variables })).data[viewName];
+						break;
+				}
+
+				nextPage = data.pageInfo.hasNextPage;
+				endCursor = data.pageInfo.endCursor;
+				const dataArr = dataToColumns(data, props.table_name);
+				appendRows(dataArr);
 			}
-
-			const dataArr = dataToColumns(data, props.table_name);
-
-			setRows([...rows, ...dataArr]);
 			setLoadingMoreData(false);
+			const finishTime = performance.now();
+			console.log("TOTAL EXECUTION TIME (ms)", finishTime - currentTimeInSeconds);
 		};
 		setLoadingMoreData(true);
 		fetchRestRecords();
-	}, []);
+	}, [props.table_name, appendRows]);
 
 	return (
 		<div style={{ marginTop: "-1rem" }}>
