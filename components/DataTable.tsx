@@ -4,7 +4,13 @@ import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFi
 import { StyledGridOverlay } from "@styles/reusedStyledComponents";
 import { bpi_light_green } from "@styles/theme/lightTheme";
 
-export default function DataTable({ cols, table, table_name, height, pageSize, pageSizeOptions, rowCount }: { cols: GridColDef[]; table: any[]; table_name: string; height: string; pageSize: number; pageSizeOptions: number[]; rowCount: number | undefined }) {
+export default function DataTable({ cols, table, table_name, height, pageSize, pageSizeOptions, rowCount, hide }: { cols: GridColDef[]; table: any[]; table_name: string; height: string; pageSize: number; pageSizeOptions: number[]; rowCount: number | undefined; hide: string[] }) {
+	const hidingColumnsMap = hide.reduce((acc, item) => {
+		acc[item] = false;
+		return acc;
+	}, {});
+
+
 	const ExportIcon = createSvgIcon(<path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z" />, "SaveAlt");
 	const CustomToolbar = () => {
 		const buttonBaseProps: ButtonProps = {
@@ -32,6 +38,7 @@ export default function DataTable({ cols, table, table_name, height, pageSize, p
 
 			apiRef.current.exportDataAsCsv(options);
 		};
+
 		return (
 			<GridToolbarContainer>
 				<GridToolbarColumnsButton />
@@ -135,6 +142,7 @@ export default function DataTable({ cols, table, table_name, height, pageSize, p
 				},
 			}}
 			rowCount={rowCount}
+			columnVisibilityModel={hidingColumnsMap}
 		/>
 	);
 }

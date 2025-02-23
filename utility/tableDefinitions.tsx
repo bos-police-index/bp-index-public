@@ -28,7 +28,7 @@ const IconWrapper = ({ Icon, fontSize = "48px", color = bpi_deep_green }: IconWr
 
 // IMPORTANT! As more data is added be sure to add the source they are from to this
 const tablesFromAnalyzeBoston = [];
-const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime"];
+const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "officer_misconduct"];
 
 const rawTableDefinitions = [
 	{
@@ -86,7 +86,7 @@ const rawTableDefinitions = [
 		table: "Officer Misconduct (IAs)",
 		query: "officer_misconduct",
 		image: { component: <IconWrapper Icon={ReportProblemIcon} />, src: ReportProblemIcon },
-		isFake: true,
+		isFake: false,
 		shortDescription: "Records of internal affair complaints against Boston Police Department officers, detailing allegation types and final dispositions",
 		longDescription:
 			"The Officer Misconduct (IAs) dataset provides detailed records of all internal affair complaints filed against officers of the Boston Police Department. It includes information on the types of allegations made, the investigative process, and the final disposition of each complaint. This dataset is crucial for transparency and accountability, offering insights into the nature and outcomes of misconduct allegations within the police force.",

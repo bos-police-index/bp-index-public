@@ -3,6 +3,7 @@
 // DATA PAGE
 export const detail_alias_name = "allLinkSu24DetailRecordsNews";
 export const court_overtime_alias_name = "allLinkSu24CourtOvertimes";
+// export const officer_ia_alias_name  = "allLinkSu24EmployeeIas" (replace if they arent the same )
 
 // PROFILE PAGE
 export const homepage_alias_name = "allSu24Homepages";
@@ -17,5 +18,6 @@ export const API_PAGE_SIZE_SMALL = 1000;
 export const table_name_to_alias_map = {
 	detail_record: detail_alias_name,
 	court_overtime: court_overtime_alias_name,
+	officer_misconduct: officer_ia_alias_name,
 };
 

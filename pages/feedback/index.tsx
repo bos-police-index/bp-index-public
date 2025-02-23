@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Alert from "@mui/material/Alert";
-import Feedback from "./Feedback";
+import Feedback from "./_Feedback";
 
 export default function Home() {
     const [submit, setSubmit] = useState<string>("");

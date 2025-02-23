@@ -97,6 +97,11 @@ export function formatDate(params: GridValueFormatterParams) {
 	return formatted;
 }
 
+// Extracts the year from a date
+export function getYearFromDate (date){
+	return String(date).substring(0,4);
+}
+
 //changes 830 to 8.5
 export function formatHours(number: number): string {
 	const hours = Math.floor(number / 100);

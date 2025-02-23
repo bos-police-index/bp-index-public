@@ -51,7 +51,6 @@ export const gatherAllDefinitions = (data: TableDefinition[]) => {
 	for (const [key, dataset] of Object.entries(data)) {
 		currTable = functionMapping[dataset.query];
 		if (!dataset.isFake) {
-			console.log(dataset.query);
 			definitions.push(...getHeaderWithDescription(currTable));
 		}
 	}

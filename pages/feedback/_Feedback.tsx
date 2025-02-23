@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import axios from "axios";
 import { bpi_deep_green, bpi_light_gray } from "@styles/theme/lightTheme";
+import GoogleCaptchaWrapper from "@utility/GoogleCaptchaWrapper";
 
 interface CreateNewIssueParams {
 	title: String;
@@ -138,4 +139,12 @@ const FeedbackForm = ({ setSubmit }) => {
 	);
 };
 
-export default FeedbackForm;
+const Feedback = ({ setSubmit }) => {
+	return (
+		<GoogleCaptchaWrapper>
+			<FeedbackForm setSubmit={setSubmit} />
+		</GoogleCaptchaWrapper>
+	);
+};
+
+export default Feedback;

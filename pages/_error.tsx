@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { bpi_deep_green } from "@styles/theme/lightTheme";
 
 interface ErrorMessageProps {
 	status: number;
@@ -26,7 +27,7 @@ function ErrorMessage({ status, errorMessage, redirect = false }: ErrorMessagePr
 	}, [secondsLeft]);
 
 	return (
-		<div className={"w-full h-full flex flex-col justify-center items-center text-white gap-2"}>
+		<div className={`w-full h-full flex flex-col justify-center items-center text-${bpi_deep_green} gap-2`}>
 			<p className={"text-8xl font-bold"}>{status}</p>
 			<p className={"text-4xl font-bold"}>{errorMessage}</p>
 			{redirect && <p className={"text-lg"}>Redirecting to home page in {secondsLeft} seconds...</p>}

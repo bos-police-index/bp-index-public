@@ -67,24 +67,24 @@ export const INDIVIDUAL_OFFICER_FINANCIAL_AND_EMPLOYEE = (bpiId: string) => {
 		${officer_financial_alias_name}(condition: {bpiId: "${bpiId}" }) {
 		  nodes {
 			race
-				  rank
-				  sex
-				  unit
-				  year
-				  zipCode
-				  unionCode
-				  badgeNo
-				  firstName
-				  lastName
-				  otPay
-				  otherPay
-				  quinnPay
-				  regularPay
-				  retroPay
-				  totalPay
-				  detailPay
-				  injuredPay
-				  year
+			rank
+			sex
+			unit
+			year
+			zipCode
+			unionCode
+			badgeNo
+			firstName
+			lastName
+			otPay
+			otherPay
+			quinnPay
+			regularPay
+			retroPay
+			totalPay
+			detailPay
+			injuredPay
+			year
 		  }
 		}
 	  }`;
@@ -269,6 +269,63 @@ export const GET_NEXT_PAGE_COURT_OVERTIMES = gql`
 	}
 `;
 
+export const GET_FIRST_1000_OFFICER_IA = gql`
+query MyQuery {
+		${officer_ia_alias_name}(first: ${API_PAGE_SIZE_SMALL}){
+			edges {
+				node {
+					actionTaken
+					adminLeave
+					allegation
+					badgeNo
+					dateReceived
+					dateHired
+					daysOrHoursSuspended
+					finding
+					firstName
+					lastName
+					iaNo
+					incidentType
+					race
+					sex
+					unionCode
+				}
+    		}
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}`;
+
+export const GET_NEXT_PAGE_OFFICER_IA = gql`
+query MyQuery($endCursor: Cursor) {
+		${officer_ia_alias_name}(first: ${API_PAGE_SIZE_SMALL}, after: $endCursor) {
+			edges {
+				node {
+					actionTaken
+					adminLeave
+					allegation
+					badgeNo
+					dateReceived
+					dateHired
+					daysOrHoursSuspended
+					finding
+					firstName
+					lastName
+					iaNo
+					incidentType
+					race
+					sex
+					unionCode
+				}
+    		}
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}`;
 
 
 
@@ -279,14 +336,13 @@ export const GET_NUMBER_OF_ROWS = (table_name: string): DocumentNode =>{
 	if (table_name.includes("detail")){
 		query_source = detail_alias_name
 	}
-	else if (table_name.includes("court_overtime")){
-		query_source = court_overtime_alias_name
-	}
-	else{
+	else if (table_name.includes("court_overtime")) {
+		query_source = court_overtime_alias_name;
+	} else if (table_name.includes("officer_misconduct")) {
+		query_source = officer_ia_alias_name;
+	} else {
 		console.log("ERROR, source to check num of rows from is invalid");
 		throw new Error("Need to add this data source to queries.ts GET_NUMBER_OF_ROWS");
-		
-		
 	}
 
 	return(

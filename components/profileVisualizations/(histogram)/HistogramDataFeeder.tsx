@@ -258,7 +258,6 @@ const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData, offi
 		);
 	};
 
-	console.log(`specificOfficerPayValue: ${specificOfficerPayValue}`);
 
 	return selectedData ? (
 		<div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "1rem 1rem" }}>

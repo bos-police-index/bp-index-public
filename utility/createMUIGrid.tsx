@@ -8,6 +8,8 @@ import ClearIcon from "@mui/icons-material/Clear";
 
 export const getMUIGrid = (table: string, rows: any[], officerName: string, includesOnly = [], excludes = []) => {
 	const cols: GridColDef[] = functionMapping[table];
+	const hide = cols.filter((col) => col.hideable === true).map((col) => col.field);
+
 	if (!rows) {
 		rows = [];
 	}
@@ -29,8 +31,8 @@ export const getMUIGrid = (table: string, rows: any[], officerName: string, incl
 	const height = officerName !== "" ? "calc(100vh - 7rem)" : "calc(100vh - 90px)";
 
 	return {
-		fullTable: <DataTable table={rows} cols={cols} table_name={`${officerName}-${table}`} height={height} pageSizeOptions={[25, 50, 75, 100]} pageSize={25} rowCount={undefined} />,
-		filteredTable: <DataTable table={rows} cols={filteredCols} table_name={`${officerName}-${table}`} height={"auto"} pageSizeOptions={[5]} pageSize={5} rowCount={undefined} />,
+		fullTable: <DataTable table={rows} cols={cols} table_name={`${officerName}-${table}`} height={height} pageSizeOptions={[25, 50, 75, 100]} pageSize={25} rowCount={undefined} hide={hide} />,
+		filteredTable: <DataTable table={rows} cols={filteredCols} table_name={`${officerName}-${table}`} height={"auto"} pageSizeOptions={[5]} pageSize={5} rowCount={undefined} hide={hide} />,
 	};
 };
 
@@ -117,6 +119,7 @@ const officer_ia_columns = () => {
 				return params.value;
 			},
 			width: 200,
+			align: "center",
 		},
 	];
 
@@ -234,12 +237,21 @@ const detail_record_columns = () => {
 	const cols: GridColDef[] = [
 		{
 			field: "id",
-			hideable: false,
+			hideable: true,
 			headerName: "ID",
 			description: "An arbitrary unique identifier used for getting a specific row of data.",
 			type: "number",
 			valueFormatter: (params) => params.value,
 			width: 100,
+		},
+		{
+			field: "year",
+			headerName: "Year",
+			description: "The year that the detail work took place",
+			type: "number",
+			valueFormatter: (params) => params.value,
+			width: 100,
+			hideable: true,
 		},
 		{
 			field: "trackingNo",
@@ -284,7 +296,7 @@ const detail_record_columns = () => {
 		{
 			field: "xstreet",
 			headerName: "Cross Street",
-			description: "TO DO",
+			description: "Name of the cross-street.",
 			type: "string",
 			valueFormatter: (params) => params.value,
 			width: 170,
@@ -348,7 +360,7 @@ const detail_record_columns = () => {
 		{
 			field: "nameId",
 			headerName: "Officer Name",
-			description: "TO DO",
+			description: "Full name of the employee.",
 			type: "string",
 			valueFormatter: (params) => params.value,
 			width: 200,
@@ -577,11 +589,34 @@ const court_overtime_columns = () => {
 	return cols;
 };
 
+const officer_misconduct_columns = () => {
+	let cols = officer_ia_columns();
+	let badge_num_col = {
+		field: "badgeNo",
+		headerName: "Officer Badge #",
+		description: "The badge number of an officer. Note that this is not necessarily unique.",
+		type: "number",
+		valueFormatter: (params) => params.value,
+		width: 150,
+	};
+
+	// change width of ia num
+	cols[1].width = 125;
+
+	// change width of date received
+	cols[2].width = 125;
+
+	cols = [cols[0], cols[1], badge_num_col, ...cols.slice(2)];
+
+	return cols;
+};
+
 export const functionMapping = {
 	detail_record: detail_record_columns(),
 	officer_ia: officer_ia_columns(),
 	police_financial: police_financial_columns(),
 	court_overtime: court_overtime_columns(),
+	officer_misconduct: officer_misconduct_columns(),
 };
 
 // THE BELOW TABLE DEFINITIONS ARE DEPRECATED BUT **may be helpful** later

@@ -1,52 +1,5 @@
 import CollapsibleDescription, { CollapsibleDescriptionProps } from "@components/CollapsibleDescription";
-import { bpi_light_gray, bpi_deep_green, bpi_light_green } from "@styles/theme/lightTheme";
-
-const Section = ({ title, content }) => {
-	const formatContent = (text) => {
-		const paragraphs = text.split("\n").filter(Boolean); // Filter out empty strings
-
-		// Map paragraphs to add bullet points to lines starting with '-'
-		const formattedText = paragraphs.map((paragraph, index) => {
-			if (paragraph.trim().startsWith("-")) {
-				return (
-					<li key={index} style={{ marginBottom: "0.5rem" }}>
-						{paragraph.trim().slice(1).trim()} {/* Remove '-' and trim */}
-					</li>
-				);
-			} else {
-				return (
-					<p key={index} style={{ marginBottom: "1rem" }}>
-						{paragraph.trim()}
-					</p>
-				);
-			}
-		});
-
-		return formattedText;
-	};
-
-	return (
-		<div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "4rem", fontSize: "large" }}>
-			<div
-				style={{
-					transform: "rotate(270deg)",
-					backgroundColor: bpi_light_green,
-					padding: "1rem 2rem",
-					textAlign: "center",
-					color: bpi_deep_green,
-					minWidth: "10rem",
-					minHeight: "4rem",
-					display: "flex",
-					justifyContent: "center",
-					alignItems: "center",
-				}}
-			>
-				{title}
-			</div>
-			<div style={{ flex: 1, minHeight: "4rem", paddingLeft: "1rem" }}>{formatContent(content)}</div>
-		</div>
-	);
-};
+import { bpi_deep_green } from "@styles/theme/lightTheme";
 
 const sectionContent: CollapsibleDescriptionProps[] = [
 	{
@@ -87,7 +40,7 @@ export default function About() {
 			<h1 className="text-5xl font-bold text-[bpi_deep_green] text-left mb-6">About</h1>
 			<div style={{ display: "flex", flexDirection: "column", gap: "2rem", marginTop: "3rem" }}>
 				{sectionContent.map((section, index) => {
-					return <CollapsibleDescription title={section.title} content={section.content} defaultOpen={section.defaultOpen} />;
+					return <CollapsibleDescription title={section.title} content={section.content} defaultOpen={section.defaultOpen} key={index} />;
 				})}
 			</div>
 		</div>

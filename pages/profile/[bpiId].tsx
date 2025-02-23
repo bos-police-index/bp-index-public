@@ -2,13 +2,15 @@ import React, { FunctionComponentElement, useEffect, useState } from "react";
 import { getMUIGrid } from "@utility/createMUIGrid";
 import apolloClient from "@lib/apollo-client";
 import { useRouter } from "next/router";
-import FullWidthTabs from "./TabTables";
+import FullWidthTabs from "../../components/TabTables";
 import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
-import PayStackedBarChart from "./StackedBarChartOfficerFinancial";
-import FinancialHistogram from "./(histogram)/FinancialHistogram";
-import { Filter } from "./(histogram)/HistogramDataFeeder";
+import PayStackedBarChart from "../../components/profileVisualizations/StackedBarChartOfficerFinancial";
+import FinancialHistogram from "../../components/profileVisualizations/(histogram)/FinancialHistogram";
+import { Filter } from "../../components/profileVisualizations/(histogram)/HistogramDataFeeder";
 import { INDIVIDUAL_OFFICER_DETAIL_RECORDS, INDIVIDUAL_OFFICER_FINANCIAL_AND_EMPLOYEE, INDIVIDUAL_OFFICER_IA } from "@lib/graphql/queries";
 import { detail_alias_name } from "@utility/dataViewAliases";
+import { GetServerSideProps } from "nextjs-routes";
+import { InferGetServerSidePropsType } from "next";
 
 export interface Table {
 	title: string;
@@ -19,44 +21,9 @@ interface DataTables {
 	filteredTable: FunctionComponentElement<{}> | null;
 }
 
-interface OfficerData {
-	bpiId: string;
-	name: string;
-	badgeNo: number;
-	rank: string;
-	unit: string;
-	residence: string;
-	sex: string;
-	race: string;
-	totalEarnings: number;
-	ia_num: number;
-	detail_num: number;
-}
+export const getServerSideProps: GetServerSideProps = async (context) => {
+	const bpiId = context.params?.bpiId as string;
 
-interface FinancialEmployeeData {
-	org: string;
-	badgeNo: number;
-	numOfIa: number;
-	rank: string;
-	race: string;
-	sex: string;
-	unit: string;
-	unionCode: string;
-	zipCode: string;
-	firstName: string;
-	lastName: string;
-	otPay: number;
-	otherPay: number;
-	quinnPay: number;
-	regularPay: number;
-	retroPay: number;
-	totalPay: number;
-	detailPay: number;
-	injuredPay: number;
-	year: number;
-}
-
-export const getData = async (keyword: string, bpiId: string) => {
 	if (!bpiId) {
 		console.log("bpiId NOT FOUND", bpiId);
 		return {
@@ -64,14 +31,25 @@ export const getData = async (keyword: string, bpiId: string) => {
 		};
 	}
 	const financial_and_employee_query = INDIVIDUAL_OFFICER_FINANCIAL_AND_EMPLOYEE(bpiId);
-	const financialAndEmployeeResponse: any = await apolloClient.query({ query: financial_and_employee_query });
-	const financeEmployeeData = financialAndEmployeeResponse.data.allLinkSu24EmployeeFinancials.nodes;
-	// if not found, return 404s
-	if (!financeEmployeeData) {
+
+	// catch error if invalid bpiID
+	let financialAndEmployeeResponse: any;
+	try {
+		financialAndEmployeeResponse = await apolloClient.query({ query: financial_and_employee_query });
+	} catch (error) {
+		console.error("GraphQL query error:", error);
+		financialAndEmployeeResponse = null;
+	}
+
+	// If the response is invalid, return a 404
+	if (!financialAndEmployeeResponse) {
 		return {
 			notFound: true,
 		};
 	}
+
+	const financeEmployeeData = financialAndEmployeeResponse.data.allLinkSu24EmployeeFinancials.nodes;
+
 	// Collapse data from all entries into one
 	let mostRecentEmployeeData: FinancialEmployeeData = financeEmployeeData[0];
 	financeEmployeeData.slice(0).map((node: any) => {
@@ -137,16 +115,19 @@ export const getData = async (keyword: string, bpiId: string) => {
 	});
 
 	// Filter the data to remove duplicates based on bpdIaNo
-	const uniqueFinancialYears = new Set();
+	let uniqueFinancialYears: number[] = [];
 	const filteredFinanceEmployeeData = financeEmployeeData.filter((node: FinancialEmployeeData) => {
 		const { year } = node;
 
-		if (!uniqueFinancialYears.has(`${year}`)) {
-			uniqueFinancialYears.add(`${year}`);
+		if (!uniqueFinancialYears.includes(Number(year))) {
+			uniqueFinancialYears.push(Number(year));
 			return true;
 		}
 		return false;
 	});
+
+	// for use in profile header
+	const mostRecentFinancialYear = Math.max(...uniqueFinancialYears);
 
 	//add artificial id for MUI purposes
 	let financialRowId = 1;
@@ -174,25 +155,6 @@ export const getData = async (keyword: string, bpiId: string) => {
 	const iaResponse: any = await apolloClient.query({ query: ia_query });
 	const iaData = iaResponse.data.allLinkSu24EmployeeIas.nodes;
 
-	// DETERMINE IF THEY ARE DUPLICATES OR JUST COINCIDENCE?
-	//Filter the data to remove duplicates based on bpdIaNo
-	// const uniqueBpdIaNos = new Set();
-	// const filteredEmployeeIaData = iaData.filter((node: any) => {
-	// 	const { iaNo } = node;
-
-	// 	if (!uniqueBpdIaNos.has(`${iaNo}`)) {
-	// 		uniqueBpdIaNos.add(`${iaNo}`);
-	// 		return true;
-	// 	}
-	// 	return false;
-	// });
-
-	//add artificial id for MUI purposes
-	// let iaRowId = 1;
-	// const newOfficerIaRows = filteredEmployeeIaData.map((node) => {
-	// 	return { id: iaRowId++, ...node };
-	// });
-	// officerData.ia_num = uniqueBpdIaNos.size;
 	let iaRowId = 1;
 	const newOfficerIaRows = iaData.map((node) => {
 		return { id: iaRowId++, ...node };
@@ -205,6 +167,7 @@ export const getData = async (keyword: string, bpiId: string) => {
 	return {
 		props: {
 			officerData: officerData,
+			mostRecentFinancialYear: mostRecentFinancialYear,
 			tables: [
 				{
 					title: "Detail Record",
@@ -216,56 +179,18 @@ export const getData = async (keyword: string, bpiId: string) => {
 					tableName: "officer_ia",
 					rows: officer_IA_rows,
 				},
-				// {
-				// 	title: "Personnel Roaster",
-				// 	tableName: "personnel_roaster",
-				// 	rows: personnel_roaster_rows,
-				// },
 				{
 					title: "Police Financial",
 					tableName: "police_financial",
 					rows: police_financial_rows,
 				},
-				// {
-				// 	title: "Police Overtime",
-				// 	tableName: "police_overtime",
-				// 	rows: police_overtime_rows,
-				// },
-				// {
-				// 	title: "Post Decertified",
-				// 	tableName: "post_decertified",
-				// 	rows: post_decertified_rows,
-				// },
-				// {
-				// 	title: "Post Certified",
-				// 	tableName: "post_certified",
-				// 	rows: post_certified_rows,
-				// },
-				// {
-				// 	title: "FIO Record",
-				// 	tableName: "fio_record",
-				// 	rows: fio_record_rows,
-				// },
-				// {
-				// 	title: "Parking Ticket",
-				// 	tableName: "parking_ticket",
-				// 	rows: parking_ticket_rows,
-				// },
-				// {
-				// 	title: "Crime Incident",
-				// 	tableName: "crime_incident",
-				// 	rows: crime_incident_rows,
-				// },
 			],
 		},
 	};
 };
 
-export default function OfficerProfile(): FunctionComponentElement<{}> {
-	const router = useRouter();
-	const { bpiId, keyword } = router.query;
+export default function OfficerProfile(props: InferGetServerSidePropsType<typeof getServerSideProps>): FunctionComponentElement<{}> {
 	const [tablesArr, setTablesArr] = useState<Table[]>([]);
-	const [officerData, setOfficerData] = useState<OfficerData>();
 	const [officerDetailData, setOfficerDetailData] = useState<Filter>();
 	const [tableFilters] = useState({
 		detail_record: {
@@ -305,44 +230,12 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 			includesOnly: ["year", "rank", "otPay", "otherPay", "quinnPay", "regularPay", "retroPay", "totalPay", "detailPay", "injuredPay"],
 			excludes: [],
 		},
-		// alpha_listing: {
-		// 	includesOnly: [],
-		// 	excludes: [],
-		// },
-		// personnel_roaster: {
-		// 	includesOnly: ["position", "location", "employee_record", "eff_date", "reason"],
-		// 	excludes: [],
-		// },
-		// police_overtime: {
-		// 	includesOnly: ["hours_worked", "ot_hours", "ot_desc", "assigned_desc", "charged_code", "charged_desc"],
-		// 	excludes: [],
-		// },
-		// post_decertified: {
-		// 	includesOnly: [],
-		// 	excludes: [],
-		// },
-		// post_certified: {
-		// 	includesOnly: [],
-		// 	excludes: ["certified_expiration_date"],
-		// },
-		// crime_incident: {
-		// 	includesOnly: ["incident_no", "offense_code", "offense_desc", "reporting_area", "incident_date", "shooting"],
-		// 	excludes: [],
-		// },
-		// fio_record: {
-		// 	includesOnly: ["contact_date", "key_situation", "zip_code", "circumstance", "basis"],
-		// 	excludes: [],
-		// },
-		// parking_ticket: {
-		// 	includesOnly: [],
-		// 	excludes: [],
-		// },
 	});
+	const mostRecentFinancialYear = props.mostRecentFinancialYear;
+	const officerData = props.officerData;
 
 	useEffect(() => {
-		const fetchData = async () => {
-			const { props } = await getData(keyword as string, bpiId as string);
-			// console.log("props", props);
+		const assignData = async () => {
 			let tablesArr: Table[] = [];
 			for (let table of props.tables) {
 				let rows = table.rows;
@@ -355,7 +248,6 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 
 				tablesArr.push(tableEntry);
 			}
-			setOfficerData(props.officerData);
 			const officerDetails: Filter = {
 				sex: props.officerData.sex,
 				race: props.officerData.race,
@@ -366,10 +258,9 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 			setOfficerDetailData(officerDetails);
 			setTablesArr(tablesArr);
 		};
-		if (keyword && bpiId) {
-			fetchData();
-		}
-	}, [bpiId, keyword]);
+
+		assignData();
+	}, [props]);
 
 	const sectionHeaderColor = bpi_light_green;
 
@@ -396,7 +287,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 						</p>
 					</div>
 					<div className="sections" style={{ display: "flex", justifyContent: "space-between", width: "100%", padding: "1rem" }}>
-						<div className="overview" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2rem", width: "52%", marginRight: "2rem", height: "300px" }}>
+						<div className="overview" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 1.5rem", width: "52%", marginRight: "2rem", height: "300px" }}>
 							<p style={{ color: sectionHeaderColor }} className="text-3xl">
 								Overview
 							</p>
@@ -419,7 +310,7 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 								<strong>Race:</strong> {officerData.race}
 							</p>
 						</div>
-						<div className="table-of-contents" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 2.5rem", width: "43%", height: "300px" }}>
+						<div className="table-of-contents" style={{ boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)", padding: "1rem 1.5rem", width: "43%", height: "300px" }}>
 							<p style={{ color: sectionHeaderColor }} className="text-3xl">
 								Data Summary
 							</p>
@@ -432,8 +323,12 @@ export default function OfficerProfile(): FunctionComponentElement<{}> {
 								<span>{officerData.ia_num}</span>
 							</div>
 
-							<div className="text-lg" style={{ display: "flex", justifyContent: "space-between" }}>
-								<strong style={{ cursor: "pointer" }}>Most Recent Earnings</strong> {`$${formatMoney(officerData.totalEarnings)}`}
+							<div className="text-lg" style={{ display: "flex", justifyContent: "space-between", lineHeight: "1", flexDirection: "column" }}>
+								<div style={{ display: "flex", justifyContent: "space-between" }}>
+									<strong style={{ cursor: "pointer" }}>{mostRecentFinancialYear} Earnings</strong> {`$${formatMoney(officerData.totalEarnings)}`}
+								</div>
+								{/* TODO: Uncomment when have data in right view  */}
+								{/* <div style={{ display: "flex", alignItems: "center", justifyContent: "end" }}>(60th Percentile)</div> */}
 							</div>
 							<p className="text-lg">{/* <strong style={{ cursor: "pointer" }}>FIO:</strong> {officerData.fio_record} */}</p>
 							<p className="text-lg">{/* <strong style={{ cursor: "pointer" }}>Traffic Tickets:</strong> {officerData.traffic_no} */}</p>
