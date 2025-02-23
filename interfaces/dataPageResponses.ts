@@ -123,3 +123,6 @@ type OfficerIACollection = Record<string, { edges: OfficerIAEdge[]; pageInfo: Of
 interface OfficerIAResponse {
 	data: OfficerIACollection;
 }
+
+// Added to prevent TS from considering this a legacy script and fail in prod
+export {}

@@ -36,3 +36,6 @@ interface FinancialEmployeeData {
 	injuredPay: number;
 	year: number;
 }
+
+// Added to prevent TS from considering this a legacy script and fail in prod
+export {}
