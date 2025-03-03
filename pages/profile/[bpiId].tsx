@@ -11,6 +11,7 @@ import { INDIVIDUAL_OFFICER_DETAIL_RECORDS, INDIVIDUAL_OFFICER_FINANCIAL_AND_EMP
 import { detail_alias_name } from "@utility/dataViewAliases";
 import { GetServerSideProps } from "nextjs-routes";
 import { InferGetServerSidePropsType } from "next";
+import { formatPercentile } from "@utility/textFormatHelpers";
 
 export interface Table {
 	title: string;
@@ -75,6 +76,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 				totalPay: node.totalPay || mostRecentEmployeeData.totalPay,
 				detailPay: node.detailPay || mostRecentEmployeeData.detailPay,
 				injuredPay: node.injuredPay || mostRecentEmployeeData.injuredPay,
+				totalPayPercentile: node.totalPayPercentile || mostRecentEmployeeData.totalPayPercentile,
 			};
 		}
 	});
@@ -92,6 +94,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		totalEarnings: mostRecentEmployeeData.totalPay,
 		ia_num: 0,
 		detail_num: 0,
+		totalPayPercentile: mostRecentEmployeeData.totalPayPercentile,
 	};
 	// console.log(officerData);
 
@@ -328,7 +331,7 @@ export default function OfficerProfile(props: InferGetServerSidePropsType<typeof
 									<strong style={{ cursor: "pointer" }}>{mostRecentFinancialYear} Earnings</strong> {`$${formatMoney(officerData.totalEarnings)}`}
 								</div>
 								{/* TODO: Uncomment when have data in right view  */}
-								{/* <div style={{ display: "flex", alignItems: "center", justifyContent: "end" }}>(60th Percentile)</div> */}
+								<div style={{ display: "flex", alignItems: "center", justifyContent: "end" }}>({formatPercentile(officerData.totalPayPercentile)} Percentile)</div>
 							</div>
 							<p className="text-lg">{/* <strong style={{ cursor: "pointer" }}>FIO:</strong> {officerData.fio_record} */}</p>
 							<p className="text-lg">{/* <strong style={{ cursor: "pointer" }}>Traffic Tickets:</strong> {officerData.traffic_no} */}</p>

@@ -85,6 +85,7 @@ export const INDIVIDUAL_OFFICER_FINANCIAL_AND_EMPLOYEE = (bpiId: string) => {
 			detailPay
 			injuredPay
 			year
+			totalPayPercentile
 		  }
 		}
 	  }`;

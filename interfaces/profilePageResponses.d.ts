@@ -13,6 +13,7 @@ declare global {
 		totalEarnings: number;
 		ia_num: number;
 		detail_num: number;
+		totalPayPercentile: number;
 	}
 
 	interface FinancialEmployeeData {
@@ -36,6 +37,7 @@ declare global {
 		detailPay: number;
 		injuredPay: number;
 		year: number;
+		totalPayPercentile: number;
 	}
 }
 // Added to prevent TS from considering this a legacy script and fail in prod

@@ -141,3 +141,32 @@ export function formatMoney(number: number): string {
 	}
 	return `$${formatted}`;
 }
+
+export function formatPercentile(percent: number): string {
+	let roundedPercent: number = Number(percent.toFixed(2));
+	let wholeNumberPart = Math.floor(roundedPercent);
+	let trailingNum = wholeNumberPart % 10;
+	let suffix: string;
+
+	// Handle special cases for 11th, 12th, and 13th
+	if (wholeNumberPart % 100 >= 11 && wholeNumberPart % 100 <= 13) {
+		suffix = "th";
+	} else {
+		switch (trailingNum) {
+			case 1:
+				suffix = "st";
+				break;
+			case 2:
+				suffix = "nd";
+				break;
+			case 3:
+				suffix = "rd";
+				break;
+			default:
+				suffix = "th";
+		}
+	}
+
+	// Ensure consistent two-decimal formatting
+	return `${roundedPercent.toFixed(2)}${suffix}`;
+}
