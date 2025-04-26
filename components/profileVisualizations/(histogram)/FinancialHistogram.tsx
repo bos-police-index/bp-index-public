@@ -1,4 +1,5 @@
 "use client";
+import { bpi_deep_green } from "@styles/theme/lightTheme";
 import HistogramDataFeeder, { Filter } from "./HistogramDataFeeder";
 
 interface FinancialHistogramProps {
@@ -62,8 +63,20 @@ export default function FinancialHistogram({ officerPayData, officerDetailData, 
 	}
 
 	return (
-		<div className="bg-white p-4 rounded-md">
-			<HistogramDataFeeder width={860} height={450} specificOfficerFinancialData={reshapeFinancialDataInput(officerPayData)} officerDetailData={officerDetailData} />
-		</div>
+		<>
+			<div className="w-full max-w-4xl flex rounded-md flex-col mb-5">
+				<p className="text-lg" style={{ color: bpi_deep_green, fontWeight: 500 }}>
+					Individual Officer Pay Histogram
+				</p>
+				<p style={{ color: bpi_deep_green, fontWeight: 300, justifyContent: "left" }} className="text-sm">
+					This feature shows how an officer’s various earnings compare to their peers by placing them within a percentile of the department’s overall pay distribution. It helps users quickly see whether an officer earns more or less than most others. Turning the Filtering by rank option
+					enables you to only compare an officer against similar ranking peers.{" "}
+				</p>
+			</div>
+
+			<div className="w-full max-w-4xl flex justify-center items-center bg-white p-6 rounded-md flex-col">
+				<HistogramDataFeeder width={860} height={450} specificOfficerFinancialData={reshapeFinancialDataInput(officerPayData)} officerDetailData={officerDetailData} />
+			</div>
+		</>
 	);
 }

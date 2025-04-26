@@ -93,7 +93,7 @@ export default function FullWidthTabs({ tables }: FullWidthTabsProps) {
 		return;
 	}
 	// Find the indices of the specific tables
-	const policeFinancialIndex = tables?.findIndex((table) => table.title === "Police Financial");
+	const policeFinancialIndex = tables?.findIndex((table) => table.title === "Police Earnings");
 	const officerIaIndex = tables?.findIndex((table) => table.title === "Officer IA");
 
 	let orderedTables: Table[] = [];

@@ -101,14 +101,35 @@ export const Histogram = ({ width, height, data, verticalLineX, mode }: Histogra
 
 	const verticalLinePosition = verticalLineX != null && verticalLineX != 0 ? xScale(verticalLineX) : null;
 
+	const sortedData = useMemo(() => [...data].sort((a, b) => a - b), [data]);
+
+	const percentile = useMemo(() => {
+		if (!sortedData.length || verticalLineX == null) return null;
+
+		// Find the rank of the employee in the sorted data
+		const rank = sortedData.filter((value) => value <= verticalLineX).length;
+
+		// Percentile calculation (rank / total count)
+		return ((rank / sortedData.length) * 100).toFixed(1); // Keep 1 decimal place
+	}, [sortedData, verticalLineX]);
+
 	return (
 		<div style={{ display: "flex", alignItems: "center", justifyContent: "center", color: bpi_deep_green, fontSize: "small", flexDirection: "column" }}>
 			<svg width={width} height={height}>
-				<g width={boundsWidth} height={boundsHeight} transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}>
+				<g width={boundsWidth} height={boundsHeight} transform={`translate(${MARGIN.left},${MARGIN.top})`}>
 					{allRects}
-					{verticalLinePosition != null && <line x1={verticalLinePosition} y1={0} x2={verticalLinePosition} y2={boundsHeight} stroke={"red"} strokeWidth={2} />}
+					{verticalLinePosition != null && (
+						<>
+							<line x1={verticalLinePosition} y1={0} x2={verticalLinePosition} y2={boundsHeight} stroke={"red"} strokeWidth={2} />
+							{percentile !== null && (
+								<text x={verticalLinePosition} y={-5} fill="red" textAnchor="middle" fontSize="12px" fontWeight="bold">
+									{percentile}%
+								</text>
+							)}
+						</>
+					)}
 				</g>
-				<g width={boundsWidth} height={boundsHeight} ref={axesRef} transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`} />
+				<g width={boundsWidth} height={boundsHeight} ref={axesRef} transform={`translate(${MARGIN.left},${MARGIN.top})`} />
 			</svg>
 			<p>*No red line means the officer did not receive pay in that category that year*</p>
 		</div>

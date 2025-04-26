@@ -1,6 +1,8 @@
 import { gql } from "@apollo/client";
-import { API_PAGE_SIZE_LARGE, API_PAGE_SIZE_MEDIUM, API_PAGE_SIZE_SMALL, court_overtime_alias_name, detail_alias_name, homepage_alias_name, officer_financial_alias_name, officer_ia_alias_name } from "@utility/dataViewAliases";
+import { court_overtime_alias_name, detail_alias_name, fio_record_alias_name, homepage_alias_name, officer_financial_alias_name, officer_ia_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map } from "@utility/dataViewAliases";
 import { DocumentNode } from "graphql";
+
+export const DATA_PAGE_SIZE = 25;
 
 // Homepage Query
 export const GET_HOMEPAGE_DATA = gql`
@@ -96,106 +98,25 @@ export const INDIVIDUAL_OFFICER_IA = (bpiId: string) => {
 		query MyQuery {
 			${officer_ia_alias_name}(condition: {bpiId: "${bpiId}"}) {
 				nodes {
-					dateReceived
+					iaNumber
+					badgeNo
+					incidentType
+					receivedDate
 					allegation
 					finding
 					actionTaken
-					adminLeave
-					daysOrHoursSuspended
-					incidentType
-					iaNo
+					leaDisposition
+					disposition
+					occuredDate
+					allegationDetails
+					allegationSubtype
+					allegationType
+					disciplines
 				}
 			}
 		}
 	`;
 };
-
-// Data Page Queries
-export const GET_FIRST_1000_DETAIL_RECORDS = gql`
-	query MyQuery {
-		${detail_alias_name}(first: ${API_PAGE_SIZE_SMALL}) {
-			pageInfo {
-				endCursor
-				hasNextPage
-			}
-			edges {
-				node {
-					adminFeeFlag
-					badgeNo
-					bpdCustomerNo
-					customerNo
-					customerSeq
-					detailRank
-					detailType
-					districtWorked
-					endTime
-					hoursWorked
-					nameId
-					payAmount
-					payHours
-					payRate
-					race
-					payTrcCode
-					sex
-					startDate
-					startTime
-					street
-					xstreet
-					trackingNo
-					streetNo
-					empRank
-					empOrgCode
-					customerName
-					noShowFlag
-					stateFunded
-				}
-			}
-		}
-	}
-`;
-
-export const GET_NEXT_PAGE_DETAIL_RECORDS: DocumentNode = gql`
-	query MyQuery($endCursor: Cursor) {
-		${detail_alias_name}(first: ${API_PAGE_SIZE_LARGE}, after: $endCursor) {
-			pageInfo {
-				endCursor
-				hasNextPage
-			}
-			edges {
-				node {
-					adminFeeFlag
-					badgeNo
-					bpdCustomerNo
-					customerNo
-					customerSeq
-					detailRank
-					detailType
-					districtWorked
-					endTime
-					hoursWorked
-					nameId
-					payAmount
-					payHours
-					payRate
-					race
-					payTrcCode
-					sex
-					startDate
-					startTime
-					street
-					xstreet
-					trackingNo
-					streetNo
-					empRank
-					empOrgCode
-					customerName
-					noShowFlag
-					stateFunded
-				}
-			}
-		}
-	}
-`;
 
 export const GET_ALL_OFFICER_FINANCIAL_DATA = gql`
 	query MyQuery {
@@ -216,142 +137,221 @@ export const GET_ALL_OFFICER_FINANCIAL_DATA = gql`
 	}
 `;
 
-export const GET_FIRST_1000_COURT_OVERTIMES = gql`
-	query MyQuery {
-		${court_overtime_alias_name}(first: ${API_PAGE_SIZE_SMALL}){
-			edges {
-				node {
-					assignedDesc
-					chargedDesc
-					description
-					endTime
-					name
-					otCode
-					otDate
-					race
-					rank
-					sex
-					startTime
-					workedHours
-				}
-			}
-			pageInfo {
-				endCursor
-				hasNextPage
-			}
-  }
-}
+export const INDIVIDUAL_OFFICER_COURT_OVERTIMES = (bpiId: string) => {
+	return gql`query MyQuery {
+		${court_overtime_alias_name}(condition: {bpiId: "${bpiId}" }) {
+		  nodes {
+				assignedDesc
+				chargedDesc
+				description
+				endTime
+				name
+				otCode
+				otDate
+				race
+				rank
+				sex
+				startTime
+				workedHours
+   		 	}
+		}
+	  }`;
+};
 
-`;
-export const GET_NEXT_PAGE_COURT_OVERTIMES = gql`
-	query MyQuery($endCursor: Cursor) {
-		${court_overtime_alias_name}(first: ${API_PAGE_SIZE_MEDIUM}, after: $endCursor) {
-			edges {
-				node {
-					assignedDesc
-					chargedDesc
-					description
-					endTime
-					name
-					otCode
-					otDate
-					race
-					rank
-					sex
-					startTime
-					workedHours
-				}
+export const INDIVIDUAL_OFFICER_FIO_RECORDS = (bpiId: string) => {
+	return gql`query MyQuery {
+		${fio_record_alias_name}(condition: {bpiId: "${bpiId}" }) {
+		 nodes {
+				contactDate
+				basis
+				circumstance
+				city
+				contactOfficerName
+				fcNum
+				frisked
+				keySituations
+				narrative
+				state
+				stopDuration
+				streetAddress
+				summonsIssued
+				supervisorName
+				vehicleSearched
+				vehicleModel
+				vehicleMake
+				vehicleColor
+				vehicleState
+				vehicleStyle
+				vehicleType
+				vehicleYear
+				weather
+				zip
 			}
-			pageInfo {
-				endCursor
-				hasNextPage
-			}
+		}
+	  }`;
+};
+
+// Data Page Queries
+export const GET_NEXT_PAGE_DETAIL_RECORDS: DocumentNode = gql`
+	query MyQuery($offset: Int, $page_size: Int, $order_by: [${removeAllPrefix(detail_alias_name)}OrderBy!], $filters: ${removePluralSuffix(removeAllPrefix(detail_alias_name))}Condition) {
+		${detail_alias_name}(first: $page_size, offset: $offset, orderBy: $order_by, condition: $filters) {
+			nodes {
+				adminFeeFlag
+				badgeNo
+				bpdCustomerNo
+				customerNo
+				customerSeq
+				detailRank
+				detailType
+				districtWorked
+				endTime
+				hoursWorked
+				nameId
+				payAmount
+				payHours
+				payRate
+				race
+				payTrcCode
+				sex
+				startDate
+				startTime
+				street
+				xstreet
+				trackingNo
+				streetNo
+				empRank
+				empOrgCode
+				customerName
+				noShowFlag
+				stateFunded
+   		 	}
+				totalCount
 		}
 	}
 `;
 
-export const GET_FIRST_1000_OFFICER_IA = gql`
-query MyQuery {
-		${officer_ia_alias_name}(first: ${API_PAGE_SIZE_SMALL}){
-			edges {
-				node {
-					actionTaken
-					adminLeave
-					allegation
-					badgeNo
-					dateReceived
-					dateHired
-					daysOrHoursSuspended
-					finding
-					firstName
-					lastName
-					iaNo
-					incidentType
-					race
-					sex
-					unionCode
-				}
-    		}
-    pageInfo {
-      endCursor
-      hasNextPage
-    }
-  }
-}`;
+export const GET_NEXT_PAGE_COURT_OVERTIMES: DocumentNode = gql`
+	query MyQuery($offset: Int, $page_size: Int, $order_by: [${removeAllPrefix(court_overtime_alias_name)}OrderBy!], $filters: ${removePluralSuffix(removeAllPrefix(court_overtime_alias_name))}Condition) {
+		${court_overtime_alias_name}(first: $page_size, offset: $offset, orderBy: $order_by, condition: $filters) {
+			nodes {
+				assignedDesc
+				chargedDesc
+				description
+				endTime
+				name
+				otCode
+				otDate
+				race
+				rank
+				sex
+				startTime
+				workedHours
+   		 	}
+				totalCount
+		}
+	}
+`;
 
 export const GET_NEXT_PAGE_OFFICER_IA = gql`
-query MyQuery($endCursor: Cursor) {
-		${officer_ia_alias_name}(first: ${API_PAGE_SIZE_SMALL}, after: $endCursor) {
-			edges {
-				node {
-					actionTaken
-					adminLeave
-					allegation
-					badgeNo
-					dateReceived
-					dateHired
-					daysOrHoursSuspended
-					finding
-					firstName
-					lastName
-					iaNo
-					incidentType
-					race
-					sex
-					unionCode
-				}
-    		}
-    pageInfo {
-      endCursor
-      hasNextPage
-    }
-  }
-}`;
+	query MyQuery($offset: Int, $page_size: Int, $order_by: [${removeAllPrefix(officer_ia_alias_name)}OrderBy!], $filters: ${removePluralSuffix(removeAllPrefix(officer_ia_alias_name))}Condition) {
+		${officer_ia_alias_name}(first: $page_size, offset: $offset, orderBy: $order_by, condition: $filters) {
+			nodes {
+			 	iaNumber
+				badgeNo
+				incidentType
+				receivedDate
+				firstName
+				lastName
+				allegation
+				finding
+				actionTaken
+				leaDisposition
+				disposition
+				occuredDate
+				allegationDetails
+				allegationSubtype
+				allegationType
+				disciplines
+   		 	}
+				totalCount
+		}
+	}
+`;
 
-
+export const GET_NEXT_PAGE_FIO_RECORDS = gql`
+	query MyQuery($offset: Int, $page_size: Int, $order_by: [${removeAllPrefix(fio_record_alias_name)}OrderBy!], $filters: ${removePluralSuffix(removeAllPrefix(fio_record_alias_name))}Condition) {
+		${fio_record_alias_name}(first: $page_size, offset: $offset, orderBy: $order_by, condition: $filters) {
+			nodes {
+				contactDate
+				basis
+				circumstance
+				city
+				contactOfficerName
+				fcNum
+				frisked
+				keySituations
+				narrative
+				state
+				stopDuration
+				streetAddress
+				summonsIssued
+				supervisorName
+				vehicleSearched
+				vehicleModel
+				vehicleMake
+				vehicleColor
+				vehicleState
+				vehicleStyle
+				vehicleType
+				vehicleYear
+				weather
+				zip
+			}
+				totalCount
+		}
+	}
+`;
 
 // Data Page Length of Data Queries
+// export const GET_NUMBER_OF_ROWS = (table_name: string): DocumentNode => {
+// 	const query_source = table_name_to_alias_map[table_name];
 
-export const GET_NUMBER_OF_ROWS = (table_name: string): DocumentNode =>{
-	let query_source = ""
-	if (table_name.includes("detail")){
-		query_source = detail_alias_name
+// 	return gql`query MyQuery {
+// 		${query_source} {
+// 			totalCount
+// 				}
+// 	}`;
+// };
+
+// Get Year range of the dataset
+export const GET_YEAR_RANGE_OF_DATASET = (table_name: string, date_column_name: string, offset: number, queryEarliest: boolean, queryLatest: boolean): DocumentNode => {
+	const query_source = table_name_to_alias_map[table_name];
+	const capitalized_date_col = toUpperSnakeCase(date_column_name);
+
+	let query_string = `query {`;
+
+	if (queryEarliest) {
+		query_string += `\n earliest: ${query_source}(orderBy: ${capitalized_date_col}_ASC, first: 1, offset: ${offset}) {
+							nodes{
+								${date_column_name}
+							}
+						}`;
 	}
-	else if (table_name.includes("court_overtime")) {
-		query_source = court_overtime_alias_name;
-	} else if (table_name.includes("officer_misconduct")) {
-		query_source = officer_ia_alias_name;
-	} else {
-		console.log("ERROR, source to check num of rows from is invalid");
-		throw new Error("Need to add this data source to queries.ts GET_NUMBER_OF_ROWS");
+	if (queryLatest) {
+		query_string += `\n latest: ${query_source}(orderBy: ${capitalized_date_col}_DESC, first: 1, , offset: ${offset}) {
+								nodes{
+								${date_column_name}
+							}
+						}`;
 	}
 
-	return(
-	gql`query MyQuery {
-		${query_source} {
-			totalCount
-				}
-	}`
+	query_string += " }";
 
-	)
-} 
+	// console.log("QUERY:", query_string);
+
+	return gql(query_string);
+};
+
+function toUpperSnakeCase(camelCaseStr) {
+	return camelCaseStr.replace(/([a-z])([A-Z])/g, "$1_$2").toUpperCase();
+}

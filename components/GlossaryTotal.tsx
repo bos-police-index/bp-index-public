@@ -35,7 +35,6 @@ interface TableDefinition {
 	isFake: boolean;
 	shortDescription: string;
 	longDescription: string;
-	years: string;
 }
 
 interface GlossaryTotalProps {
@@ -90,6 +89,7 @@ const GlossaryTotal: React.FC<GlossaryTotalProps> = ({ tableDefinitions, columnO
 		rows = columnObjects;
 	}
 	let seenLetters = {};
+	let seenTerms = {};
 	return (
 		<div className="max-w-5xl mx-auto bg-white mb-[2rem] p-[7rem]" style={{ boxShadow: "0px 0px 10px 2px rgba(0, 0, 0, 0.2)" }}>
 			{total ? (
@@ -108,6 +108,11 @@ const GlossaryTotal: React.FC<GlossaryTotalProps> = ({ tableDefinitions, columnO
 							firstAppearance = true;
 							seenLetters[col.name.substring(0, 1)] = 1;
 						}
+						// prevents same col from 2+ tables appearing multiple times
+						if (seenTerms[col.name]) {
+							return;
+						}
+						seenTerms[col.name] = 1;
 
 						return <GlossaryItem key={index} columnObject={col} isTotal={total} last={rows.length === index + 1} firstAppearance={firstAppearance} />;
 					})}

@@ -2,11 +2,12 @@ import { GridColDef } from "@mui/x-data-grid";
 import React from "react";
 import DataTable from "@components/DataTable";
 import { rgbToHex, Tooltip } from "@mui/material";
-import { formatDateShort, formatDate, formatHours, formatMoney, formatTime, yAndNToBoolean, fixNameOrdering } from "./textFormatHelpers";
+import { formatDateShort, formatDate, formatHours, formatMoney, formatTime, yAndNToBoolean, fixNameOrdering, noNullStringToBool, fixZipCode } from "./textFormatHelpers";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
+import { handleQuery } from "./queryUtils";
 
-export const getMUIGrid = (table: string, rows: any[], officerName: string, includesOnly = [], excludes = []) => {
+export const getMUIGrid = (table: string, rows: any[], officerName: string, includesOnly = [], excludes = [], rowCount) => {
 	const cols: GridColDef[] = functionMapping[table];
 	const hide = cols.filter((col) => col.hideable === true).map((col) => col.field);
 
@@ -28,11 +29,33 @@ export const getMUIGrid = (table: string, rows: any[], officerName: string, incl
 	// 100vh - 7rem is for data-table, aka /data/tables/[table_name]
 	// 100vh - 90px is for screen overlay table, inside the officer profile page
 
-	const height = officerName !== "" ? "calc(100vh - 7rem)" : "calc(100vh - 90px)";
+	return {
+		fullTable: <DataTable table={rows} cols={cols} table_name={`${officerName}-${table}`} pageSizeOptions={[25, 50, 75, 100]} pageSize={25} rowCount={undefined} hide={hide} isServerSideRendered={false} />,
+		filteredTable: <DataTable table={rows} cols={filteredCols} table_name={`${officerName}-${table}`} pageSizeOptions={[5]} pageSize={5} rowCount={undefined} hide={hide} isServerSideRendered={false} />,
+	};
+};
+
+export const getServerSidePaginationMUIGrid = (table_name: string, includesOnly = [], excludes = []) => {
+	const cols: GridColDef[] = functionMapping[table_name];
+	const hide = cols.filter((col) => col.hideable === true).map((col) => col.field);
+
+	// if includesOnly contains anything, we remove all columns that are not in includesOnly
+	// Except for the id column, which is always included
+	let filteredCols: GridColDef[] = cols.filter((col: GridColDef) => {
+		return includesOnly.length === 0 || includesOnly.includes(col.field) || col.field === "id";
+	});
+
+	// if excludes contains anything, we remove all columns that are in excludes
+	// Except for the id column, which is always included
+	filteredCols = filteredCols.filter((col: GridColDef) => {
+		return !excludes.includes(col.field) || col.field === "id";
+	});
+
+	// 100vh - 7rem is for data-table, aka /data/tables/[table_name]
+	// 100vh - 90px is for screen overlay table, inside the officer profile page
 
 	return {
-		fullTable: <DataTable table={rows} cols={cols} table_name={`${officerName}-${table}`} height={height} pageSizeOptions={[25, 50, 75, 100]} pageSize={25} rowCount={undefined} hide={hide} />,
-		filteredTable: <DataTable table={rows} cols={filteredCols} table_name={`${officerName}-${table}`} height={"auto"} pageSizeOptions={[5]} pageSize={5} rowCount={undefined} hide={hide} />,
+		dataPageTable: <DataTable table={[]} cols={cols} table_name={table_name} pageSizeOptions={[25, 50, 75, 100]} pageSize={25} rowCount={undefined} hide={hide} isServerSideRendered={true} query={handleQuery(table_name)} />,
 	};
 };
 
@@ -47,10 +70,12 @@ const officer_ia_columns = () => {
 				return params.value;
 			},
 			width: 100,
+			filterable: false,
 		},
 		{
-			field: "iaNo",
+			field: "iaNumber",
 			headerName: "IA Number",
+			description: "Internal Affairs (IA) case number assigned to track the investigation",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -58,15 +83,17 @@ const officer_ia_columns = () => {
 			width: 250,
 		},
 		{
-			field: "dateReceived",
-			headerName: "Date Received",
-			type: "date",
-			valueFormatter: formatDateShort,
-			width: 200,
+			field: "badgeNo",
+			headerName: "Officer Badge #",
+			description: "The badge number of an officer. Note that this is not necessarily unique.",
+			type: "number",
+			valueFormatter: (params) => params.value,
+			width: 150,
 		},
 		{
 			field: "incidentType",
 			headerName: "Incident Type",
+			description: "The general category of the reported event (e.g., use of force, misconduct, policy violation)",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -74,8 +101,28 @@ const officer_ia_columns = () => {
 			width: 200,
 		},
 		{
+			field: "receivedDate",
+			headerName: "Date Received",
+			description: "The date when the complaint or investigation was officially received",
+			type: "date",
+			valueFormatter: formatDateShort,
+			width: 200,
+		},
+		{
+			field: "officerName",
+			headerName: "Officer Name",
+			description: "The full name of the officer involved in the incident",
+			valueGetter: (params) => {
+				const firstName = params.row.firstName || "";
+				const lastName = params.row.lastName || "";
+				return `${firstName} ${lastName}`.trim();
+			},
+			width: 200,
+		},
+		{
 			field: "allegation",
 			headerName: "Allegation",
+			description: "The specific accusation or complaint made against the officer(s)",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -85,6 +132,7 @@ const officer_ia_columns = () => {
 		{
 			field: "finding",
 			headerName: "Finding",
+			description: "The outcome of the investigation (e.g., sustained, not sustained, exonerated, unfounded)",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -94,6 +142,7 @@ const officer_ia_columns = () => {
 		{
 			field: "actionTaken",
 			headerName: "Action Taken",
+			description: "Disciplinary or corrective actions imposed if the allegation was substantiated (e.g., reprimand, suspension, termination).",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
@@ -101,25 +150,72 @@ const officer_ia_columns = () => {
 			width: 200,
 		},
 		{
-			field: "adminLeave",
-			headerName: "Administrative Leave",
-			type: "boolean",
-			valueGetter: (params) => yAndNToBoolean(params.value),
-			renderCell: (params) => {
-				if (params.value === null) return "";
-				return params.value ? <CheckIcon fontSize="small" htmlColor="#00000099" /> : <ClearIcon fontSize="small" htmlColor="#00000061" />;
-			},
-			width: 200,
-		},
-		{
-			field: "daysOrHoursSuspended",
-			headerName: "Days/Hours Suspended",
+			field: "disposition",
+			headerName: "Disposition",
+			description: "The final status of the case, including whether it was closed, pending, or referred to another agency.",
 			type: "string",
 			valueFormatter: (params) => {
 				return params.value;
 			},
 			width: 200,
-			align: "center",
+		},
+		{
+			field: "occuredDate",
+			headerName: "Date Occurred",
+			description: "The actual date on which the incident occurred.",
+			type: "date",
+			valueFormatter: formatDateShort,
+			width: 200,
+		},
+		{
+			field: "allegationType",
+			headerName: "Allegation Type",
+			description: "A broader categorization of the allegation.",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "allegationSubtype",
+			headerName: "Allegation Subtype",
+			description: "A more detailed or specific categorization of the allegation.",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "allegationDetails",
+			headerName: "Allegation Details",
+			description: "Detailed information or context about the allegation.",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "disciplines",
+			headerName: "Disciplines",
+			description: "Any disciplinary categories relevant to the case or action taken.",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "leaDisposition",
+			headerName: "LEA Disposition",
+			description: "The final disposition or outcome of the case as determined by the Law Enforcement Agency.(e.g., sustained, not sustained, exonerated, unfounded)",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
 		},
 	];
 
@@ -137,6 +233,7 @@ const police_financial_columns = () => {
 				return params.value;
 			},
 			width: 50,
+			filterable: false,
 		},
 		{
 			field: "year",
@@ -146,6 +243,7 @@ const police_financial_columns = () => {
 				return params.value;
 			},
 			width: 70,
+			filterable: false,
 		},
 		{
 			field: "totalPay",
@@ -243,6 +341,7 @@ const detail_record_columns = () => {
 			type: "number",
 			valueFormatter: (params) => params.value,
 			width: 100,
+			filterable: false,
 		},
 		{
 			field: "year",
@@ -252,6 +351,7 @@ const detail_record_columns = () => {
 			valueFormatter: (params) => params.value,
 			width: 100,
 			hideable: true,
+			filterable: false,
 		},
 		{
 			field: "trackingNo",
@@ -313,15 +413,15 @@ const detail_record_columns = () => {
 			field: "startTime",
 			headerName: "Start Time",
 			description: "The time of day it started",
-			type: "number",
-			valueFormatter: (params) => formatTime(params.value),
+			type: "string",
+			valueFormatter: (params) => params.value,
 			width: 100,
 		},
 		{
 			field: "endTime",
 			headerName: "End Time",
 			description: "The time of day it ended",
-			type: "number",
+			type: "string",
 			valueFormatter: (params) => formatTime(params.value),
 			width: 100,
 		},
@@ -591,14 +691,14 @@ const court_overtime_columns = () => {
 
 const officer_misconduct_columns = () => {
 	let cols = officer_ia_columns();
-	let badge_num_col = {
-		field: "badgeNo",
-		headerName: "Officer Badge #",
-		description: "The badge number of an officer. Note that this is not necessarily unique.",
-		type: "number",
-		valueFormatter: (params) => params.value,
-		width: 150,
-	};
+	// let badge_num_col = {
+	// 	field: "badgeNo",
+	// 	headerName: "Officer Badge #",
+	// 	description: "The badge number of an officer. Note that this is not necessarily unique.",
+	// 	type: "number",
+	// 	valueFormatter: (params) => params.value,
+	// 	width: 150,
+	// };
 
 	// change width of ia num
 	cols[1].width = 125;
@@ -606,7 +706,252 @@ const officer_misconduct_columns = () => {
 	// change width of date received
 	cols[2].width = 125;
 
-	cols = [cols[0], cols[1], badge_num_col, ...cols.slice(2)];
+	cols = [cols[0], cols[1], ...cols.slice(2)];
+
+	return cols;
+};
+
+const fio_record_columns = () => {
+	const cols: GridColDef[] = [
+		{
+			field: "fcNum",
+			headerName: "Field Contact #",
+			description: "Field Contact Number",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "contactDate",
+			headerName: "Contact Date",
+			description: "Date on which the stop occurred",
+			type: "date",
+			valueFormatter: formatDate,
+			width: 200,
+		},
+		{
+			field: "contactOfficerName",
+			headerName: "Contact Officer",
+			description: "Officer's name",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "supervisorName",
+			headerName: "Supervisor Name",
+			description: "Supervisor's name",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "streetAddress",
+			headerName: "Street Address",
+			description: "The street address where the encounter happened",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "city",
+			headerName: "City",
+			description: "City of location where stop occurred",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+		},
+		{
+			field: "state",
+			headerName: "State",
+			description: "State of location where stop occurred",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 75,
+		},
+		{
+			field: "zip",
+			headerName: "Zip Code",
+			description: "The zip code of where the stop happened",
+			type: "string",
+			valueFormatter: (params) => {
+				return fixZipCode(params.value);
+			},
+			width: 75,
+		},
+		{
+			field: "stopDuration",
+			headerName: "Stop Duration",
+			description: "Length of stop (time)",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "circumstance",
+			headerName: "Circumstance",
+			description: "Basis for field contact (Encounter, Intel, Reasonable Suspicion, Probable Cause)",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 125,
+		},
+		{
+			field: "basis",
+			headerName: "Basis",
+			description: "Circumstances of field contact (Observed, Encountered, Stopped)",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 125,
+		},
+		{
+			field: "vehicleYear",
+			headerName: "Vehicle Year",
+			description: "Vehicle year",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 125,
+		},
+		{
+			field: "vehicleState",
+			headerName: "Vehicle State",
+			description: "Vehicle registration state",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 125,
+		},
+		{
+			field: "vehicleModel",
+			headerName: "Vehicle Model",
+			description: "Vehicle model",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 125,
+		},
+		{
+			field: "vehicleMake",
+			headerName: "Vehicle Make",
+			description: "Vehicle make",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "vehicleColor",
+			headerName: "Vehicle Color",
+			description: "Vehicle color",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+		},
+		{
+			field: "vehicleStyle",
+			headerName: "Vehicle Style",
+			description: "Passenger Car or pick up truck",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "vehicleType",
+			headerName: "Vehicle Type",
+			description: "Type of Vehicle (Sedan, Compact Car, SUV, Utility Vehicle)",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "vehicleSearched",
+			headerName: "Vehicle Searched",
+			description: "Indicates if a vehicle was searched",
+			type: "boolean",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "keySituations",
+			headerName: "Key Situation",
+			description: "What happened in the event and what was present",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "narrative",
+			headerName: "Narrative",
+			description: "Reasons for Interrogation, Observation, Frisk, or Search",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "frisked",
+			headerName: "Frisked",
+			description: "Whether or not an officer passes the hands over (someone) in a search for hidden weapons, drugs, or other items.",
+			type: "boolean",
+			valueFormatter: (params) => {
+				return noNullStringToBool(params.value);
+			},
+			width: 100,
+		},
+		{
+			field: "summonsIssued",
+			headerName: "Summons Issued",
+			description: "Indicates if a summons was issued",
+			type: "boolean",
+			valueFormatter: (params) => {
+				return noNullStringToBool(params.value);
+			},
+			width: 150,
+		},
+		{
+			field: "weather",
+			headerName: "Weather",
+			description: "The weather of the day",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+	];
 
 	return cols;
 };
@@ -617,6 +962,7 @@ export const functionMapping = {
 	police_financial: police_financial_columns(),
 	court_overtime: court_overtime_columns(),
 	officer_misconduct: officer_misconduct_columns(),
+	fio_record: fio_record_columns(),
 };
 
 // THE BELOW TABLE DEFINITIONS ARE DEPRECATED BUT **may be helpful** later
@@ -1433,215 +1779,7 @@ export const functionMapping = {
 
 // 	return cols;
 // };
-// const fio_record_columns = () => {
-// 	const cols: GridColDef[] = [
-// 		{
-// 			field: "id",
-// 			hideable: false,
-// 			headerName: "ID",
-// 			type: "number",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 100,
-// 		},
-// 		{
-// 			field: "field_contact_no",
-// 			headerName: "Field Contact #",
-// 			type: "number",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 200,
-// 		},
-// 		{
-// 			field: "contact_date",
-// 			headerName: "Contact Date",
-// 			type: "date",
-// 			valueFormatter: formatDate,
-// 			width: 200,
-// 		},
-// 		{
-// 			field: "contact_officer",
-// 			headerName: "Contact Officer",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 200,
-// 		},
-// 		{
-// 			field: "supervisor_no",
-// 			headerName: "Supervisor #",
-// 			type: "number",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 150,
-// 		},
-// 		{
-// 			field: "supervisor_name",
-// 			headerName: "Supervisor Name",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 200,
-// 		},
-// 		{
-// 			field: "street_name",
-// 			headerName: "Street Name",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 150,
-// 		},
-// 		{
-// 			field: "city",
-// 			headerName: "City",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 100,
-// 		},
-// 		{
-// 			field: "state",
-// 			headerName: "State",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 150,
-// 		},
-// 		{
-// 			field: "zip_code",
-// 			headerName: "Zip Code",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				let val: number = parseInt(params.value);
-// 				val = Math.round(val / 10);
-// 				let valAsStr: string = val.toString();
-// 				while (valAsStr.length < 5) {
-// 					valAsStr = "0" + valAsStr;
-// 				}
-// 				return valAsStr;
-// 			},
-// 			width: 150,
-// 		},
-// 		{
-// 			field: "stop_duration",
-// 			headerName: "Stop Duration",
-// 			type: "number",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 200,
-// 		},
-// 		{
-// 			field: "circumstance",
-// 			headerName: "Circumstance",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 200,
-// 		},
-// 		{
-// 			field: "basis",
-// 			headerName: "Basis",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 150,
-// 		},
-// 		{
-// 			field: "vehicle_year",
-// 			headerName: "Vehicle Year",
-// 			type: "number",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 150,
-// 		},
-// 		{
-// 			field: "vehicle_state",
-// 			headerName: "Vehicle State",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 200,
-// 		},
-// 		{
-// 			field: "vehicle_model",
-// 			headerName: "Vehicle Model",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 200,
-// 		},
-// 		{
-// 			field: "vehicle_color",
-// 			headerName: "Vehicle Color",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 200,
-// 		},
-// 		{
-// 			field: "vehicle_style",
-// 			headerName: "Vehicle Style",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 200,
-// 		},
-// 		{
-// 			field: "vehicle_type",
-// 			headerName: "Vehicle Type",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 150,
-// 		},
-// 		{
-// 			field: "key_situation",
-// 			headerName: "Key Situation",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 200,
-// 		},
-// 		{
-// 			field: "contact_reason",
-// 			headerName: "Contact Reason",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 200,
-// 		},
-// 		{
-// 			field: "weather",
-// 			headerName: "Weather",
-// 			type: "string",
-// 			valueFormatter: (params) => {
-// 				return params.value;
-// 			},
-// 			width: 150,
-// 		},
-// 	];
 
-// 	return cols;
-// };
 // const bpd_customer_columns = () => {
 // 	const cols: GridColDef[] = [
 // 		{

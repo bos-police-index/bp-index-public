@@ -1,7 +1,7 @@
 "use client";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
-import { payCategoryColorMap } from "@styles/theme/lightTheme";
+import { bpi_deep_green, payCategoryColorMap } from "@styles/theme/lightTheme";
 import { formatMoney } from "@utility/textFormatHelpers";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -137,9 +137,20 @@ function PayStackedBarChart(data) {
 	}
 
 	return (
-		<div className="w-full max-w-4xl flex justify-center items-center bg-white p-6 rounded-md">
-			<Bar data={chartData} options={options} />
-		</div>
+		<>
+			<div className="w-full max-w-4xl flex rounded-md flex-col mb-5">
+				<p className="text-lg" style={{ color: bpi_deep_green, fontWeight: 500 }}>
+					Officer Earnings Visualization
+				</p>
+				<p style={{ color: bpi_deep_green, fontWeight: 300, justifyContent: "left" }} className="text-sm">
+					This tool provides a look at individual police officers' earnings, including base salary, overtime, detail, etc. By visualizing this data, users can better understand patterns in an officer earnings, identify trends in earning patterns.
+				</p>
+			</div>
+
+			<div className="w-full max-w-4xl flex justify-center items-center bg-white p-6 rounded-md flex-col">
+				<Bar data={chartData} options={options} />
+			</div>
+		</>
 	);
 }
 

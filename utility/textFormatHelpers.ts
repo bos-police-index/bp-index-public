@@ -97,9 +97,32 @@ export function formatDate(params: GridValueFormatterParams) {
 	return formatted;
 }
 
-// Extracts the year from a date
+// Extracts the year from a date (1/10/2020 --> 2020)
 export function getYearFromDate (date){
 	return String(date).substring(0,4);
+}
+
+//  Extracts the year from a date (1/10/2020 0:30 --> 2020)
+export function getYearFromAnyFormat(date) {
+	if (!date) return "Invalid Date"; // Handle null/undefined input
+
+	// Check if the format is YYYY (e.g. "2019")
+	if (/^(1\d{3}|2\d{3})$/.test(date)) {
+		return date;
+	}
+	// Check if the format is YYYY-MM-DD (e.g., "1993-01-11")
+	if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+		return date.substring(0, 4);
+	}
+
+	// Check if the format is DD/MM/YYYY or DD/MM/YYYY HH:MM
+	let parts = date.split("/");
+	if (parts.length === 3) {
+		// The year part might have extra time data (e.g., "2020 18:00"), so split by space
+		return parts[2].split(" ")[0].substring(0, 4);
+	}
+
+	return "Invalid Date"; // If format is unrecognized
 }
 
 //changes 830 to 8.5
@@ -142,8 +165,15 @@ export function formatMoney(number: number): string {
 	return `$${formatted}`;
 }
 
-export function formatPercentile(percent: number): string {
-	let roundedPercent: number = Number(percent.toFixed(2));
+export function formatMoneyNoCents(number: number): string {
+	return new Intl.NumberFormat("en-US", {
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0,
+	}).format(number);
+}
+
+export function formatPercentileNoDecimals(percent: number): string {
+	let roundedPercent: number = Number(percent.toFixed(0));
 	let wholeNumberPart = Math.floor(roundedPercent);
 	let trailingNum = wholeNumberPart % 10;
 	let suffix: string;
@@ -168,5 +198,35 @@ export function formatPercentile(percent: number): string {
 	}
 
 	// Ensure consistent two-decimal formatting
-	return `${roundedPercent.toFixed(2)}${suffix}`;
+	return `${roundedPercent.toFixed(0)}${suffix}`;
+}
+
+export function noNullStringToBool(rowVal: string): boolean {
+	if (rowVal.includes("No")) {
+		return false;
+	}
+	return true;
+}
+
+// Converts Zip Code Strings that may be malformed (only 4 digits or XXXXX - XXXXX) into properly formed 5 digit zips
+export function fixZipCode(zip: string) {
+	if (zip.length == 0 || zip.startsWith("00000")) {
+		return "";
+	}
+
+	// Case #1 Length > 5 (XXXXX-XXXXX)
+	else if (zip.length > 5 && zip.includes("-")) {
+		zip = zip.split("-")[0];
+	} 
+	// Case #1.5 Length > 5 (XXXXXXXXXX)
+	else if (zip.length > 5) {
+		zip = zip.substring(0, 5);
+	}
+	// Case #2 Length < 5 (XXXX)
+	else if (zip.length < 5) {
+		zip = zip.padStart(5, "0");
+	}
+
+	// Case #3 Length = 5 (XXXXX)
+	return zip;
 }

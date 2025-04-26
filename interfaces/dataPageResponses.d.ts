@@ -1,15 +1,12 @@
 /* TODO: When adding new data you need to make the following interfaces:
-- Record 
-- Edge 
-- PageInfo
-- Collection
-- Response
+- Record (interface)
+- Response (interface)
 */
 
 declare global {
 	/* ------------------- DETAIL RECORDS ---------------------*/
 	interface DetailRecord {
-		adminFeeFlag: string;
+		adminFeeFlag: string; // "Y" or "N"
 		badgeNo: number;
 		bpdCustomerNo: number;
 		customerNo: number;
@@ -20,7 +17,7 @@ declare global {
 		endTime: string;
 		hoursWorked: number;
 		nameId: string;
-		payAmount: string;
+		payAmount: number;
 		payHours: number;
 		payRate: number;
 		race: string;
@@ -35,25 +32,15 @@ declare global {
 		empRank: number;
 		empOrgCode: number;
 		customerName: string;
-		noShowFlag: string;
-		prepaidFlag: string;
-		stateFunded: string;
+		noShowFlag: string; // "Y" or "N"
+		stateFunded: string; // "Y" or "N"
 	}
-
-	interface DetailRecordsEdge {
-		node: DetailRecord;
-		cursor: string;
-	}
-
-	interface DetailRecordsPageInfo {
-		endCursor: string;
-		hasNextPage: boolean;
-	}
-
-	type DetailRecordsCollection = Record<string, { edges: DetailRecordsEdge[]; pageInfo: DetailRecordsPageInfo }>;
 
 	interface DetailRecordsResponse {
-		data: DetailRecordsCollection;
+		records: {
+			nodes: DetailRecord[];
+			totalCount: number;
+		};
 	}
 
 	/* ------------------- COURT OVERTIME ---------------------*/
@@ -73,57 +60,77 @@ declare global {
 		workedHours: number;
 	}
 
-	interface CourtOvertimeEdge {
-		node: CourtOvertimeRecord;
-		cursor: string;
-	}
-
-	interface CourtOvertimePageInfo {
-		endCursor: string;
-		hasNextPage: boolean;
-	}
-
-	type CourtOvertimeCollection = Record<string, { edges: CourtOvertimeEdge[]; pageInfo: CourtOvertimePageInfo }>;
-
 	interface CourtOvertimeResponse {
-		data: CourtOvertimeCollection;
+		records: {
+			nodes: CourtOvertimeRecord[];
+			totalCount: number;
+		};
 	}
 
 	/* ------------------- OFFICER IA ---------------------*/
 
 	interface OfficerIARecord {
-		actionTaken: string;
-		adminLeave: string;
-		allegation: string;
+		iaNumber: string;
 		badgeNo: number;
-		dateReceived: string;
-		dateHired: string;
-		daysOrHoursSuspended: string;
-		finding: string;
+		incidentType: string;
+		receivedDate: string;
 		firstName: string;
 		lastName: string;
-		iaNo: string;
-		incidentType: string;
-		race: string;
-		sex: string;
-		unionCode: string;
+		allegation: string;
+		finding: string;
+		actionTaken: string;
+		leaDisposition: string;
+		disposition: string;
+		occuredDate: string;
+		allegationDetails: string;
+		allegationSubtype: string;
+		allegationType: string;
+		disciplines: string;
 	}
-
-	interface OfficerIAEdge {
-		node: OfficerIARecord;
-		cursor: string;
-	}
-
-	interface OfficerIAPageInfo {
-		endCursor: string;
-		hasNextPage: boolean;
-	}
-
-	type OfficerIACollection = Record<string, { edges: OfficerIAEdge[]; pageInfo: OfficerIAPageInfo }>;
 
 	interface OfficerIAResponse {
-		data: OfficerIACollection;
+		records: {
+			nodes: OfficerIARecord[];
+			totalCount: number;
+		};
+	}
+
+	/* ------------------- FIO Record ---------------------*/
+
+	interface FIORecord {
+		contactDate: string;
+		basis: string;
+		circumstance: string;
+		city: string;
+		contactOfficerName: string;
+		fcNum: string;
+		frisked: string;
+		keySituations: string;
+		narrative: string;
+		state: string;
+		stopDuration: string;
+		streetAddress: string;
+		summonsIssued: string;
+		supervisorName: string;
+		vehicleSearched: string;
+		vehicleModel: string;
+		vehicleMake: string;
+		vehicleColor: string;
+		vehicleState: string;
+		vehicleStyle: string;
+		vehicleType: string;
+		vehicleYear: number;
+		weather: string;
+		zip: string;
+	}
+
+	interface FIORecordResponse {
+		records: {
+			nodes: FIORecord[];
+			totalCount: number;
+		};
 	}
 }
+
 // Added to prevent TS from considering this a legacy script and fail in prod
 export {};

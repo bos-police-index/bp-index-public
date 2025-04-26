@@ -13,6 +13,7 @@ declare global {
 		totalEarnings: number;
 		ia_num: number;
 		detail_num: number;
+		fio_record_num: number;
 		totalPayPercentile: number;
 	}
 

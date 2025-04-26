@@ -49,7 +49,8 @@ export default function SearchBar({ title, officerName }: SearchBarProps) {
 		<div className="flex justify-between px-2 w-screen items-center shrink mt-[0em]" onMouseLeave={handleLeave}>
 			<span className="font-urbanist" style={{ color: "white" }}></span>
 
-			{hoveredOn ? (
+			{/* Change "true" to hoveredOn to make conditionally hide */}
+			{true ? (
 				<div className="w-full max-w-[80%] relative">
 					<button type="button" style={{ marginRight: "0rem" }} className="absolute inset-y-0 grid w-8 place-content-center bg-white rounded-r-[0.6rem] text-gray-400 hover:bg-gray-300 transition-background duration-300 z-10 right-0" onClick={handleSearch}>
 						<span className="sr-only">Search</span>

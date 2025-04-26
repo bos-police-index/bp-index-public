@@ -1,18 +1,53 @@
 import Button, { ButtonProps } from "@mui/material/Button";
 import { createSvgIcon } from "@mui/material";
-import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFilterButton, GridToolbarDensitySelector, GridCsvExportOptions, useGridApiContext, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarFilterButton, GridToolbarDensitySelector, GridCsvExportOptions, useGridApiContext, GridColDef, GridFilterModel, GridSortModel } from "@mui/x-data-grid";
 import { StyledGridOverlay } from "@styles/reusedStyledComponents";
 import { bpi_light_green } from "@styles/theme/lightTheme";
+import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@apollo/client";
+import { dataToColumns } from "@pages/data/tables/[table_name]";
+import { QueryOptions } from "interfaces/operationalInterfaces";
+import { functionMapping } from "@utility/createMUIGrid";
 
-export default function DataTable({ cols, table, table_name, height, pageSize, pageSizeOptions, rowCount, hide }: { cols: GridColDef[]; table: any[]; table_name: string; height: string; pageSize: number; pageSizeOptions: number[]; rowCount: number | undefined; hide: string[] }) {
-	const hidingColumnsMap = hide.reduce((acc, item) => {
-		acc[item] = false;
-		return acc;
-	}, {});
+/*
+TODO: 
+- Fix Column selection 
+- Make Filter function make new query
+- Export Current Columns, only returns current page atm
+- export All Columns only returns current page 
+*/
 
+export default function DataTable({
+	cols,
+	table,
+	table_name,
+	pageSize,
+	pageSizeOptions,
+	rowCount,
+	hide,
+	isServerSideRendered,
+	query,
+}: {
+	cols: GridColDef[];
+	table: any[];
+	table_name: string;
+	pageSize: number;
+	pageSizeOptions: number[];
+	rowCount: number;
+	hide: string[];
+	isServerSideRendered: boolean;
+	query?: any;
+}) {
+	const [columnVisibilityModel, setColumnVisibilityModel] = useState(() =>
+		hide.reduce((acc, item) => {
+			acc[item] = false;
+			return acc;
+		}, {}),
+	);
 
-	const ExportIcon = createSvgIcon(<path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z" />, "SaveAlt");
+	/* Toolbar used in Datagrid */
 	const CustomToolbar = () => {
+		const ExportIcon = createSvgIcon(<path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z" />, "SaveAlt");
 		const buttonBaseProps: ButtonProps = {
 			color: "primary",
 			size: "small",
@@ -43,17 +78,18 @@ export default function DataTable({ cols, table, table_name, height, pageSize, p
 			<GridToolbarContainer>
 				<GridToolbarColumnsButton />
 				<GridToolbarFilterButton />
-				<GridToolbarDensitySelector />
+				{/* <GridToolbarDensitySelector /> */}
 				<Button {...buttonBaseProps} onClick={() => handleExport()}>
 					Export Current Columns
 				</Button>
-				<Button {...buttonBaseProps} onClick={() => handleExport(true)}>
+				{/* <Button {...buttonBaseProps} onClick={() => handleExport(true)}>
 					Export All Columns
-				</Button>
+				</Button> */}
 			</GridToolbarContainer>
 		);
 	};
 
+	/* Whats shown when there are no rows (regardless of filter) */
 	function noRowsOverlay() {
 		return (
 			<StyledGridOverlay style={{ margin: "3rem" }}>
@@ -80,6 +116,7 @@ export default function DataTable({ cols, table, table_name, height, pageSize, p
 		);
 	}
 
+	/* Whats shown when there are no rows bc of current filter */
 	function noResultsOverlay() {
 		return (
 			<StyledGridOverlay style={{ marginTop: "3rem" }}>
@@ -106,43 +143,200 @@ export default function DataTable({ cols, table, table_name, height, pageSize, p
 			</StyledGridOverlay>
 		);
 	}
-	return (
-		<DataGrid
-			className={"w-full bg-white"}
-			sx={{
-				"& .MuiSwitch-switchBase.Mui-checked": {
-					backgroundColor: bpi_light_green,
-				},
-				"& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-					backgroundColor: bpi_light_green,
-				},
-				"& .MuiButtonBase-root": {
-					color: bpi_light_green,
-				},
-			}}
-			columns={cols}
-			rows={table}
-			density={"compact"}
-			slots={{
-				toolbar: CustomToolbar,
-				noRowsOverlay: () => noRowsOverlay(),
-				noResultsOverlay: () => noResultsOverlay(),
-			}}
-			pageSizeOptions={pageSizeOptions}
-			autoHeight={true}
-			style={{ minHeight: "20rem" }}
-			initialState={{
-				sorting: {
-					sortModel: [{ field: "year", sort: "desc" }],
-				},
-				pagination: {
-					paginationModel: {
-						pageSize: pageSize,
+
+	/*
+	Datagrid for when all the data is already loaded on the frontend
+	*/
+	const DataGridClientSidePaginated = () => {
+		return (
+			<DataGrid
+				className={"w-full bg-white"}
+				sx={{
+					"& .MuiSwitch-switchBase.Mui-checked": {
+						backgroundColor: bpi_light_green,
 					},
-				},
-			}}
-			rowCount={rowCount}
-			columnVisibilityModel={hidingColumnsMap}
-		/>
-	);
+					"& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+						backgroundColor: bpi_light_green,
+					},
+					"& .MuiButtonBase-root": {
+						color: bpi_light_green,
+					},
+				}}
+				columns={cols}
+				rows={table}
+				density={"compact"}
+				slots={{
+					toolbar: CustomToolbar,
+					noRowsOverlay: () => noRowsOverlay(),
+					noResultsOverlay: () => noResultsOverlay(),
+				}}
+				pageSizeOptions={pageSizeOptions}
+				autoHeight={true}
+				style={{ minHeight: "20rem" }}
+				initialState={{
+					sorting: {
+						sortModel: [{ field: "year", sort: "desc" }],
+					},
+					pagination: {
+						paginationModel: {
+							pageSize: pageSize,
+						},
+					},
+				}}
+				rowCount={rowCount}
+				columnVisibilityModel={columnVisibilityModel}
+				onColumnVisibilityModelChange={(model) => setColumnVisibilityModel(model)}
+			/>
+		);
+	};
+
+	/*
+	Datagrid for when all the data is being paged server side 
+	*/
+	const DataGridServerSidePaginated = () => {
+		const [paginationModel, setPaginationModel] = useState({
+			page: 0,
+			pageSize: 25,
+		});
+		const [queryOptions, setQueryOptions] = useState<any>();
+
+		/* Used to get the correct field type so that the custom GraphQL query can match the type of the DB */
+		const getFieldType = (fieldName: string): string => {
+			const fieldType = functionMapping[table_name].find((field) => field.field === fieldName)?.type;
+			if (!fieldType) {
+				console.warn(`Field type for ${fieldName} not found in functionMapping`);
+				return "unknown";
+			}
+			if (fieldType === "string") {
+				return "string";
+			} else if (fieldType === "number") {
+				return "number";
+			}
+			return "unknown";
+		};
+
+		//TODO: Handle post processed columns. Going to need to re -unprocess the input to this function?
+		const onFilterChange = useCallback((filterModel: GridFilterModel) => {
+			// Default filter in case no filters are applied
+			const filters = {} as string[];
+			filterModel.items.forEach((item) => {
+				if (item.field && item.value !== undefined && item.value !== null && item.value !== "") {
+					// Add each field:value pair to the condition object
+
+					//get the type of the field
+
+					const FieldType = getFieldType(item.field);
+					switch (FieldType) {
+						case "string":
+							filters[item.field] = item.value.toString(); // Ensure it's a string
+							break;
+						case "number":
+							filters[item.field] = parseInt(item.value) || item.value; // Convert to integer if possible
+							break;
+						default:
+							console.warn(`Unsupported field type for ${item.field}: ${FieldType}`);
+							break;
+					}
+				}
+			});
+
+			setQueryOptions((prev) => ({
+				...prev,
+				filters: filters,
+			}));
+		}, []);
+
+		const handleSortModelChange = useCallback((sortModel: GridSortModel) => {
+			// Transform MUI's sort model to GraphQL orderBy format
+			let orderBy = ["NATURAL"];
+
+			if (sortModel.length > 0) {
+				const { field, sort } = sortModel[0];
+
+				// Turn camelCase field names to uppercase snake_case
+				orderBy = [
+					field
+						.split(/(?=[A-Z])/)
+						.join("_")
+						.toUpperCase() + (sort === "desc" ? "_DESC" : "_ASC"),
+				];
+			}
+
+			setQueryOptions((prev) => ({
+				...prev,
+				orderBy,
+			}));
+		}, []);
+
+		const { loading, error, data, refetch } = useQuery(query, {
+			variables: {
+				offset: paginationModel.page * paginationModel.pageSize,
+				page_size: paginationModel.pageSize,
+				order_by: queryOptions?.orderBy || ["NATURAL"],
+				filters: queryOptions?.filters || {},
+			},
+			fetchPolicy: "network-only",
+		});
+
+		const handlePaginationChange = (newModel) => {
+			setPaginationModel(newModel);
+			refetch({ offset: newModel.page * newModel.pageSize, page_size: paginationModel.pageSize, ...queryOptions });
+		};
+
+		useEffect(() => {
+			refetch({
+				offset: paginationModel.page * paginationModel.pageSize,
+				page_size: paginationModel.pageSize,
+				// filters: queryOptions?.filterModel ?? {},
+				order_by: queryOptions?.orderBy ?? ["NATURAL"],
+			});
+		}, [queryOptions, paginationModel.page, paginationModel.pageSize, refetch]);
+
+		let { formattedData, rowCount } = dataToColumns(data, table_name);
+
+		return (
+			<DataGrid
+				className={"w-full bg-white"}
+				sx={{
+					"& .MuiSwitch-switchBase.Mui-checked": {
+						backgroundColor: bpi_light_green,
+					},
+					"& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+						backgroundColor: bpi_light_green,
+					},
+					"& .MuiButtonBase-root": {
+						color: bpi_light_green,
+					},
+				}}
+				columns={cols}
+				rows={formattedData || []}
+				density={"compact"}
+				slots={{
+					toolbar: CustomToolbar,
+					noRowsOverlay: () => noRowsOverlay(),
+					noResultsOverlay: () => noResultsOverlay(),
+				}}
+				pageSizeOptions={pageSizeOptions}
+				autoHeight={true}
+				style={{ minHeight: "64rem" }}
+				loading={loading}
+				rowCount={rowCount}
+				// Dynamically change columns visible
+				columnVisibilityModel={columnVisibilityModel}
+				onColumnVisibilityModelChange={(model) => setColumnVisibilityModel(model)}
+				// Server Side Pagination
+				paginationMode="server"
+				paginationModel={paginationModel}
+				onPaginationModelChange={handlePaginationChange}
+				// Server Side Filtering
+				filterMode="server"
+				onFilterModelChange={onFilterChange}
+				//Server Side Sorting
+				sortingMode="server"
+				onSortModelChange={handleSortModelChange}
+			/>
+		);
+	};
+
+	return isServerSideRendered ? <DataGridServerSidePaginated /> : <DataGridClientSidePaginated />;
 }

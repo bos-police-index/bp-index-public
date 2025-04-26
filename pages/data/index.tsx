@@ -45,54 +45,66 @@ export default function Home() {
 				</div>
 
 				<div className={"flex flex-row flex-wrap gap-3 items-center justify-start pb-12 pt-8"}>
-					{tableDefinitions.map((table) => (
-						<Card
-							key={table.table}
-							style={{
-								borderColor: bpi_deep_green,
-								boxShadow: "0px 0px 4px 4px rgba(0, 0, 0, 0.1)",
-								color: bpi_deep_green,
-								width: "241px",
-								height: "170px",
-								margin: "1rem 1rem",
-								alignContent: "center",
-								transition: "transform 0.5s",
-								backgroundColor: cardFlipped == table.table ? bpi_light_green : "transparent",
-								opacity: table.isFake ? "50%" : "100%",
-								pointerEvents: table.isFake ? "none" : "all",
-							}}
-							onMouseEnter={() => handleHover(table)}
-							onMouseLeave={handleLeave}
-						>
+					{tableDefinitions.map((table, key) => {
+						const card = (
+							<Card
+								key={table.table}
+								style={{
+									borderColor: bpi_deep_green,
+									boxShadow: "0px 0px 4px 4px rgba(0, 0, 0, 0.1)",
+									color: bpi_deep_green,
+									width: "241px",
+									height: "170px",
+									margin: "1rem 1rem",
+									alignContent: "center",
+									transition: "transform 0.5s",
+									backgroundColor: cardFlipped == table.table ? bpi_light_green : "transparent",
+									opacity: table.isFake ? "50%" : "100%",
+									pointerEvents: table.isFake ? "none" : "all",
+								}}
+								onMouseEnter={() => handleHover(table)}
+								onMouseLeave={handleLeave}
+							>
+								<div
+									className={`flex flex-col items-center justify-center text-lg font-medium rounded-lg overflow-clip gap-4`}
+									style={{
+										display: "flex",
+										alignItems: "center",
+										justifyContent: "space-between",
+										color: cardFlipped === table.table ? "white" : bpi_deep_green,
+										backgroundColor: cardFlipped !== table.table ? "white" : bpi_light_green,
+										lineHeight: "1.3",
+									}}
+								>
+									{cardFlipped == table.table ? (
+										<div style={{ fontSize: "medium" }}>{table.shortDescription}</div>
+									) : (
+										<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: bpi_deep_green }}>
+											<div>{table.image.component}</div>
+											<div style={{ textAlign: "center" }}>{table.table}</div>
+										</div>
+									)}
+								</div>
+							</Card>
+						);
+
+						return !table.isFake ? (
 							<Link
 								href={{
 									pathname: "/data/tables/[table_name]",
 									query: { table_name: table.query },
 								}}
-								className={`flex flex-col items-center justify-center text-lg font-medium rounded-lg overflow-clip gap-4`}
-								style={{
-									display: "flex",
-									alignItems: "center",
-									justifyContent: "space-between",
-									color: cardFlipped === table.table ? "white" : bpi_deep_green,
-									backgroundColor: cardFlipped !== table.table ? "white" : bpi_light_green,
-									lineHeight: "1.3",
-								}}
+								key={key}
 							>
-								{cardFlipped == table.table ? (
-									<div style={{ fontSize: "medium" }}>{table.shortDescription}</div>
-								) : (
-									<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: bpi_deep_green }}>
-										<div>{table.image.component}</div>
-										<div style={{ textAlign: "center" }}>{table.table}</div>
-									</div>
-								)}
+								{card}
 							</Link>
-						</Card>
-					))}
+						) : (
+							<div key={key}>{card}</div>
+						);
+					})}
 
 					{/* dummy cards */}
-					{[...Array(4)].map((_, index) => (
+					{[...Array(3)].map((_, index) => (
 						<Card
 							key={`dummy-${index}`}
 							style={{

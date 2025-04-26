@@ -55,16 +55,6 @@ export interface PayTypeBuckets {
 	[year: number]: PayTypeBucketRow;
 }
 
-enum PoliceOfficerRanks {
-	Captain,
-	Command,
-	Detective,
-	Lieutenant,
-	Officer,
-	Other,
-	Sergeant,
-}
-
 async function fetchHomepageData(): Promise<SearchResponseData[]> {
 	const { data } = await apolloClient.query<HomepageData>({ query: GET_HOMEPAGE_DATA });
 	const rows = new Map<number, SearchResponseData>();

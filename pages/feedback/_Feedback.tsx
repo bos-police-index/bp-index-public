@@ -8,6 +8,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import axios from "axios";
 import { bpi_deep_green, bpi_light_gray } from "@styles/theme/lightTheme";
 import GoogleCaptchaWrapper from "@utility/GoogleCaptchaWrapper";
+import { checkIfEmailInputProperlyFormatted } from "@utility/utility";
 
 interface CreateNewIssueParams {
 	title: String;
@@ -85,8 +86,13 @@ const FeedbackForm = ({ setSubmit }) => {
 		if (!title) setTitleError(true);
 		if (!feedback) setFeedbackError(true);
 
-		if (!title || !feedback) {
-			console.error("Feedback and/or title not supplied");
+		if (!title || !feedback || !email) {
+			setSubmit("Please fill all fields");
+			return;
+		}
+
+		if (!checkIfEmailInputProperlyFormatted(email)) {
+			setSubmit("Invalid email format, please check your spelling");
 			return;
 		}
 
@@ -128,7 +134,7 @@ const FeedbackForm = ({ setSubmit }) => {
 					<div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "0rem 2rem", maxHeight: "65%" }}>
 						<TextField label="Title" style={{ width: "90%" }} required value={title} onChange={(input) => setTitle(input.target.value)} error={titleError} />
 						<TextField id="outlined-multiline-static" label="Feedback" multiline rows={3} style={{ width: "90%" }} required value={feedback} onChange={(input) => setFeedback(input.target.value)} error={feedbackError} />
-						<TextField label="Email (optional)" type="email" style={{ width: "90%" }} value={email} onChange={(input) => setEmail(input.target.value)} />
+						<TextField label="Email" required type="email" style={{ width: "90%" }} value={email} onChange={(input) => setEmail(input.target.value)} />
 						<Button style={{ backgroundColor: bpi_deep_green, marginTop: "1.5rem", marginBottom: "3rem" }} type="submit" variant="contained">
 							Submit Feedback
 						</Button>
