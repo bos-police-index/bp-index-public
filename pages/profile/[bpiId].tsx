@@ -10,7 +10,7 @@ import { court_overtime_alias_name, detail_alias_name, fio_record_alias_name, of
 import { GetServerSideProps } from "nextjs-routes";
 import { InferGetServerSidePropsType } from "next";
 import { fixZipCode, formatMoneyNoCents, formatPercentileNoDecimals } from "@utility/textFormatHelpers";
-import { deduplicateRecordsbyId, extractEmployeeFinancialRowsFromIndividualEmployeeFinancialQuery, getIndividualOfficerFinancial, getMostRecentOfficerFinancialData, getOfficerProfileData } from "./_data_fetchers";
+import { deduplicateRecordsbyId, extractEmployeeFinancialRowsFromIndividualEmployeeFinancialQuery, getIndividualOfficerFinancial, getMostRecentOfficerFinancialData, getOfficerProfileData } from "../../services/profile/data_fetchers";
 import { getNeighborhoodByZip } from "@utility/zipCodeMapping";
 import { Divider } from "@mui/material";
 import { TableOfContentsButton } from "@components/profileVisualizations/TableOfContentsButton";
@@ -119,42 +119,17 @@ export default function OfficerProfile(props: InferGetServerSidePropsType<typeof
 	const [tablesArr, setTablesArr] = useState<Table[]>([]);
 	const [officerDetailData, setOfficerDetailData] = useState<Filter>();
 	const [tableFilters] = useState({
-		//TODO: see if you can get rid of includes only
 		detail_record: {
-			includesOnly: [
-				"adminFeeFlag",
-				"bpdCustomerNo",
-				"customerNo",
-				"customerNoAndSeq",
-				"customerSeq",
-				"detailRank",
-				"detailType",
-				"districtWorked",
-				"endTime",
-				"fbkPayDate",
-				"location",
-				"hoursWorked",
-				"payAmount",
-				"payHours",
-				"payRate",
-				"payTrcCode",
-				"rowId",
-				"startDate",
-				"startTime",
-				"street",
-				"xStreet",
-				"trackingNo",
-				"streetNo",
-			],
+			includesOnly: [],
 			excludes: [],
 		},
 		officer_ia: {
-			includesOnly: ["iaNo", "dateReceived", "incidentType", "allegation", "finding", "actionTaken", "adminLeave", "daysOrHoursSuspended", "Citizen complaint"],
+			includesOnly: [],
 			excludes: [],
 		},
 
 		police_financial: {
-			includesOnly: ["year", "rank", "otPay", "otherPay", "quinnPay", "regularPay", "retroPay", "totalPay", "detailPay", "injuredPay"],
+			includesOnly: [],
 			excludes: [],
 		},
 		court_overtime: {
@@ -208,7 +183,7 @@ export default function OfficerProfile(props: InferGetServerSidePropsType<typeof
 					position: "relative",
 				}}
 			>
-				<div className="contain-content" style={{ width: "68.25%", margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "flex-start", marginBottom: "1.5rem" }}>
+				<div className="contain-content" style={{ width: "68.25%", margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "flex-start", marginBottom: "1.5rem" }} id="profile-header">
 					<div className="title" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: bpi_deep_green }}>
 						<p className="relative text-4xl font-bold" style={{ paddingTop: "2rem", marginLeft: "1rem", marginBottom: "1.5rem" }}>
 							{officerData.name}
