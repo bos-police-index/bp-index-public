@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import axios from "axios";
 import { bpi_deep_green, bpi_light_gray } from "@styles/theme/lightTheme";
-import GoogleCaptchaWrapper from "@utility/GoogleCaptchaWrapper";
+import GoogleCaptchaWrapper from "@components/GoogleCaptchaWrapper";
 import { checkIfEmailInputProperlyFormatted } from "@utility/utility";
 
 interface CreateNewIssueParams {

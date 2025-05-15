@@ -3,7 +3,7 @@ import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import { Tooltip } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { fetchHompage } from "@utility/dataUtils";
+import { fetchHompage } from "services/homepage/data_fetchers";
 import { StyledGridOverlay } from "@styles/reusedStyledComponents";
 import { bpi_light_green } from "@styles/theme/lightTheme";
 import { properCaseName } from "@utility/textFormatHelpers";

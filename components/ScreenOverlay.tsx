@@ -2,9 +2,8 @@ import { TbArrowBackUp } from "react-icons/tb";
 import React from "react";
 import { bpi_deep_green, bpi_light_green } from "@styles/theme/lightTheme";
 import { createSvgIcon } from "@mui/material";
-import { PDFDownloadLink, Document, Page, Text } from "@react-pdf/renderer";
 import { pdf } from "@react-pdf/renderer";
-import GlossaryTotal, { gatherAllDefinitions } from "./GlossaryTotal";
+import { gatherAllDefinitions } from "./GlossaryTotal";
 import PdfDownloadGlossary from "./PdfDownloadGlossary";
 
 interface ScreenOverlayProps {

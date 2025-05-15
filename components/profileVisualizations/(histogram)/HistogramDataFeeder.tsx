@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Histogram } from "./Histogram";
-import { fetchFinancialsHistogram, PayTypeBuckets } from "@utility/dataUtils";
+import { fetchFinancialsHistogram } from "services/profile/financial_histogram/data_fetchers";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import { PayTypeMap } from "./FinancialHistogram";

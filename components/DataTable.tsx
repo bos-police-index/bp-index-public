@@ -6,13 +6,10 @@ import { bpi_light_green } from "@styles/theme/lightTheme";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { dataToColumns } from "@pages/data/tables/[table_name]";
-import { QueryOptions } from "interfaces/operationalInterfaces";
 import { functionMapping } from "@utility/createMUIGrid";
 
 /*
 TODO: 
-- Fix Column selection 
-- Make Filter function make new query
 - Export Current Columns, only returns current page atm
 - export All Columns only returns current page 
 */

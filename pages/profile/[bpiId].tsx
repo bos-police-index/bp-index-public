@@ -15,7 +15,7 @@ import { getNeighborhoodByZip } from "@utility/zipCodeMapping";
 import { Divider } from "@mui/material";
 import { TableOfContentsButton } from "@components/profileVisualizations/TableOfContentsButton";
 
-export interface Table {
+interface Table {
 	title: string;
 	tables: DataTables;
 }

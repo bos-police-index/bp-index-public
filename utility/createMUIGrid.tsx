@@ -1,7 +1,7 @@
 import { GridColDef } from "@mui/x-data-grid";
 import React from "react";
 import DataTable from "@components/DataTable";
-import { rgbToHex, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { formatDateShort, formatDate, formatHours, formatMoney, formatTime, yAndNToBoolean, fixNameOrdering, noNullStringToBool, fixZipCode } from "./textFormatHelpers";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";

@@ -6,37 +6,14 @@ import { formatMoney } from "@utility/textFormatHelpers";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-interface EmployeeFinancial {
-	id: number;
-	__typename: "LinkSu24EmployeeFinancial";
-	race: "WHITE" | "BLACK" | "HISPANIC" | "ASIAN" | "OTHER";
-	rank: string;
-	sex: "M" | "F";
-	unit: string;
-	year: number;
-	zipCode: string;
-	unionCode: string;
-	badgeNo: number;
-	firstName: string;
-	lastName: string;
-	otPay: number;
-	otherPay: number;
-	quinnPay: number;
-	regularPay: number;
-	retroPay: number;
-	totalPay: number;
-	detailPay: number;
-	injuredPay: number;
-}
-
 function PayStackedBarChart(data) {
-	const tableData: EmployeeFinancial[] = data?.data?.props?.table || [];
+	const tableData: FinancialEmployeeData[] = data?.data?.props?.table || [];
 	if (!tableData || !tableData.length) {
 		return <div>No financial data available</div>;
 	}
 
 	// Mapping the data to extract relevant pay fields for each year
-	const financialYearsPay = tableData.map((table: EmployeeFinancial) => ({
+	const financialYearsPay = tableData.map((table: FinancialEmployeeData) => ({
 		year: table.year,
 		regularPay: table.regularPay,
 		detailPay: table.detailPay,

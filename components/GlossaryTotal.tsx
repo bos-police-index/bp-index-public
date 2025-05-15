@@ -1,40 +1,12 @@
 "use client";
 import getHeaderWithDescription from "@utility/columnDefinitions";
 import { functionMapping } from "@utility/createMUIGrid";
-import { OverridableComponent } from "@mui/material/OverridableComponent";
-import { SvgIconTypeMap } from "@mui/material";
 import { bpi_deep_green } from "@styles/theme/lightTheme";
 import { Typography } from "antd";
 
-export interface ColumnObject {
+interface ColumnObject {
 	name: string;
 	description: string;
-}
-
-export interface GlossaryProps {
-	columnObjects: ColumnObject[];
-}
-
-export interface ColumnObject {
-	name: string;
-	description: string;
-}
-
-export interface GlossaryProps {
-	columnObjects: ColumnObject[];
-}
-
-interface TableDefinition {
-	source: string | React.JSX.Element;
-	table: string;
-	query: string;
-	image: {
-		component: React.JSX.Element;
-		src: OverridableComponent<SvgIconTypeMap<{}, "svg">> & {};
-	};
-	isFake: boolean;
-	shortDescription: string;
-	longDescription: string;
 }
 
 interface GlossaryTotalProps {

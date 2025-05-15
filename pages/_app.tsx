@@ -23,6 +23,7 @@ import Navbar from "@components/Navbar";
 import { ApolloProvider } from "@apollo/client";
 import apolloClient from "@lib/apollo-client";
 import Link from "next/link";
+
 interface ApplicationAppProps extends AppProps {
 	emotionCache?: EmotionCache;
 }

@@ -12,7 +12,7 @@ import FindInPageIcon from "@mui/icons-material/FindInPage";
 import { CSSProperties } from "react";
 import { bpi_deep_green } from "@styles/theme/lightTheme";
 
-export interface IconWrapperProps {
+interface IconWrapperProps {
 	Icon: React.ElementType;
 	fontSize?: string | number;
 	color?: string;
@@ -27,7 +27,7 @@ const IconWrapper = ({ Icon, fontSize = "48px", color = bpi_deep_green }: IconWr
 	return <Icon style={iconStyle} />;
 };
 
-// IMPORTANT! As more data is added be sure to add the source they are from to this
+// TODO:! As more data is added be sure to add the source they are from to this
 const tablesFromAnalyzeBoston = ["fio_record"];
 const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "officer_misconduct"];
 
@@ -117,7 +117,7 @@ const rawTableDefinitions = [
 	},
 ];
 
-export const tableDefinitions = rawTableDefinitions.map((table) => ({
+export const tableDefinitions: TableDefinition[] = rawTableDefinitions.map((table) => ({
 	...table,
 	source: tablesFromPublicRecordsRequests.includes(table.query) ? "Public Records Request" : tablesFromAnalyzeBoston.includes(table.query) ? <a href="https://data.boston.gov/">Analyze Boston</a> : "Public Records Request",
 }));

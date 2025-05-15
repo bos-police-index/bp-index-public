@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/router";
 import { Tooltip } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { fetchHompage } from "@utility/dataUtils";
+import { fetchHompage } from "services/homepage/data_fetchers";
 import backgroundImage from "../public/fist-in-air.jpeg";
 import { properCaseName } from "@utility/textFormatHelpers";
 import { StyledGridOverlay } from "@styles/reusedStyledComponents";

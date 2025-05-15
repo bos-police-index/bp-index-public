@@ -13,7 +13,7 @@ Read more about the specifics of the directories in their respective `README.md`
 
 **`/components`** - where all components live that are referenced 1 or more times in `/pages`. These are kept here as they aren't routable and it promotes reusability + organization. Consider creating components to put in this directory instead of writing extremely long files in `/pages` 
 
-**`/interfaces`** - where all TypeScript interfaces live for code cleanliness and reusability purposes.
+**`/interfaces`** - where all reused TypeScript interfaces live for code cleanliness and reusability purposes. Interfaces that are only used in the source file and a little elsewhere live in their source file.
 
 **`/lib`** - where all GraphQL queries live as well as the Apollo Client Initialization 
 
