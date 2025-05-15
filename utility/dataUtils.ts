@@ -146,6 +146,7 @@ export const fetchFinancialsHistogram = async (rank: String) => {
 	try {
 		const allFinancials = await fetchFinancialsHistogramData();
 
+		//TODO: Remove hardcoding of "2023" in case that in the future we don't have any data for 2023
 		// organize values into pay types
 		var rankMatchingPayTypeBuckets: PayTypeBuckets = {
 			[2023]: {

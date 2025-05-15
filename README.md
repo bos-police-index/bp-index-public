@@ -4,44 +4,37 @@
 
 ## System Architecture:
 
-This web-app is a site with a [Next.js](https://nextjs.org/) framework, with a PostreSQL server as the backend. We also use [Material UI](https://mui.com) and [TSX](https://www.npmjs.com/package/tsx) to assist in the front-end.
+This web-app is a site with a [Next.js](https://nextjs.org/) framework, with a PostreSQL server as the backend interacted with using [GraphQL](https://graphql.org/). We also use [Material UI](https://mui.com) and [TSX](https://www.npmjs.com/package/tsx) to assist in the front-end.
 
 The [Boston Police Index](https://dev-bpi.netlify.app), aims to be a successor to the now inactive [Woke Windows](https://www.wokewindows.org) project, where we aim to make Boston police data as accessible and easy to understand for as many people as possible.
 
-## How to install and use Prisma
+# Directory Structure Overview
+Read more about the specifics of the directories in their respective `README.md`'s
 
-Prisma is a next generation ORM that can be used to access databases in node.js and Typescript applications. Essentially, for this project, you are attempting to build a full stack application that fetches data from the backend and presents the tables on the website.
+**`/components`** - where all components live that are referenced 1 or more times in `/pages`. These are kept here as they aren't routable and it promotes reusability + organization. Consider creating components to put in this directory instead of writing extremely long files in `/pages` 
 
-Prerequisites
-Node.js
-PostgreSQL Database
-Github account
+**`/interfaces`** - where all TypeScript interfaces live for code cleanliness and reusability purposes.
 
-Next, refer to this link and follow the steps to test out Prisma.
-https://vercel.com/guides/nextjs-prisma-postgres
+**`/lib`** - where all GraphQL queries live as well as the Apollo Client Initialization 
 
-When you reach step 2 in the tutorial where it asks you for a database url, talk to the professor and ask for the database url.
-Note that, if you try to run the repo locally, you will realize that you need to create a dummy .env file on the root of the directory because github hides the database url for the public to see. Meaning you would need to create a .env file and include the url every time.
+**`/pages`** - the standard directory in Next.js for routing ([brush up about it here](https://nextjs.org/docs/pages/building-your-application/routing/pages-and-layouts)). Every directory is a path, so everything in this directory is routable ([except for those starting with _](https://nextjs.org/docs/app/getting-started/project-structure#private-folders)). For components of specific pages that most likely have no other use (ex: `./feedback/_FeedbackForm.tsx`) you can colocate those with their respective page. `./profile` and `./data/tables` make use of [dynamic routes](https://nextjs.org/docs/app/getting-started/project-structure#private-folders).
 
-## Transitioning from Prisma to GraphQL
+**`/public`** - the standard directory in Next.js for images. Keep all src images in this directory. Many of these images are not actually being used, feel free to clean those out.
 
-Currently, we are in the process of moving from Prisma to querying using GraphQL. Some parts of the application still use Prisma, but they should be converted to use GraphQL.
+**`/services`** - where complex data fetching logic can be placed instead of bloating files in the `/pages` directory. Serves same purpose as `/components` but for data fetching.
 
-# .env
+**`/styles`** - where themes, global styles, and hex code variables are stored. Only need to touch this if changing the color / ratios of the site.
 
-DATABASE_URL = "URL"
-NEXT_PUBLIC_API_URL="URL"
+**`/utility`** - where ad hoc helper methods, text formatters, and maps live. 
 
-Step 3
-The tutorial shows you how to create a schema in your database. In other words, you would need to create columns and define data types.
-npx prisma db push to make the changes to the database.
 
-npx prisma studio will open an url and you can see the database.
+# Getting Set Up to Contribute
+1. Populate your own `.env` file using `.env.example`
+2. Familiarize yourself with the repository structure (each high level directory has a `README.md` but below there is a summary of what each directory is for)
+3. Consult **Work to Be Done** to see what you can work on
 
 ## Testing Local Changes
-
 To test changes locally, run either commands:
-npm run dev will open up a url which then directs you to the website of the page..
 
 ```bash
 npm run dev
@@ -49,51 +42,69 @@ npm run dev
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying any file. The page auto-updates as you edit the file.
+Open [http://localhost:3010](http://localhost:3010) with your browser to see the result.
 
 # Next.js Configuration Information
-
 1. We're using typed routes for Next.js. This means that when you are navigating using `<Link />` or similar methods you will get type checking and type hints for the routes.
 2. We are using `superjson` to handle automatic serialization and deserialization of data between the server and the client. This means that you can use `Date` objects and other complex types in your data and they will be serialized and deserialized automatically. It should be noted that the data you return from `getStaticProps` etc should still be fairly "simple" in nature as there is a cost to serialization and deserialization.
 
-## How the database works
-* Import the datasets into DBeaver and select the categories for each variable such as int, date, time…
-* Then go to prisma file, select schema.prisma to assign @id from the variable and remove the @ignore for each dataset
-* The PlaceHolder tables are directly connected with the .csv files of the datasets, the user should be able to download the .csv files from under the table “download” button.
 
-## Contribution Steps
-**Step 1**: Move task from “Sprint Backlog” to “In Progress”
+# Work to Be Done
+This is a high level description of what needs to be done. To get access to the [Kanban board](https://www.atlassian.com/agile/kanban/boards#:~:text=A%20kanban%20board%20is%20an,order%20in%20their%20daily%20work.) please consult the onboarding materials in Google Drive. Particularly the Project Description.
 
-Log in to the [Boston Police Index Taiga Page](https://tree.taiga.io/project/langdon-boston-police-index/timeline) and click “Scrum” then “Backlog”. Click a task you want to work on and click “In Progress” for a task you want to work on.
+## 🚀 New Functionality
 
-**Step 2**: Create a branch
+---
 
-Click onto the top left “Branch” button and create a new branch by clicking the “New Branch Button on the top right. Name the new branch something related to the change.
+### 1. Server-Side Pagination Rollout for `/data`
 
-**Step 3**: Add any changes or modifications
+To achieve a **60× performance gain**, we are deprecating client-side pagination. As a result, all core features on the `/data` page need to be re-implemented using server-side logic.
 
-After switching to the new branch in your IDE, make modifications to complete the selected task from Step 1. Make sure to test your changes before pushing as outlined in [Testing Local Changes](#testing-local-changes).
+**Progress Checklist:**
 
-**Step 4**: Submit a pull request to Git
+- [x] Single Page Pagination  
+- [x] Exact Filtering (`=`)  
+- [x] Sorting (`ASC` / `DESC`)  
+- [x] Select Columns  
+- [ ] Fuzzy Filtering (`contains`)  
+- [ ] Export Current Columns (active filter only)  
+- [ ] Export Entire Table  
 
-Click on the “Pull request” button and create a new pull request by clicking the “New pull request” button on the top right. Select the correct branch, confirm that changes are correct, and submit the pull request.
+---
 
-**Step 5**: Other teammates review the new changes and give a “thumbs up”
+### 2. UX Enhancements for Server-Side Pagination
 
-A teammate should notify others in the group using the appropriate methods when a pull request is submitted. A separate teammate should check the changes the made and give it a “thumbs up” by moving the task from “In Progress” to “Ready for Review” as outlined in Step 6
+Improving user experience alongside functional upgrades.
 
-**Step 6**: Move task from “In Progress” to “Ready for Review”
+**Planned Improvements:**
 
-Log in to the [Boston Police Index Taiga Page](https://tree.taiga.io/project/langdon-boston-police-index/timeline) and click “Scrum” then “Backlog”. Click a task you want to work on and click “Ready for Review” for a task you want reviewed.
+- [ ] Preload next **X** pages to reduce pagination lag  
+- [ ] Add "Drill Down" pages for each row (similar to officer profile pages) 
 
-**Step 7**: Wait for the project manager to approve the Pull Request before merging
+## 👷‍♂️ Known Issues to Solve
+### 1. Filtering vs Formatted Data Mismatch
 
-Patience is important, please wait for the project manager to approve the pull request.
+**Problem:**  
+Users see *formatted* data in `/data`, but filters operate on the *raw* data. This causes confusion when filtering doesn’t return expected results.
 
-**Step 8**: Once approved, merge
+**Why this happens:**
+- We use **text formatters** to make raw data more legible.
+- Filters are applied to unformatted (raw) values.
 
-After the project manager approves the changes, go ahead and merge the new branch to the main branch.
+**Considered Solutions:**
 
-**Step 9**: Once merged, move the task to “Done”
+| Possible Solution                     | Drawbacks                                                                                          |
+|--------------------------------------|-----------------------------------------------------------------------------------------------------|
+| Change backend data to be legible    | Not sustainable. Every new dataset would need transformation. Risk of losing important raw details. |
+| Abandon all text formatters          | Reduces readability. Raw data may be inconsistently typed (e.g., `"T"`/`"F"` strings vs booleans).  |
+
+---
+
+### 2. Pagination Limits Export and Performance
+
+**Problem:**  
+The data page only loads the **currently visible rows** on the frontend.
+
+**Implications:**
+- "Export Current Columns" only exports the **current page**.
+- Pagination is **slow** due to data fetching on each page switch.
