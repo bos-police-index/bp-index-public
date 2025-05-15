@@ -9,7 +9,6 @@ This web-app is a site with a [Next.js](https://nextjs.org/) framework, with a P
 The [Boston Police Index](https://dev-bpi.netlify.app), aims to be a successor to the now inactive [Woke Windows](https://www.wokewindows.org) project, where we aim to make Boston police data as accessible and easy to understand for as many people as possible.
 
 # Directory Structure Overview
-Read more about the specifics of the directories in their respective `README.md`'s
 
 **`/components`** - where all components live that are referenced 1 or more times in `/pages`. These are kept here as they aren't routable and it promotes reusability + organization. Consider creating components to put in this directory instead of writing extremely long files in `/pages` 
 
@@ -32,6 +31,7 @@ Read more about the specifics of the directories in their respective `README.md`
 1. Populate your own `.env` file using `.env.example`
 2. Familiarize yourself with the repository structure (each high level directory has a `README.md` but below there is a summary of what each directory is for)
 3. Consult **Work to Be Done** to see what you can work on
+4. Get access to all of the resources in the onboarding document (GraphiQL, Notion Kanban, GitHub Private Repo, Postgres DB through DBeaver, Slack channel, `.env` secrets)
 
 ## Testing Local Changes
 To test changes locally, run either commands:
