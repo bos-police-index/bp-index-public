@@ -43,13 +43,14 @@ export const executeDataPageQuery = async (table_name, query, variables) => {
 	return data;
 };
 
-// ADDING NEW DATA? Add a new key-value pair for each new table 
-// required that year is the first part of the date
+/* 
+ADDING NEW DATA? Add a new key-value pair for each new table 
+required that year is the first part of the date
+ */
 export const tableDateColumnMap = {
 	detail_record: "startDate",
 	court_overtime: "otDate",
 	officer_misconduct: "occuredDate",
-	// fio_record: "contactDate" // bad format, can't use well
 	fio_record: "year",
 };
 

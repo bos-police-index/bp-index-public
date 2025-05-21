@@ -1,5 +1,6 @@
 import apolloClient from "@lib/apollo-client";
 import { INDIVIDUAL_OFFICER_FINANCIAL_AND_EMPLOYEE } from "@lib/graphql/queries";
+import { officer_financial_alias_name } from "@utility/dataViewAliases";
 
 /*
 Function that fetches the financial data by BPI ID for a specific officer
@@ -23,7 +24,7 @@ export async function getIndividualOfficerFinancial(bpiId: string) {
 		};
 	}
 
-	return financialAndEmployeeResponse.data.allLinkSu24EmployeeFinancials.nodes;
+	return financialAndEmployeeResponse.data[officer_financial_alias_name].nodes;
 }
 
 export function getMostRecentOfficerFinancialData(data) {

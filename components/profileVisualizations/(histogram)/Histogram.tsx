@@ -103,6 +103,7 @@ export const Histogram = ({ width, height, data, verticalLineX, mode }: Histogra
 
 	const sortedData = useMemo(() => [...data].sort((a, b) => a - b), [data]);
 
+	// Used to calculate percentile
 	const percentile = useMemo(() => {
 		if (!sortedData.length || verticalLineX == null) return null;
 

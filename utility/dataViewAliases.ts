@@ -12,7 +12,7 @@ export const court_overtime_alias_name = "allVwCourtOvertimes";
 export const fio_record_alias_name = "allVwFieldInterrogationAndObservations";
 
 // PROFILE PAGE
-export const homepage_alias_name = "homepage";
+export const homepage_alias_name = "allHomepages";
 export const officer_financial_alias_name = "allVwEmployeeFinancials";
 export const officer_ia_alias_name = "allVwEmployeeIaNews";
 
