@@ -1,19 +1,22 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { functionMapping, getServerSidePaginationMUIGrid } from "@utility/createMUIGrid";
-import apolloClient from "@lib/apollo-client";
-import { GET_YEAR_RANGE_OF_DATASET } from "@lib/graphql/queries";
-import IconWrapper, { tableDefinitions } from "@utility/tableDefinitions";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import getHeaderWithDescription from "@utility/columnDefinitions";
-import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
-import ScreenOverlay from "@components/ScreenOverlay";
+
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { Button } from "antd";
-import GlossaryTotal from "@components/GlossaryTotal";
-import { table_name_to_alias_map } from "@utility/dataViewAliases";
+
+import apolloClient from "@lib/apollo-client";
+import { GET_YEAR_RANGE_OF_DATASET } from "@lib/graphql/queries";
+
+import { functionMapping, getServerSidePaginationMUIGrid } from "@utility/createMUIGrid";
+import IconWrapper, { tableDefinitions } from "@utility/tableDefinitions";
+import getHeaderWithDescription from "@utility/columnDefinitions";
 import { getYearFromAnyFormat, getYearFromDate } from "@utility/textFormatHelpers";
+import { table_name_to_alias_map } from "@utility/dataViewAliases";
 import { tableDateColumnMap } from "@utility/queryUtils";
+import ScreenOverlay from "@components/ScreenOverlay";
+import GlossaryTotal from "@components/GlossaryTotal";
+import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
 
 export const dataToColumns = (data, table_name: string) => {
 	const viewName = table_name_to_alias_map[table_name];
@@ -56,7 +59,6 @@ export const dataToColumns = (data, table_name: string) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
 	const table_name = context.params?.table_name as string;
 
-	// 404
 	if (!table_name_to_alias_map[table_name] || !table_name) {
 		return {
 			notFound: true,
@@ -73,12 +75,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 			const dateRange = await apolloClient.query({ query: GET_YEAR_RANGE_OF_DATASET(table_name, tableDateColumnMap[table_name], offset, earliestNeeded, latestNeeded) });
 
 			if (earliestNeeded && dateRange.data.earliest.nodes[0] != null ? dateRange.data.earliest.nodes[0][tableDateColumnMap[table_name]] : false) {
-				// console.log(dateRange.data.earliest.nodes[0][tableDateColumnMap[table_name]], offset);
 				dates.earliest = dateRange.data.earliest.nodes[0][tableDateColumnMap[table_name]];
 				earliestNeeded = false;
 			}
 			if (latestNeeded && dateRange.data.latest.nodes[0] != null ? dateRange.data.latest.nodes[0][tableDateColumnMap[table_name]] : false) {
-				// console.log(dateRange.data.latest.nodes[0][tableDateColumnMap[table_name]], offset);
 				dates.latest = dateRange.data.latest.nodes[0][tableDateColumnMap[table_name]];
 				latestNeeded = false;
 			}
@@ -106,10 +106,6 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 		document.getElementById("screen-overlay").classList.add("flex");
 		document.getElementById("screen-overlay").classList.remove("hidden");
 	};
-
-	// const appendRows = useCallback((newData) => {
-	// 	setRows((prevRows) => [...prevRows, ...newData]);
-	// }, []);
 
 	const table = getServerSidePaginationMUIGrid(props.table_name, [], []);
 	return (
@@ -150,8 +146,8 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 					<ScreenOverlay title={currentOverlay.title} children={currentOverlay.table} />
 				</div>
 			</div>
-			<div style={{ backgroundColor: bpi_light_gray, paddingTop: "2rem", width: "100vw", marginLeft: 0, marginTop: "2rem" }}>
-				<div className={"max-w-1128 h-full "} style={{ width: "68.25%" }}>
+			<div style={{ backgroundColor: bpi_light_gray, paddingTop: "2rem", marginLeft: 0, marginTop: "2rem" }}>
+				<div className={"max-w-1128 h-full "} style={{ width: "68.25%", margin: "0 auto" }}> {/* Added margin: "0 auto" for centering */}
 					<div style={{ display: "flex", alignItems: "center", justifyContent: "end", marginBottom: "1rem" }}>
 						<Button onClick={handleSeeAllClick} type="primary" shape="round" className={" text-white font-urbanist active:scale-[.95] p-2 w-32 shadow-xl transition-button duration-300 hover:bg-primary-hover"} style={{ backgroundColor: bpi_deep_green, height: "2.3rem" }}>
 							Table Glossary

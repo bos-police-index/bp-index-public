@@ -1,28 +1,29 @@
 import { FunctionComponent, useEffect, useState } from "react";
-import type { AppProps } from "next/app";
 import { CacheProvider, EmotionCache } from "@emotion/react";
+import Link from "next/link";
+import Head from "next/head";
+import type { AppProps } from "next/app";
+import { useRouter } from "next/router";
+import { ApolloProvider } from "@apollo/client";
 import { ThemeProvider, CssBaseline, createTheme } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Loading from "@components/Loading";
+import { Toaster } from "sonner";
+import NProgress from "nprogress";
 
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
-import createEmotionCache from "../utility/createEmotionCache";
-import "../styles/globals.css";
-
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { Toaster } from "sonner";
-import NProgress from "nprogress";
-import "nprogress/nprogress.css";
-import lightThemeOptions from "@styles/theme/lightTheme";
+import Loading from "@components/Loading";
 import Navbar from "@components/Navbar";
-import { ApolloProvider } from "@apollo/client";
+
+import createEmotionCache from "@utility/createEmotionCache";
 import apolloClient from "@lib/apollo-client";
-import Link from "next/link";
+
+import "@styles/globals.css";
+import lightThemeOptions from "@styles/theme/lightTheme";
+import "nprogress/nprogress.css";
 
 interface ApplicationAppProps extends AppProps {
 	emotionCache?: EmotionCache;
@@ -82,26 +83,34 @@ const Application: FunctionComponent<ApplicationAppProps> = (props) => {
 				<ThemeProvider theme={lightTheme}>
 					<QueryClientProvider client={queryClient}>
 						<CssBaseline />
-						<div data-theme="light" className={"max-w-screen h-screen overflow-clip bg-transparent max-h-screen"}>
-							<div id={"wrapper"} className={"max-w-screen h-full overflow-y-auto overflow-x-clip flex flex-col"}>
+						<div data-theme="light" className={"max-w-screen h-screen overflow-clip bg-transparent max-h-screen flex flex-col"}>
+							<Navbar /> 
+							
+							<div id={"wrapper"} className={"flex-1 max-w-screen overflow-y-auto overflow-x-hidden"}> {/* Takes remaining height, scrolls vertically, hides horizontal overflow */}
 								<Head>
 									<title>Boston Police Index</title>
 									<link rel="icon" href="/favicon.ico" />
 								</Head>
-								<div id="allow-screen-stretch" style={{ height: "100vh", margin: "0 auto", width: "100%" }}>
-									<Navbar />
-									<main className="flex-1 bg-transparent">
+								
+								<div id="allow-screen-stretch" style={{ margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", minHeight: "100%" }}> {/* Ensures it stretches to at least fill wrapper */}
+									<main className="flex-1 bg-transparent"> 
 										{loading ? <Loading /> : <Component {...pageProps} />}
 										<Toaster richColors closeButton />
-										<div style={{ background: "none ", fontSize: "x-small", display: "flex", alignItems: "center", justifyContent: "center" }}>
+										<div style={{ background: "none ", fontSize: "x-small", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem 0" }}>
 											This is a beta version of the website, if you experience any bugs or would like to recommend a feature, please click{" "}
 											<b>
 												<Link href="/feedback" content="here">
 													{" "}
 													&nbsp;<u>here</u>&nbsp;
-												</Link>{" "}
+												</Link>
 											</b>
-											to submit a feedback form
+											. For more information, please visit the FAQ page{" "}
+											<b>
+												<Link href="/about" scroll={false}>
+													&nbsp;<u>here</u>
+												</Link>
+											</b>
+											.
 										</div>
 									</main>
 								</div>

@@ -19,30 +19,31 @@ interface CreateNewIssueParams {
 const FeedbackForm = ({ setSubmit }) => {
 	const { executeRecaptcha } = useGoogleReCaptcha();
 
-	const [title, setTitle] = useState<String>("");
+	const [subject, setSubject] = useState<String>("");
 	const [feedback, setFeedback] = useState<String>("");
 	const [email, setEmail] = useState<String>("");
 
-	const [titleError, setTitleError] = useState<boolean>(false);
+	const [subjectError, setSubjectError] = useState<boolean>(false);
 	const [feedbackError, setFeedbackError] = useState<boolean>(false);
+	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
 	const gitToken = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
 	const gitOwner = process.env.NEXT_PUBLIC_GITHUB_REPO_OWNER;
 	const gitRepoName = process.env.NEXT_PUBLIC_GITHUB_REPO_NAME;
 	const gitRepoAssignee = process.env.NEXT_PUBLIC_GITHUB_ASSIGNEE;
-	const secretCaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SECRET_KEY;
+	// const secretCaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SECRET_KEY;
 
 	const octokit = new Octokit({
 		auth: gitToken,
 	});
 
-	async function createNewIssue({ title, feedback, contactInfo }: CreateNewIssueParams) {
+	async function createNewIssue({ subject, feedback, contactInfo }: { subject: String; feedback: String; contactInfo: String | undefined; }) {
 		const body = `**User's Feedback:** ${feedback}\n\n**Contact Info:** ${contactInfo}`;
 		try {
 			const response = await octokit.request(`POST /repos/${gitOwner}/${gitRepoName}/issues`, {
 				owner: gitOwner,
 				repo: gitRepoName,
-				title,
+				title: subject,
 				body,
 				assignees: [gitRepoAssignee],
 				labels: ["feedback"],
@@ -57,14 +58,16 @@ const FeedbackForm = ({ setSubmit }) => {
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
+		setIsSubmitting(true);
 
 		// Reset error states
-		setTitleError(false);
+		setSubjectError(false);
 		setFeedbackError(false);
 		setSubmit("");
 
 		if (!executeRecaptcha) {
 			console.log("not available to execute captcha");
+			setIsSubmitting(false);
 			return;
 		}
 
@@ -83,62 +86,195 @@ const FeedbackForm = ({ setSubmit }) => {
 		});
 
 		// Validate input fields
-		if (!title) setTitleError(true);
+		if (!subject) setSubjectError(true);
 		if (!feedback) setFeedbackError(true);
 
-		if (!title || !feedback || !email) {
+		if (!subject || !feedback || !email) {
 			setSubmit("Please fill all fields");
+			setIsSubmitting(false);
 			return;
 		}
 
 		if (!checkIfEmailInputProperlyFormatted(email)) {
 			setSubmit("Invalid email format, please check your spelling");
+			setIsSubmitting(false);
 			return;
 		}
 
 		if (response?.data?.success === true) {
-			// console.log(`Success with score of ${response.data.score}`);
 			setSubmit("Recatpcha verified and form submitted");
+			
+			await createNewIssue({
+				subject,
+				feedback,
+				contactInfo: email,
+			});
+			
+			setSubject("");
+			setFeedback("");
+			setEmail("");
 		} else {
-			// console.log(`Failed with score ${response?.data?.score}`);
 			setSubmit("Failed to verify captcha. You may be a robot.");
-			return;
 		}
-
-		await createNewIssue({
-			title,
-			feedback,
-			contactInfo: email,
-		});
-		setTitle("");
-		setFeedback("");
-		setEmail("");
+		
+		setIsSubmitting(false);
 	};
 
 	return (
-		<div style={{ height: "87vh", width: "100vw", padding: "4rem 0", color: bpi_deep_green, backgroundColor: bpi_light_gray }}>
-			<div>
+		<div style={{ 
+			minHeight: "100vh", 
+			width: "100vw", 
+			display: "flex", 
+			alignItems: "center", 
+			justifyContent: "center", 
+			backgroundColor: bpi_light_gray,
+			padding: "2rem 0"
+		}}>
+			<div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
 				<Box
 					component="form"
 					onSubmit={handleSubmit}
 					sx={{
-						"& .MuiTextField-root": { m: 1, width: "25ch" },
+						'& .MuiTextField-root': { 
+							width: '100%',
+							my: 1.5,
+							'& .MuiOutlinedInput-root': {
+								'&:hover fieldset': {
+									borderColor: bpi_deep_green,
+								},
+								'&.Mui-focused fieldset': {
+									borderColor: bpi_deep_green,
+									borderWidth: '2px',
+								},
+							},
+							'& .MuiFormLabel-root.Mui-focused': {
+								color: bpi_deep_green,
+							},
+						},
+						boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+						borderRadius: 3,
+						p: { xs: 3, sm: 5 },
+						backgroundColor: 'white',
+						width: { xs: '92%', sm: '70%', md: '50%', lg: '40%' },
+						maxWidth: 550,
+						display: 'flex',
+						flexDirection: 'column',
+						gap: 1,
+						position: 'relative',
+						overflow: 'hidden'
 					}}
 					noValidate
 					autoComplete="off"
-					style={{ margin: "0 auto", backgroundColor: "white", width: "50vw", height: "70%", borderRadius: "14px", boxShadow: "0px 0px 8px 3px rgba(0, 0, 0, 0.1)" }}
 				>
-					<div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem 0" }}>
-						<p className="text-4xl font-bold">Feedback Form</p>
+					<div 
+						style={{ 
+							position: 'absolute', 
+							top: 0, 
+							left: 0, 
+							right: 0, 
+							height: '4px', 
+							background: `linear-gradient(90deg, ${bpi_deep_green} 0%, #3bb78f 100%)` 
+						}}
+					/>
+					
+					<div style={{ width: '100%', textAlign: 'center', marginBottom: '1.8rem' }}>
+						<h1
+							className="text-4xl font-bold" 
+							style={{ 
+								color: bpi_deep_green, 
+								letterSpacing: 1,
+								margin: '0 0 0.5rem 0',
+								fontSize: '2rem' 
+							}}
+						>
+							Feedback Form
+						</h1>
+						<p
+							style={{ 
+								color: '#555', 
+								fontSize: '0.95rem', 
+								marginTop: 8,
+								fontWeight: 400 
+							}}
+						>
+							We value your feedback. Please share your thoughts with us.
+						</p>
 					</div>
-					<div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "0rem 2rem", maxHeight: "65%" }}>
-						<TextField label="Title" style={{ width: "90%" }} required value={title} onChange={(input) => setTitle(input.target.value)} error={titleError} />
-						<TextField id="outlined-multiline-static" label="Feedback" multiline rows={3} style={{ width: "90%" }} required value={feedback} onChange={(input) => setFeedback(input.target.value)} error={feedbackError} />
-						<TextField label="Email" required type="email" style={{ width: "90%" }} value={email} onChange={(input) => setEmail(input.target.value)} />
-						<Button style={{ backgroundColor: bpi_deep_green, marginTop: "1.5rem", marginBottom: "3rem" }} type="submit" variant="contained">
-							Submit Feedback
+					
+					<TextField
+						label="Email Address"
+						required
+						type="email"
+						variant="outlined"
+						value={email}
+						onChange={(input) => setEmail(input.target.value)}
+						InputProps={{ 
+							style: { borderRadius: 8 }
+						}}
+					/>
+					
+					<TextField
+						label="Subject"
+						required
+						variant="outlined"
+						value={subject}
+						onChange={(input) => setSubject(input.target.value)}
+						error={subjectError}
+						helperText={subjectError ? "Subject is required" : ""}
+						InputProps={{ 
+							style: { borderRadius: 8 }
+						}}
+					/>
+					
+					<TextField
+						id="outlined-multiline-static"
+						label="Feedback"
+						multiline
+						rows={5}
+						required
+						variant="outlined"
+						value={feedback}
+						onChange={(input) => setFeedback(input.target.value)}
+						error={feedbackError}
+						helperText={feedbackError ? "Feedback is required" : ""}
+						InputProps={{ 
+							style: { borderRadius: 8 }
+						}}
+					/>
+					
+					<div style={{ width: '100%', marginTop: '1.5rem' }}>
+						<Button
+							style={{
+								background: `linear-gradient(90deg, ${bpi_deep_green} 0%, #3bb78f 100%)`,
+								color: 'white',
+								borderRadius: 8,
+								padding: '0.8rem 0',
+								fontWeight: 600,
+								fontSize: '1rem',
+								boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
+								textTransform: 'none',
+								transition: 'all 0.3s ease'
+							}}
+							type="submit"
+							variant="contained"
+							fullWidth
+							disabled={isSubmitting}
+							className="hover-scale"
+						>
+							{isSubmitting ? 'Submitting...' : 'Submit Feedback'}
 						</Button>
 					</div>
+					
+					<p
+						style={{
+							fontSize: '0.8rem',
+							color: '#777',
+							textAlign: 'center',
+							marginTop: '1.5rem'
+						}}
+					>
+						Your feedback helps us improve our services
+					</p>
 				</Box>
 			</div>
 		</div>
