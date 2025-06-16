@@ -1,22 +1,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { Button } from "antd";
 
 import apolloClient from "@lib/apollo-client";
 import { GET_YEAR_RANGE_OF_DATASET } from "@lib/graphql/queries";
-
-import { functionMapping, getServerSidePaginationMUIGrid } from "@utility/createMUIGrid";
+import { functionMapping } from "@utility/createMUIGrid";
 import IconWrapper, { tableDefinitions } from "@utility/tableDefinitions";
 import getHeaderWithDescription from "@utility/columnDefinitions";
 import { getYearFromAnyFormat, getYearFromDate } from "@utility/textFormatHelpers";
 import { table_name_to_alias_map } from "@utility/dataViewAliases";
-import { tableDateColumnMap } from "@utility/queryUtils";
+import { tableDateColumnMap, handleQuery } from "@utility/queryUtils";
 import ScreenOverlay from "@components/ScreenOverlay";
 import GlossaryTotal from "@components/GlossaryTotal";
-import { bpi_deep_green, bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
+import DataTable from "@components/DataTable";
+import { bpi_deep_green, bpi_light_green } from "@styles/theme/lightTheme";
 
 export const dataToColumns = (data, table_name: string) => {
 	const viewName = table_name_to_alias_map[table_name];
@@ -47,7 +46,6 @@ export const dataToColumns = (data, table_name: string) => {
 	}
 
 	if (table_name === "employee") {
-		// remove the officer_photo column
 		dataArr.forEach((item) => {
 			delete item["officer_photo"];
 		});
@@ -65,7 +63,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		};
 	}
 
-	// Get Min and Max years of dataset
 	let dates = { earliest: "", latest: "" };
 	let earliestNeeded = true;
 	let latestNeeded = true;
@@ -107,56 +104,116 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 		document.getElementById("screen-overlay").classList.remove("hidden");
 	};
 
-	const table = getServerSidePaginationMUIGrid(props.table_name, [], []);
+	const cols = functionMapping[props.table_name];
+	const hide = cols.filter((col) => col.hideable === true).map((col) => col.field);
+	
 	return (
-		<div style={{ marginTop: "-1rem" }}>
-			<div className={"max-w-1128 h-full"} style={{ backgroundColor: "white", color: bpi_deep_green, fontSize: "large", width: "68.25%", marginLeft: "auto", marginRight: "auto" }}>
-				<div style={{ margin: "1rem 0" }}>
-					<div style={{ margin: "1rem 0" }}>
-						<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-							<span style={{ margin: "1rem 0" }}>
-								<Link href="/" style={{ color: bpi_light_green }}>
-									{"Home > "}
-								</Link>
-								<Link href="/data" style={{ color: bpi_light_green }}>
-									{"Data > "}
-								</Link>
-								<span style={{ color: bpi_light_green, textDecoration: "none", cursor: "default" }}>{tableDef.table}</span>
-							</span>
+		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+			<div className="bg-white shadow-sm border-b border-gray-200">
+				<div className="max-w-7xl mx-auto px-6 py-8">
+					<nav className="flex items-center space-x-2 text-sm font-medium mb-6">
+						<Link href="/" className="hover:text-opacity-80 transition-colors" style={{ color: bpi_light_green }}>
+							Home
+						</Link>
+						<span className="text-gray-400">/</span>
+						<Link href="/data" className="hover:text-opacity-80 transition-colors" style={{ color: bpi_light_green }}>
+							Data
+						</Link>
+						<span className="text-gray-400">/</span>
+						<span className="text-gray-600">{tableDef.table}</span>
+					</nav>
+
+					<div className="flex items-start space-x-6">
+						<div className="flex-shrink-0">
+							<div 
+								className="w-16 h-16 rounded-xl flex items-center justify-center shadow-lg"
+								style={{ 
+									background: `linear-gradient(135deg, ${bpi_light_green}, ${bpi_deep_green})` 
+								}}
+							>
+								<IconWrapper 
+									Icon={tableDef.image.src} 
+									color="white" 
+									fontSize="2rem" 
+								/>
+							</div>
+						</div>
+						<div className="flex-1">
+							<h1 className="text-3xl font-bold text-gray-900 mb-3">
+								{tableDef.table}
+							</h1>
+							<p className="text-lg text-gray-600 leading-relaxed mb-6">
+								{tableDef?.longDescription}
+							</p>
+							
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+									<h3 className="font-semibold text-gray-900 mb-2">Data Sources</h3>
+									<p className="text-gray-700 text-sm">{tableDef.source}</p>
+								</div>
+								<div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+									<h3 className="font-semibold text-gray-900 mb-2">Time Period</h3>
+									<p className="text-gray-700 text-sm">
+										{props.dataYearRange.earliest === "" 
+											? "Unspecified" 
+											: `${getYearFromAnyFormat(props.dataYearRange.earliest)} - ${getYearFromAnyFormat(props.dataYearRange.latest)}`
+										}
+									</p>
+								</div>
+							</div>
 						</div>
 					</div>
-				</div>
-				<div>
-					<div style={{ display: "flex", alignItems: "center", justifyContent: "start", marginBottom: "1rem" }}>
-						<div style={{ marginLeft: "-0.8rem" }}>
-							{" "}
-							<IconWrapper Icon={tableDef.image.src} color={bpi_light_green} fontSize="4rem" />
-						</div>
-						<h2 style={{ marginLeft: "1rem", fontSize: "xx-large", fontWeight: "bold" }}>{tableDef.table}</h2>
-					</div>
-
-					<p style={{ color: bpi_deep_green, fontSize: "medium" }}>{tableDef?.longDescription}</p>
-					<br />
-					<strong style={{ fontSize: "x-large" }}>Sources: </strong>
-					{tableDef.source}
-					<br />
-					<strong style={{ fontSize: "x-large" }}>Years: </strong>
-					{props.dataYearRange.earliest == "" ? "Unspecified" : getYearFromAnyFormat(props.dataYearRange.earliest) + " - " + getYearFromAnyFormat(props.dataYearRange.latest)}
-
-					<ScreenOverlay title={currentOverlay.title} children={currentOverlay.table} />
 				</div>
 			</div>
-			<div style={{ backgroundColor: bpi_light_gray, paddingTop: "2rem", marginLeft: 0, marginTop: "2rem" }}>
-				<div className={"max-w-1128 h-full "} style={{ width: "68.25%", margin: "0 auto" }}> {/* Added margin: "0 auto" for centering */}
-					<div style={{ display: "flex", alignItems: "center", justifyContent: "end", marginBottom: "1rem" }}>
-						<Button onClick={handleSeeAllClick} type="primary" shape="round" className={" text-white font-urbanist active:scale-[.95] p-2 w-32 shadow-xl transition-button duration-300 hover:bg-primary-hover"} style={{ backgroundColor: bpi_deep_green, height: "2.3rem" }}>
-							Table Glossary
+
+			<div className="max-w-7xl mx-auto px-6 py-8">
+				<div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+					<div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+						<div>
+							<h2 className="text-xl font-semibold text-gray-900">Data Table</h2>
+							<p className="text-sm text-gray-600 mt-1">
+								Explore and analyze the {tableDef.table.toLowerCase()} data
+							</p>
+						</div>
+						<Button 
+							onClick={handleSeeAllClick} 
+							type="primary" 
+							className="rounded-lg px-6 py-2 h-auto font-medium shadow-sm transition-all duration-200 hover:shadow-md"
+							style={{ 
+								backgroundColor: bpi_deep_green,
+								borderColor: bpi_deep_green,
+							}}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.backgroundColor = bpi_light_green;
+								e.currentTarget.style.borderColor = bpi_light_green;
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.backgroundColor = bpi_deep_green;
+								e.currentTarget.style.borderColor = bpi_deep_green;
+							}}
+						>
+							📖 Table Glossary
 						</Button>
 					</div>
 
-					{table.dataPageTable}
+					<div className="p-6">
+						<DataTable 
+							table={[]} 
+							cols={cols} 
+							table_name={props.table_name} 
+							pageSizeOptions={[25, 50, 75, 100]} 
+							pageSize={25} 
+							rowCount={undefined} 
+							hide={hide} 
+							isServerSideRendered={true} 
+							query={handleQuery(props.table_name)}
+							className="rounded-lg"
+						/>
+					</div>
 				</div>
 			</div>
+
+			<ScreenOverlay title={currentOverlay.title} children={currentOverlay.table} />
 		</div>
 	);
 }

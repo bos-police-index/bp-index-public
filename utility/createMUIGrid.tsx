@@ -5,7 +5,6 @@ import { Tooltip } from "@mui/material";
 import { formatDateShort, formatDate, formatHours, formatMoney, formatTime, yAndNToBoolean, fixNameOrdering, noNullStringToBool, fixZipCode } from "./textFormatHelpers";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
-import { handleQuery } from "./queryUtils";
 
 export const getMUIGrid = (table: string, rows: any[], officerName: string, includesOnly = [], excludes = [], rowCount) => {
 	const cols: GridColDef[] = functionMapping[table];
@@ -32,30 +31,6 @@ export const getMUIGrid = (table: string, rows: any[], officerName: string, incl
 	return {
 		fullTable: <DataTable table={rows} cols={cols} table_name={`${officerName}-${table}`} pageSizeOptions={[25, 50, 75, 100]} pageSize={25} rowCount={undefined} hide={hide} isServerSideRendered={false} />,
 		filteredTable: <DataTable table={rows} cols={filteredCols} table_name={`${officerName}-${table}`} pageSizeOptions={[5]} pageSize={5} rowCount={undefined} hide={hide} isServerSideRendered={false} />,
-	};
-};
-
-export const getServerSidePaginationMUIGrid = (table_name: string, includesOnly = [], excludes = []) => {
-	const cols: GridColDef[] = functionMapping[table_name];
-	const hide = cols.filter((col) => col.hideable === true).map((col) => col.field);
-
-	// if includesOnly contains anything, we remove all columns that are not in includesOnly
-	// Except for the id column, which is always included
-	let filteredCols: GridColDef[] = cols.filter((col: GridColDef) => {
-		return includesOnly.length === 0 || includesOnly.includes(col.field) || col.field === "id";
-	});
-
-	// if excludes contains anything, we remove all columns that are in excludes
-	// Except for the id column, which is always included
-	filteredCols = filteredCols.filter((col: GridColDef) => {
-		return !excludes.includes(col.field) || col.field === "id";
-	});
-
-	// 100vh - 7rem is for data-table, aka /data/tables/[table_name]
-	// 100vh - 90px is for screen overlay table, inside the officer profile page
-
-	return {
-		dataPageTable: <DataTable table={[]} cols={cols} table_name={table_name} pageSizeOptions={[25, 50, 75, 100]} pageSize={25} rowCount={undefined} hide={hide} isServerSideRendered={true} query={handleQuery(table_name)} />,
 	};
 };
 
