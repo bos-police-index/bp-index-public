@@ -98,6 +98,15 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 	const [currentOverlay, setCurrentOverlay] = useState({ table: null, title: null });
 	const viewName = table_name_to_alias_map[props.table_name];
 
+	const handleRowClick = (params) => {
+		if (props.table_name === "officer_misconduct" && params.row.iaNumber) {
+			router.push({
+				pathname: "/ia/[iaNumber]",
+				query: { iaNumber: params.row.iaNumber }
+			});
+		}
+	};
+
 	const handleSeeAllClick = () => {
 		setCurrentOverlay({ table: <GlossaryTotal columnObjects={props.columns} total={false} />, title: `${tableDef.table} Glossary` });
 		document.getElementById("screen-overlay").classList.add("flex");
@@ -208,6 +217,7 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 							isServerSideRendered={true} 
 							query={handleQuery(props.table_name)}
 							className="rounded-lg"
+							onRowClick={handleRowClick}
 						/>
 					</div>
 				</div>

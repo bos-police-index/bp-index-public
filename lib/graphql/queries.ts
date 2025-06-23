@@ -224,6 +224,7 @@ export const GET_NEXT_PAGE_DETAIL_RECORDS: DocumentNode = gql`
 				customerName
 				noShowFlag
 				stateFunded
+				bpiId
    		 	}
 				totalCount
 		}
@@ -246,6 +247,7 @@ export const GET_NEXT_PAGE_COURT_OVERTIMES: DocumentNode = gql`
 				sex
 				startTime
 				workedHours
+				bpiId
    		 	}
 				totalCount
 		}
@@ -272,6 +274,7 @@ export const GET_NEXT_PAGE_OFFICER_IA = gql`
 				allegationSubtype
 				allegationType
 				disciplines
+				bpiId
    		 	}
 				totalCount
 		}
@@ -306,22 +309,40 @@ export const GET_NEXT_PAGE_FIO_RECORDS = gql`
 				vehicleYear
 				weather
 				zip
+				bpiId
 			}
 				totalCount
 		}
 	}
 `;
 
-// Data Page Length of Data Queries
-// export const GET_NUMBER_OF_ROWS = (table_name: string): DocumentNode => {
-// 	const query_source = table_name_to_alias_map[table_name];
-
-// 	return gql`query MyQuery {
-// 		${query_source} {
-// 			totalCount
-// 				}
-// 	}`;
-// };
+export const GET_IA_CASE_BY_NUMBER = (iaNumber: string) => {
+	return gql`
+		query MyQuery {
+			${officer_ia_alias_name}(condition: {iaNumber: "${iaNumber}"}) {
+				nodes {
+					iaNumber
+					badgeNo
+					incidentType
+					receivedDate
+					firstName
+					lastName
+					allegation
+					finding
+					actionTaken
+					leaDisposition
+					disposition
+					occuredDate
+					allegationDetails
+					allegationSubtype
+					allegationType
+					disciplines
+					bpiId
+				}
+			}
+		}
+	`;
+};
 
 // Get Year range of the dataset
 export const GET_YEAR_RANGE_OF_DATASET = (table_name: string, date_column_name: string, offset: number, queryEarliest: boolean, queryLatest: boolean): DocumentNode => {

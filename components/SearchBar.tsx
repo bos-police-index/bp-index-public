@@ -1,93 +1,95 @@
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
+import { styled } from "@mui/material/styles";
+import SearchIcon from "@mui/icons-material/Search";
+import { IconButton, InputBase, Paper } from "@mui/material";
+import { Route } from "nextjs-routes";
 
 interface SearchBarProps {
 	title: string;
 	officerName: string;
 }
 
+const StyledPaper = styled(Paper)(({ theme }) => ({
+	display: "flex",
+	alignItems: "center",
+	width: "100%",
+	maxWidth: "400px",
+	borderRadius: "var(--radius-md)",
+	background: "rgba(255, 255, 255, 0.1)",
+	backdropFilter: "blur(8px)",
+	border: "1px solid rgba(255, 255, 255, 0.2)",
+	transition: "var(--transition-default)",
+
+	"&:hover, &:focus-within": {
+		background: "rgba(255, 255, 255, 0.15)",
+		border: "1px solid rgba(255, 255, 255, 0.3)",
+	},
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+	flex: 1,
+	color: "var(--white)",
+	padding: "0.5rem 1rem",
+
+	"& input::placeholder": {
+		color: "rgba(255, 255, 255, 0.7)",
+		opacity: 1,
+	},
+}));
+
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+	padding: "0.5rem",
+	color: "var(--white)",
+
+	"&:hover": {
+		background: "rgba(255, 255, 255, 0.1)",
+	},
+}));
+
 export default function SearchBar({ title, officerName }: SearchBarProps) {
 	const router = useRouter();
 	const [keyword, setKeyword] = useState<string>("");
-	const [hoveredOn, setHoveredOn] = useState<boolean>(false);
-	const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+	const searchInputRef = useRef<HTMLInputElement>(null);
 
-	const handleHover = () => {
-		if (hoverTimeout) {
-			clearTimeout(hoverTimeout);
-			setHoverTimeout(null);
-		}
-		setHoveredOn(true);
-	};
-
-	const handleLeave = () => {
-		if (keyword != "") {
+	const handleSearch = (e: React.FormEvent) => {
+		e.preventDefault();
+		if (!keyword.trim()) {
+			toast.error("Please enter a search term");
 			return;
 		}
-		const timeout = setTimeout(() => {
-			setHoveredOn(false);
-			setHoverTimeout(null);
-		}, 500);
-		setHoverTimeout(timeout);
+
+		router.push({
+			pathname: `/search/${keyword.trim()}`,
+		} as Route);
+
+		setKeyword("");
 	};
 
-	const handleSearch = () => {
-		if (keyword.length > 0) {
-			router
-				.push({
-					pathname: "/search/[keyword]",
-					query: { keyword: keyword },
-				})
-				.then(() => {});
-		} else {
-			toast.error("Please enter a valid keyword");
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === "Enter") {
+			handleSearch(e);
 		}
 	};
 
 	return (
-		<div className="flex justify-between px-2 w-screen items-center shrink mt-[0em]" onMouseLeave={handleLeave}>
-			<span className="font-urbanist" style={{ color: "white" }}></span>
-
-			{/* Change "true" to hoveredOn to make conditionally hide */}
-			{true ? (
-				<div className="w-full max-w-[80%] relative">
-					<button type="button" style={{ marginRight: "0rem" }} className="absolute inset-y-0 grid w-8 place-content-center bg-white rounded-r-[0.6rem] text-gray-400 hover:bg-gray-300 transition-background duration-300 z-10 right-0" onClick={handleSearch}>
-						<span className="sr-only">Search</span>
-						<svg fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="h-5 w-5">
-							<path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-						</svg>
-					</button>
-					<input
-						type="text"
-						value={keyword}
-						placeholder={title}
-						style={{
-							boxShadow: "0px 0px 6px 1.8px rgba(0, 0, 0, 0.1)",
-							color: "#000",
-							boxSizing: "border-box",
-							fontSize: "1.2rem",
-						}}
-						className="input h-8 w-[14.6rem] bg-white join-item ml-[35rem] rounded-[0.6rem] pl-5 pr-6 placeholder:text-gray text-base md:text-lg focus:outline-none"
-						onChange={(e) => setKeyword(e.target.value)}
-						onKeyDown={(e) => {
-							if (e.key === "Enter") {
-								e.preventDefault();
-								handleSearch();
-								setKeyword("");
-							}
-						}}
-					/>
-				</div>
-			) : (
-				<>
-					<div style={{ marginRight: "0.3rem" }} onMouseEnter={handleHover}>
-						<svg fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="h-5 w-5">
-							<path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-						</svg>
-					</div>
-				</>
-			)}
-		</div>
+		<form onSubmit={handleSearch}>
+			<StyledPaper elevation={0}>
+				<StyledInputBase
+					placeholder="Search officers..."
+					value={keyword}
+					onChange={(e) => setKeyword(e.target.value)}
+					onKeyDown={handleKeyDown}
+					inputRef={searchInputRef}
+					inputProps={{
+						"aria-label": "search officers",
+					}}
+				/>
+				<StyledIconButton type="submit" aria-label="search">
+					<SearchIcon />
+				</StyledIconButton>
+			</StyledPaper>
+		</form>
 	);
 }

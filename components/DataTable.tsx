@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
+
 import { useQuery } from "@apollo/client";
+
 import Button, { ButtonProps } from "@mui/material/Button";
 import { createSvgIcon } from "@mui/material";
 import Menu from "@mui/material/Menu";
@@ -49,6 +51,7 @@ export default function DataTable({
 	style,
 	initialState,
 	exportOptions,
+	onRowClick,
 }: {
 	cols: GridColDef[];
 	table: any[];
@@ -67,6 +70,7 @@ export default function DataTable({
 	style?: React.CSSProperties;
 	initialState?: any;
 	exportOptions?: any;
+	onRowClick?: (params: any) => void;
 }) {
 	const [columnVisibilityModel, setColumnVisibilityModel] = useState(() => {
 		const allVisible = cols.reduce((acc, col) => {
@@ -604,6 +608,7 @@ export default function DataTable({
 				columnVisibilityModel={columnVisibilityModel}
 				onColumnVisibilityModelChange={(model) => setColumnVisibilityModel(model)}
 				loading={loading}
+				onRowClick={onRowClick}
 			/>
 		);
 	};
@@ -797,6 +802,7 @@ export default function DataTable({
 				onFilterModelChange={onFilterChange}
 				sortingMode="server"
 				onSortModelChange={handleSortModelChange}
+				onRowClick={onRowClick}
 			/>
 		);
 	};

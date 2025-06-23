@@ -11,7 +11,7 @@ import backgroundImage from "../public/fist-in-air.jpeg";
 import FadeIn from "@components/FadeIn";
 import DataTable from "@components/DataTable";
 import { fetchHompage } from "services/homepage/data_fetchers";
-import { bpi_light_gray } from "@styles/theme/lightTheme";
+import { bpi_light_gray, bpi_light_green } from "@styles/theme/lightTheme";
 
 export default function Home() {
 	const [keyword, setKeyword] = useState<string>("");
@@ -50,7 +50,8 @@ export default function Home() {
 							pathname: `/profile/[bpiId]`,
 							query: { bpiId: params.row.bpiId, keyword: params.row.fullName },
 						}}
-						className="link hover:text-blue-500"
+						style={{ color: bpi_light_green, textDecoration: "none" }}
+						className="hover:opacity-80"
 					>
 						{properCasedName}
 					</Link>

@@ -1,28 +1,52 @@
-@import url("https://fonts.googleapis.com/css2?family=Righteous&family=Urbanist:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Righteous&family=Urbanist:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
- 
+  /* Primary Colors */
   --bpi_deep_green: #296351;
   --bpi_light_green: #439679;
   --light_gray: #F5F5F5;
   --white: #ffffff;
+  
+  /* Z-index Layers */
+  --z-navbar: 10;
+  --z-dropdown: 20;
+  --z-modal: 30;
+  --z-tooltip: 40;
+  --z-glossary: 50;
+  --z-overlay: 100;
 
-  /* Old colors */
-  --bpi_dark_blue: #032752;
+  /* Semantic Colors */
+  --text-primary: #1A1A1A;
+  --text-secondary: #4A4A4A;
+  --background-primary: var(--white);
+  --background-secondary: var(--light_gray);
+  
+  /* Elevation Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* Transitions */
+  --transition-default: all 0.2s ease-in-out;
+  
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
 }
 
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
-
-html {
-  background: linear-gradient(0deg, var(--white) 0%, var(--white) 50%, var(--white) 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  color: var(--text-primary);
+  background: var(--background-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
@@ -36,20 +60,44 @@ code {
   font-family: Menlo, Monaco, Lucida Console, Courier New, monospace;
 }
 
-.container {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+/* Modern Button Styles */
+.button {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  transition: var(--transition-default);
+  cursor: pointer;
 }
 
+.button-primary {
+  background: var(--bpi_deep_green);
+  color: var(--white);
+}
+
+.button-primary:hover {
+  background: var(--bpi_light_green);
+  transform: translateY(-1px);
+}
+
+/* Card Styles */
+.card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-default);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Animation Classes */
 .fade-in-section {
   opacity: 0;
-  transform: translateY(10vh);
+  transform: translateY(20px);
   visibility: hidden;
-  transition: opacity 0.6s ease-out, transform 1.2s ease-out;
-  will-change: opacity, visibility;
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  will-change: opacity, transform, visibility;
 }
 
 .fade-in-section.is-visible {
@@ -58,9 +106,42 @@ code {
   visibility: visible;
 }
 
-/* Custom max-width styling */
+/* Layout Utilities */
 .max-w-1128 {
   max-width: 1128px;
   margin: 0 auto;
-  padding: 0 15px; 
+  padding: 0 1.5rem;
+}
+
+/* Modern Container */
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+/* MUI Popover z-index override */
+.mui-popover-zindex {
+  z-index: var(--z-dropdown) !important;
+}
+
+/* Ensure glossary and overlays are above navbar */
+.glossary-overlay {
+  z-index: var(--z-glossary) !important;
+}
+
+.modal-overlay {
+  z-index: var(--z-modal) !important;
+}
+
+.tooltip {
+  z-index: var(--z-tooltip) !important;
+}
+
+.screen-overlay {
+  z-index: var(--z-overlay) !important;
 }
