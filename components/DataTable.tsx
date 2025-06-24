@@ -609,6 +609,7 @@ export default function DataTable({
 				onColumnVisibilityModelChange={(model) => setColumnVisibilityModel(model)}
 				loading={loading}
 				onRowClick={onRowClick}
+				disableColumnMenu={true}
 			/>
 		);
 	};
@@ -803,6 +804,7 @@ export default function DataTable({
 				sortingMode="server"
 				onSortModelChange={handleSortModelChange}
 				onRowClick={onRowClick}
+				disableColumnMenu={true}
 			/>
 		);
 	};

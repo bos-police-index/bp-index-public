@@ -1,6 +1,7 @@
 "use client";
-import { bpi_deep_green } from "@styles/theme/lightTheme";
+
 import HistogramDataFeeder, { Filter } from "./HistogramDataFeeder";
+import { useEffect, useState } from "react";
 
 interface FinancialHistogramProps {
 	officerPayData: any;
@@ -22,6 +23,24 @@ export interface PayTypeMap {
 }
 
 export default function FinancialHistogram({ officerPayData, officerDetailData, mode }: FinancialHistogramProps) {
+	const [dimensions, setDimensions] = useState({ width: 860, height: 450 });
+	
+	useEffect(() => {
+		const handleResize = () => {
+			const isMobile = window.innerWidth < 640;
+			setDimensions({
+				width: isMobile ? Math.max(300, window.innerWidth - 40) : 860,
+				height: isMobile ? 350 : 450
+			});
+		};
+		
+		handleResize();
+		
+		window.addEventListener('resize', handleResize);
+		
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
+
 	function reshapeFinancialDataInput(data) {
 		if (!data) {
 			return;
@@ -63,20 +82,30 @@ export default function FinancialHistogram({ officerPayData, officerDetailData, 
 	}
 
 	return (
-		<>
-			<div className="w-full max-w-4xl flex rounded-md flex-col mb-5">
-				<p className="text-lg" style={{ color: bpi_deep_green, fontWeight: 500 }}>
-					Individual Officer Pay Histogram
-				</p>
-				<p style={{ color: bpi_deep_green, fontWeight: 300, justifyContent: "left" }} className="text-sm">
-					This feature shows how an officer’s various earnings compare to their peers by placing them within a percentile of the department’s overall pay distribution. It helps users quickly see whether an officer earns more or less than most others. Turning the Filtering by rank option
-					enables you to only compare an officer against similar ranking peers.{" "}
+		<div className="space-y-3 sm:space-y-4">
+			<div className="w-full flex flex-col px-1 sm:px-0">
+				<div className="flex flex-col mb-1 sm:mb-3">
+					<h3 className="text-sm sm:text-lg font-medium text-gray-800 mb-1 sm:mb-0 text-center sm:text-left">
+						Officer Pay Distribution
+					</h3>
+				</div>
+				
+				<p className="text-[11px] sm:text-sm text-gray-600 mb-2 sm:mb-3 leading-snug sm:leading-relaxed text-center sm:text-left">
+					This chart shows how this officer's earnings compare to peers within the department's pay distribution. 
+					Use the filter below to compare against officers of similar rank or the entire department.
 				</p>
 			</div>
 
-			<div className="w-full max-w-4xl flex justify-center items-center bg-white p-6 rounded-md flex-col">
-				<HistogramDataFeeder width={860} height={450} specificOfficerFinancialData={reshapeFinancialDataInput(officerPayData)} officerDetailData={officerDetailData} />
+			<div className="w-full flex justify-center items-center bg-white rounded-lg shadow-sm p-1 sm:p-3 overflow-x-auto">
+				<div className="min-w-full w-full">
+					<HistogramDataFeeder 
+						width={dimensions.width} 
+						height={dimensions.height} 
+						specificOfficerFinancialData={reshapeFinancialDataInput(officerPayData)} 
+						officerDetailData={officerDetailData} 
+					/>
+				</div>
 			</div>
-		</>
+		</div>
 	);
 }

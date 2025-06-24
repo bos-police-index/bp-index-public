@@ -9,9 +9,10 @@ import { Route } from "nextjs-routes";
 interface SearchBarProps {
 	title: string;
 	officerName: string;
+	onSearchExecuted?: () => void; 
 }
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
+const StyledPaper = styled(Paper)(({ }) => ({
 	display: "flex",
 	alignItems: "center",
 	width: "100%",
@@ -28,7 +29,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 	},
 }));
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
+const StyledInputBase = styled(InputBase)(({ }) => ({
 	flex: 1,
 	color: "var(--white)",
 	padding: "0.5rem 1rem",
@@ -39,7 +40,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 	},
 }));
 
-const StyledIconButton = styled(IconButton)(({ theme }) => ({
+const StyledIconButton = styled(IconButton)(({ }) => ({
 	padding: "0.5rem",
 	color: "var(--white)",
 
@@ -48,7 +49,7 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 	},
 }));
 
-export default function SearchBar({ title, officerName }: SearchBarProps) {
+export default function SearchBar({ title, officerName, onSearchExecuted }: SearchBarProps) {
 	const router = useRouter();
 	const [keyword, setKeyword] = useState<string>("");
 	const searchInputRef = useRef<HTMLInputElement>(null);
@@ -65,6 +66,10 @@ export default function SearchBar({ title, officerName }: SearchBarProps) {
 		} as Route);
 
 		setKeyword("");
+		
+		if (onSearchExecuted) {
+			onSearchExecuted();
+		}
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
