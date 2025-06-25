@@ -253,24 +253,25 @@ export default function Home() {
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<div 
-				className="relative w-full border-b border-gray-200"
+				className="relative w-full border-b border-gray-200 md:bg-fixed"
 				style={{
-					backgroundImage: `linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.75) 100%), url(${backgroundImage.src})`,
+					backgroundImage: `linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.85) 100%), url(${backgroundImage.src})`,
 					backgroundSize: 'cover',
 					backgroundPosition: 'center',
-					backgroundAttachment: 'fixed'
+					backgroundAttachment: 'scroll',
+					minHeight: '300px'
 				}}
 			>
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-					<div className="text-center mb-16">
-						<h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 md:py-28">
+					<div className="text-center mb-12 sm:mb-16">
+						<h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 tracking-tight drop-shadow-lg">
 							Boston Police Index
 						</h1>
-						<p className="text-xl sm:text-2xl text-slate-200 max-w-4xl mx-auto mb-10 leading-relaxed">
+						<p className="text-lg sm:text-xl md:text-2xl text-white max-w-4xl mx-auto mb-8 sm:mb-10 leading-relaxed drop-shadow">
 							Bringing transparency to law enforcement activities through public records and data.
 						</p>
-						<div className="inline-flex items-center px-8 py-4 bg-white/15 backdrop-blur-sm border border-white/30 rounded-xl text-white font-medium text-lg shadow-lg">
-							<svg className="w-6 h-6 mr-3 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<div className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-white/20 backdrop-blur-md border border-white/40 rounded-xl text-white font-medium text-base sm:text-lg shadow-lg">
+							<svg className="min-w-5 w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
 							</svg>
 							<span className="font-semibold">
@@ -282,7 +283,7 @@ export default function Home() {
 											endValue={searchResData.length} 
 											duration={2000}
 											animation="easeInOut" 
-											className="text-emerald-300 font-bold mr-2" 
+											className="text-emerald-300 font-bold mr-1 sm:mr-2" 
 										/>
 										<span>Officers in Database</span>
 									</>
@@ -292,45 +293,45 @@ export default function Home() {
 					</div>
 
 					{/* Info Cards */}
-					<div className="grid md:grid-cols-3 gap-8 lg:gap-10">
-						<div className="bg-white rounded-2xl p-8 hover:shadow-2xl transition-all duration-300 shadow-xl border border-gray-100 group">
-							<div className="flex items-center mb-6">
-								<div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-									<svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6 lg:gap-10">
+						<div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 sm:p-8 hover:shadow-2xl transition-all duration-300 shadow-xl border border-gray-100 group">
+							<div className="flex items-center mb-4 sm:mb-6">
+								<div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+									<svg className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
 									</svg>
 								</div>
-								<h3 className="text-xl font-bold text-gray-900 ml-4">Data Transparency</h3>
+								<h3 className="text-lg sm:text-xl font-bold text-gray-900 ml-3 sm:ml-4">Data Transparency</h3>
 							</div>
-							<p className="text-gray-600 leading-relaxed">
+							<p className="text-gray-600 leading-relaxed text-sm sm:text-base">
 								All information sourced from public sources and public records requests.
 							</p>
 						</div>
 
-						<div className="bg-white rounded-2xl p-8 hover:shadow-2xl transition-all duration-300 shadow-xl border border-gray-100 group">
-							<div className="flex items-center mb-6">
-								<div className="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
-									<svg className="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 sm:p-8 hover:shadow-2xl transition-all duration-300 shadow-xl border border-gray-100 group">
+							<div className="flex items-center mb-4 sm:mb-6">
+								<div className="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-100 rounded-xl flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+									<svg className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
 									</svg>
 								</div>
-								<h3 className="text-xl font-bold text-gray-900 ml-4">Easy Search</h3>
+								<h3 className="text-lg sm:text-xl font-bold text-gray-900 ml-3 sm:ml-4">Easy Search</h3>
 							</div>
-							<p className="text-gray-600 leading-relaxed">
+							<p className="text-gray-600 leading-relaxed text-sm sm:text-base">
 								Powerful search and filtering capabilities to find specific officers and data points.
 							</p>
 						</div>
 
-						<div className="bg-white rounded-2xl p-8 hover:shadow-2xl transition-all duration-300 shadow-xl border border-gray-100 group">
-							<div className="flex items-center mb-6">
-								<div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-									<svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 sm:p-8 hover:shadow-2xl transition-all duration-300 shadow-xl border border-gray-100 group">
+							<div className="flex items-center mb-4 sm:mb-6">
+								<div className="w-12 h-12 sm:w-14 sm:h-14 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+									<svg className="w-6 h-6 sm:w-7 sm:h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
 									</svg>
 								</div>
-								<h3 className="text-xl font-bold text-gray-900 ml-4">Community Resource</h3>
+								<h3 className="text-lg sm:text-xl font-bold text-gray-900 ml-3 sm:ml-4">Community Resource</h3>
 							</div>
-							<p className="text-gray-600 leading-relaxed">
+							<p className="text-gray-600 leading-relaxed text-sm sm:text-base">
 								Supporting journalists, policy makers, and citizens in understanding police accountability.
 							</p>
 						</div>
@@ -338,16 +339,16 @@ export default function Home() {
 				</div>
 			</div>
 			{/* Main Content Section */}
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
 				<FadeIn>
 					{/* Data Table Container */}
 					<div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-						<div className="p-6 sm:p-8">
-							<div className="mb-6">
-								<h2 className="text-2xl font-semibold text-gray-900 mb-2">
+						<div className="p-4 sm:p-6 md:p-8">
+							<div className="mb-4 sm:mb-6">
+								<h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
 									Officer Database
 								</h2>
-								<p className="text-gray-600">
+								<p className="text-gray-600 text-sm sm:text-base">
 									Search and explore comprehensive data on Boston Police Department officers.
 								</p>
 							</div>

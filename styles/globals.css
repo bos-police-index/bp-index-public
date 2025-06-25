@@ -47,6 +47,7 @@ body {
   background: var(--background-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 * {
@@ -196,4 +197,14 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+@media (max-width: 640px) {
+  .text-slate-200 {
+    color: #ffffff !important; 
+  }
+  
+  [style*="background-attachment: fixed"] {
+    background-attachment: scroll !important;
+  }
 }
