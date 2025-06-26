@@ -28,8 +28,15 @@ const IconWrapper = ({ Icon, fontSize = "48px", color = bpi_deep_green }: IconWr
 };
 
 // TODO:! As more data is added be sure to add the source they are from to this
-const tablesFromAnalyzeBoston = ["fio_record", "crime_incident"];
+const tablesFromAnalyzeBoston = ["fio_record"];
 const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "officer_misconduct"];
+const tablesFromWokeWindows = ["crime_incident"];
+
+// Date ranges for specific tables
+export const tableDateRanges = {
+    "crime_incident": "1930 - 2021",
+    // Add more fixed date ranges for other tables here as needed
+};
 
 const rawTableDefinitions = [
 	{
@@ -119,7 +126,13 @@ const rawTableDefinitions = [
 
 export const tableDefinitions: TableDefinition[] = rawTableDefinitions.map((table) => ({
 	...table,
-	source: tablesFromPublicRecordsRequests.includes(table.query) ? "Public Records Request" : tablesFromAnalyzeBoston.includes(table.query) ? <a href="https://data.boston.gov/">Analyze Boston</a> : "Public Records Request",
+	source: tablesFromWokeWindows.includes(table.query)
+		? <a href="https://www.wokewindows.org/">Woke Windows</a>
+		: tablesFromPublicRecordsRequests.includes(table.query)
+			? "Public Records Request"
+			: tablesFromAnalyzeBoston.includes(table.query)
+				? <a href="https://data.boston.gov/">Analyze Boston</a>
+				: "Public Records Request",
 }));
 
 export default IconWrapper;

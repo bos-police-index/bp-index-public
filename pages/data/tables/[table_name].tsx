@@ -7,7 +7,7 @@ import { Button } from "antd";
 import apolloClient from "@lib/apollo-client";
 import { GET_YEAR_RANGE_OF_DATASET } from "@lib/graphql/queries";
 import { functionMapping } from "@utility/createMUIGrid";
-import IconWrapper, { tableDefinitions } from "@utility/tableDefinitions";
+import IconWrapper, { tableDefinitions, tableDateRanges } from "@utility/tableDefinitions";
 import getHeaderWithDescription from "@utility/columnDefinitions";
 import { getYearFromAnyFormat, getYearFromDate } from "@utility/textFormatHelpers";
 import { table_name_to_alias_map } from "@utility/dataViewAliases";
@@ -190,11 +190,10 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 						</div>
 						<div>
 							<p className="text-gray-700 font-medium">
-								{props.table_name === "crime_incident" 
-									? "1930 - 2021"
-									: props.dataYearRange.earliest === "" 
+								{tableDateRanges[props.table_name] || 
+									(props.dataYearRange.earliest === "" 
 										? "Unspecified" 
-										: `${getYearFromAnyFormat(props.dataYearRange.earliest)} - ${getYearFromAnyFormat(props.dataYearRange.latest)}`
+										: `${getYearFromAnyFormat(props.dataYearRange.earliest)} - ${getYearFromAnyFormat(props.dataYearRange.latest)}`)
 								}
 							</p>
 						</div>
