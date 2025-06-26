@@ -1026,8 +1026,159 @@ const fio_record_columns = () => {
 	return cols;
 };
 
+const crime_incident_columns = () => {
+	const cleanYamlString = (str: string | null) => {
+		if (!str) return '';
+		return str.replace(/---\\n- /g, '').replace(/\\n/g, '').trim();
+	};
+
+	const cols: GridColDef[] = [
+		{
+			field: "occurredOnDate",
+			headerName: "Occurred Date",
+			description: "The date when the incident occurred",
+			type: "date",
+			valueFormatter: formatDateShort,
+			width: 150,
+		},
+		{
+			field: "district",
+			headerName: "District",
+			description: "Police district where the incident occurred",
+			type: "string",
+			valueGetter: (params) => {
+				if (params.row.district) return params.row.district;
+				const bagOfText = params.row.bagOfText;
+				if (bagOfText) {
+					const match = bagOfText.match(/DISTRICT\s*([A-Z0-9-]+)/i);
+					if (match) return match[1];
+				}
+				return '';
+			},
+			width: 100,
+		},
+		{
+			field: "latitude",
+			headerName: "Latitude",
+			description: "Latitude coordinate of the incident location",
+			type: "number",
+			valueFormatter: (params) => params.value || '',
+			width: 120,
+		},
+		{
+			field: "longitude",
+			headerName: "Longitude",
+			description: "Longitude coordinate of the incident location",
+			type: "number",
+			valueFormatter: (params) => params.value || '',
+			width: 120,
+		},
+		{
+			field: "offenses",
+			headerName: "Offenses",
+			description: "Description of the offenses involved in the incident",
+			type: "string",
+			valueFormatter: (params) => {
+				if (!params.value) return '';
+				return params.value.replace(/---\\n- /g, '').replace(/\\n/g, '');
+			},
+			width: 200,
+		},
+		{
+			field: "numberOfOffenders",
+			headerName: "# of Offenders",
+			description: "Number of offenders involved in the incident",
+			type: "number",
+			valueFormatter: (params) => params.value || '',
+			width: 120,
+		},
+		{
+			field: "numberOfVictims",
+			headerName: "# of Victims",
+			description: "Number of victims involved in the incident",
+			type: "number",
+			valueFormatter: (params) => params.value || '',
+			width: 120,
+		},
+		{
+			field: "numberOfArrestees",
+			headerName: "# of Arrests",
+			description: "Number of people arrested in relation to the incident",
+			type: "number",
+			valueFormatter: (params) => params.value || '',
+			width: 120,
+		},
+		{
+			field: "shooting",
+			headerName: "Shooting Involved",
+			description: "Whether the incident involved a shooting",
+			type: "boolean",
+			valueFormatter: (params) => params.value === null ? '' : params.value ? 'Yes' : 'No',
+			width: 140,
+		},
+		{
+			field: "locationOfOccurrence",
+			headerName: "Location",
+			description: "Description of where the incident occurred",
+			type: "string",
+			valueGetter: (params) => {
+				const loc = cleanYamlString(params.value);
+				if (!loc && params.row.bagOfText) {
+					const parts = params.row.bagOfText.split(' ');
+					if (parts.length >= 2) {
+						return `${parts[1]} ${parts[2]}`; 
+					}
+				}
+				return loc;
+			},
+			width: 200,
+		},
+		{
+			field: "locationType",
+			headerName: "Location Type",
+			description: "Type of location where the incident occurred (e.g., street, residence, business)",
+			type: "string",
+			valueFormatter: (params) => params.value || '',
+			width: 150,
+		},
+		{
+			field: "reportDate",
+			headerName: "Reported Date",
+			description: "The date when the incident was reported",
+			type: "date",
+			valueFormatter: formatDateShort,
+			width: 150,
+		},
+		{
+			field: "incidentNumber",
+			headerName: "Incident #",
+			description: "Unique identifier for the incident",
+			type: "number",
+			valueFormatter: (params) => params.value || '',
+			width: 150,
+		},
+		{
+			field: "natureOfIncident",
+			headerName: "Nature of Incident",
+			description: "Description of the type of incident",
+			type: "string",
+			valueGetter: (params) => {
+				const nature = cleanYamlString(params.value);
+				if (!nature && params.row.bagOfText) {
+					const match = params.row.bagOfText.match(/\d+\s+.*?\s+(.*?)(?=\s+\d{6}|\s+[A-Z]+\s+[A-Z]+\s+|$)/);
+					if (match) return match[1].trim();
+				}
+				return nature;
+			},
+			width: 200,
+		}
+	];
+	return cols;
+};
+
 export const functionMapping = {
 	detail_record: detail_record_columns(),
+	crime_incident: crime_incident_columns(), // Using actual crime incident columns now
 	officer_ia: officer_ia_columns(),
 	police_financial: police_financial_columns(),
 	court_overtime: court_overtime_columns(),

@@ -18,8 +18,8 @@ import DataTable from "@components/DataTable";
 import { bpi_deep_green, bpi_light_green } from "@styles/theme/lightTheme";
 
 export const dataToColumns = (data, table_name: string) => {
-	const viewName = table_name_to_alias_map[table_name];
-	let date_row_name = tableDateColumnMap[table_name];
+	const viewName = table_name_to_alias_map[table_name];	
+	let date_row_name = tableDateColumnMap[table_name];	
 	let dataArr: any[] = [];
 	let rowCount: number;
 
@@ -190,9 +190,11 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 						</div>
 						<div>
 							<p className="text-gray-700 font-medium">
-								{props.dataYearRange.earliest === "" 
-									? "Unspecified" 
-									: `${getYearFromAnyFormat(props.dataYearRange.earliest)} - ${getYearFromAnyFormat(props.dataYearRange.latest)}`
+								{props.table_name === "crime_incident" 
+									? "1930 - 2021"
+									: props.dataYearRange.earliest === "" 
+										? "Unspecified" 
+										: `${getYearFromAnyFormat(props.dataYearRange.earliest)} - ${getYearFromAnyFormat(props.dataYearRange.latest)}`
 								}
 							</p>
 						</div>

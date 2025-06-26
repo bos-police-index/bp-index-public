@@ -28,7 +28,7 @@ const IconWrapper = ({ Icon, fontSize = "48px", color = bpi_deep_green }: IconWr
 };
 
 // TODO:! As more data is added be sure to add the source they are from to this
-const tablesFromAnalyzeBoston = ["fio_record"];
+const tablesFromAnalyzeBoston = ["fio_record", "crime_incident"];
 const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "officer_misconduct"];
 
 const rawTableDefinitions = [
@@ -54,7 +54,7 @@ const rawTableDefinitions = [
 		table: "Crime Incident",
 		query: "crime_incident",
 		image: { component: <IconWrapper Icon={EventNoteIcon} />, src: EventNoteIcon },
-		isFake: true,
+		isFake: false,
 		shortDescription: "Records from the crime incident report system, focusing on the type, time, and location of the crime incidents",
 		longDescription:
 			"The Crime Incident Records dataset offers a comprehensive view of crime reports logged in the  crime incident report system. It includes a reduced but essential set of fields designed to capture the type of crime, as well as the time and location of each incident. This streamlined dataset is essential for analyzing crime patterns, trends, and hot spots within the city.",

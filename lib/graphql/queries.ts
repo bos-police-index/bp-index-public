@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { court_overtime_alias_name, detail_alias_name, fio_record_alias_name, homepage_alias_name, officer_financial_alias_name, officer_ia_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map } from "@utility/dataViewAliases";
+import { court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, fio_record_alias_name, homepage_alias_name, officer_financial_alias_name, officer_ia_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map } from "@utility/dataViewAliases";
 import { DocumentNode } from "graphql";
 
 export const DATA_PAGE_SIZE = 25;
@@ -312,6 +312,49 @@ export const GET_NEXT_PAGE_FIO_RECORDS = gql`
 				bpiId
 			}
 				totalCount
+		}
+	}
+`;
+
+export const GET_NEXT_PAGE_CRIME_INCIDENTS: DocumentNode = gql`
+	query MyQuery($offset: Int, $page_size: Int, $order_by: [${removeAllPrefix(crime_incident_alias_name)}OrderBy!], $filters: ${removePluralSuffix(removeAllPrefix(crime_incident_alias_name))}Condition) {
+		${crime_incident_alias_name}(first: $page_size, offset: $offset, orderBy: $order_by, condition: $filters) {
+			nodes {
+				id
+				geocodeLongitude
+				exceptionalClearanceDate
+				buiOfficerId
+				bagOfText
+				buiBadgeNo
+				numberOfOffenders
+				offenses
+				officerJournalName
+				numberOfArrestees
+				shooting
+				locationOfOccurrence
+				locationType
+				street
+				reportingArea
+				reportedLongitude
+				reportedLatitude
+				reportDate
+				officerId
+				occurredOnDate
+				numberOfVictims
+				nibrsOffenses
+				natureOfIncident
+				longitude
+				latitude
+				incidentNumber
+				incidentClearance
+				district
+				createdAt
+				geocodeLatitude
+				buiNameId
+				bpiId
+				attributions
+			}
+			totalCount
 		}
 	}
 `;

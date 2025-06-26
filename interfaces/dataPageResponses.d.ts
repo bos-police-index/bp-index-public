@@ -130,6 +130,50 @@ declare global {
 			totalCount: number;
 		};
 	}
+
+	/* ------------------- CRIME INCIDENTS ---------------------*/
+	interface CrimeIncidentRecord {
+		id: string;
+		geocodeLongitude: number;
+		exceptionalClearanceDate: string | null;
+		buiOfficerId: string | null;
+		bagOfText: string;
+		buiBadgeNo: string | null;
+		numberOfOffenders: number | null;
+		offenses: string | null;
+		officerJournalName: string;
+		numberOfArrestees: number | null;
+		shooting: boolean | null;
+		locationOfOccurrence: string;
+		locationType: string | null;
+		street: string | null;
+		reportingArea: string | null;
+		reportedLongitude: number | null;
+		reportedLatitude: number | null;
+		reportDate: string;
+		officerId: string;
+		occurredOnDate: string;
+		numberOfVictims: number | null;
+		nibrsOffenses: string | null;
+		natureOfIncident: string;
+		longitude: number;
+		latitude: number;
+		incidentNumber: number;
+		incidentClearance: string | null;
+		district: string | null;
+		createdAt: string;
+		geocodeLatitude: number;
+		buiNameId: string | null;
+		bpiId: string | null;
+		attributions: string;
+	}
+
+	interface CrimeIncidentsResponse {
+		records: {
+			nodes: CrimeIncidentRecord[];
+			totalCount: number;
+		};
+	}
 }
 
 // Added to prevent TS from considering this a legacy script and fail in prod
