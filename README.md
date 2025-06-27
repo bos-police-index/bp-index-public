@@ -1,40 +1,157 @@
-[![Netlify Status](https://api.netlify.com/api/v1/badges/168b2ed1-4784-4179-b85b-84a67618a35e/deploy-status)](https://app.netlify.com/sites/dev-bpi/deploys)
-
 # Boston Police Index
 
-## System Architecture:
+[![Netlify Status](https://api.netlify.com/api/v1/badges/168b2ed1-4784-4179-b85b-84a67618a35e/deploy-status)](https://app.netlify.com/sites/dev-bpi/deploys)
 
-This web-app is a site with a [Next.js](https://nextjs.org/) framework, with a PostreSQL server as the backend interacted with using [GraphQL](https://graphql.org/). We also use [Material UI](https://mui.com) and [TSX](https://www.npmjs.com/package/tsx) to assist in the front-end.
+## Project Overview
 
-The [Boston Police Index](https://dev-bpi.netlify.app), aims to be a successor to the now inactive [Woke Windows](https://www.wokewindows.org) project, where we aim to make Boston police data as accessible and easy to understand for as many people as possible.
+The Boston Police Index (BPI) is a public transparency initiative that provides accessible insights into Boston Police Department data. Our platform serves as a comprehensive data portal for researchers, journalists, and community members to analyze police activities, compensation, and accountability measures.
+
+### Project Goals
+
+-   Provide transparent access to Boston police data
+-   Enable data-driven policy discussions
+-   Support community oversight through accessible visualizations
+-   Maintain historical records for longitudinal analysis
+
+### Key Features
+
+-   ✅ Modern, responsive UI with drill-down capabilities
+-   ✅ Advanced data export functionality
+-   ✅ Interactive data visualizations
+-   ✅ Mobile-responsive design
+-   Comprehensive search and filtering
+-   Historical data tracking
+
+## Deliverables & Resources
+
+### Live Deployments
+
+-   **Main Application**: [Boston Police Index](https://dev-bpi.netlify.app)
+
+### Data Sources
+
+-   Analyze Boston datasets
+-   Public records requests
+-   Historical archives from Woke Windows project
+
+## Handoff Notes
+
+### Recently Completed Features
+
+1. **UI/UX Improvements**
+
+    - Complete redesign for better usability
+    - Mobile-responsive layout implementation
+    - Drill-down functionality for detailed data exploration
+
+2. **Data Export**
+    - Comprehensive export options
+    - Multiple format support
+    - Batch export capabilities
+
+### Next Priority Tasks
+
+1. **Data Processing**
+
+    - Standardize percentile calculations across components
+    - Implement consistent data transformation methods
+    - Add data validation layers
+
+2. **Performance**
+
+    - Implement pagination preloading
+    - Optimize GraphQL queries
+    - Add background data loading
+
+3. **User Experience**
+    - Enhance search functionality with autocomplete
+    - Add new visualization options
+    - Improve error messaging
+
+### Getting Started Guide for New Team
+
+1. **First Week Tasks**
+
+    - Review the current data processing implementation in `/services/profile/`
+    - Examine visualization components in `/components/profileVisualizations/`
+    - Study the GraphQL query structure in `/lib/graphql/`
+
+2. **Quick Wins**
+
+    - Start with standardizing percentile calculations
+    - Implement basic error boundaries
+    - Add input validation to data processing functions
+
+3. **Long-term Focus**
+
+    - Improve test coverage
+    - Enhance documentation
+    - Optimize performance for large datasets
+
+4. **Key Files to Review**
+    - `/services/profile/data_fetchers.ts` - Main data processing
+    - `/components/DataTable.tsx` - Core table component
+    - `/utility/createMUIGrid.tsx` - Table definitions
+    - `/lib/graphql/queries.ts` - GraphQL queries
+
+## System Architecture
+
+The Boston Police Index is built with modern web technologies:
+
+-   **Frontend**: [Next.js](https://nextjs.org/) (React framework) with TypeScript
+-   **UI Components**: [Material UI](https://mui.com) for a consistent and accessible interface
+-   **Backend**: PostgreSQL database with [GraphQL](https://graphql.org/) API layer
+-   **API Gateway**: PostGraphile for type-safe GraphQL schema generation
+-   **Deployment**: Netlify for continuous deployment and hosting
+
+The [Boston Police Index](https://dev-bpi.netlify.app) aims to be a successor to the now inactive [Woke Windows](https://www.wokewindows.org) project, making Boston police data accessible and easy to understand for the public.
+
+## Requirements
+
+-   Node.js 18.x or later
+-   npm 8.x or later
+-   PostgreSQL 14.x or later
 
 # Directory Structure Overview
 
-**`/components`** - where all components live that are referenced 1 or more times in `/pages`. These are kept here as they aren't routable and it promotes reusability + organization. Consider creating components to put in this directory instead of writing extremely long files in `/pages` 
-
-**`/interfaces`** - where all reused TypeScript interfaces live for code cleanliness and reusability purposes. Interfaces that are only used in the source file and a little elsewhere live in their source file.
-
-**`/lib`** - where all GraphQL queries live as well as the Apollo Client Initialization 
-
-**`/pages`** - the standard directory in Next.js for routing ([brush up about it here](https://nextjs.org/docs/pages/building-your-application/routing/pages-and-layouts)). Every directory is a path, so everything in this directory is routable ([except for those starting with _](https://nextjs.org/docs/app/getting-started/project-structure#private-folders)). For components of specific pages that most likely have no other use (ex: `./feedback/_FeedbackForm.tsx`) you can colocate those with their respective page. `./profile` and `./data/tables` make use of [dynamic routes](https://nextjs.org/docs/app/getting-started/project-structure#private-folders).
-
-**`/public`** - the standard directory in Next.js for images. Keep all src images in this directory. Many of these images are not actually being used, feel free to clean those out.
-
-**`/services`** - where complex data fetching logic can be placed instead of bloating files in the `/pages` directory. Serves same purpose as `/components` but for data fetching.
-
-**`/styles`** - where themes, global styles, and hex code variables are stored. Only need to touch this if changing the color / ratios of the site.
-
-**`/utility`** - where ad hoc helper methods, text formatters, and maps live. 
-
+| Directory     | Purpose                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/components` | Houses reusable components referenced across pages. Promotes modularity and code organization. Create components here instead of writing large files in `/pages`.                                                                                                                                                                                                        |
+| `/interfaces` | Contains shared TypeScript interfaces. Local interfaces used in single files should remain in their source files.                                                                                                                                                                                                                                                        |
+| `/lib`        | Contains GraphQL queries and Apollo Client initialization.                                                                                                                                                                                                                                                                                                               |
+| `/pages`      | Next.js routing directory. Each folder represents a route path ([routing docs](https://nextjs.org/docs/pages/building-your-application/routing/pages-and-layouts)). All directories are routable except those prefixed with `_`. Uses [dynamic routes](https://nextjs.org/docs/app/getting-started/project-structure#private-folders) for `/profile` and `/data/tables`. |
+| `/public`     | Next.js static assets directory. Contains images and other public resources. Note: Some images are unused and can be cleaned up.                                                                                                                                                                                                                                         |
+| `/services`   | Houses complex data fetching logic, keeping `/pages` lean. Similar to `/components` but for data operations.                                                                                                                                                                                                                                                             |
+| `/styles`     | Contains theme configuration, global styles, and color variables. Edit only when changing site design.                                                                                                                                                                                                                                                                   |
+| `/utility`    | Contains helper functions, text formatters, and mapping utilities.                                                                                                                                                                                                                                                                                                       |
 
 # Getting Set Up to Contribute
-1. Populate your own `.env` file using `.env.example`
-2. Familiarize yourself with the repository structure (each high level directory has a `README.md` but below there is a summary of what each directory is for)
-3. Consult **Work to Be Done** to see what you can work on
-4. Get access to all of the resources in the onboarding document (GraphiQL, Notion Kanban, GitHub Private Repo, Postgres DB through DBeaver, Slack channel, `.env` secrets)
+
+## Prerequisites
+
+1. Install Node.js 18.x or later and npm 8.x or later
+2. Request access to:
+    - GraphiQL interface
+    - Notion board
+    - GitHub Private Repository
+    - PostgreSQL Database (DBeaver access)
+    - Slack channel
+    - Environment secrets
+
+## Setup Steps
+
+1. Clone the repository
+2. Copy `.env.example` to `.env` and populate with your credentials
+3. Install dependencies:
+    ```bash
+    npm install
+    ```
+4. Familiarize yourself with the repository structure in the **Directory Structure Overview** above
+5. Check the **Work to Be Done** section and **Notion board** for tasks
 
 ## Testing Local Changes
-To test changes locally, run either commands:
+
+To test changes locally, run either command:
 
 ```bash
 npm run dev
@@ -44,109 +161,182 @@ yarn dev
 
 Open [http://localhost:3010](http://localhost:3010) with your browser to see the result.
 
+## Contributing Guidelines
+
+1. Create a new branch for each feature/bugfix
+2. Follow the TypeScript code style
+3. Update documentation as needed
+4. Submit pull requests against the main branch
+
 # Next.js Configuration Information
-1. We're using typed routes for Next.js. This means that when you are navigating using `<Link />` or similar methods you will get type checking and type hints for the routes.
-2. We are using `superjson` to handle automatic serialization and deserialization of data between the server and the client. This means that you can use `Date` objects and other complex types in your data and they will be serialized and deserialized automatically. It should be noted that the data you return from `getStaticProps` etc should still be fairly "simple" in nature as there is a cost to serialization and deserialization.
+
+| Feature                   | Description                                               | Usage Notes                                                                                                                                                                                                         |
+| ------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Typed Routes**          | Type-safe routing with `<Link />` components              | • Provides type checking and hints for routes<br>• Catches routing errors at compile time<br>• Helps with refactoring and maintenance                                                                               |
+| **SuperJSON Integration** | Handles complex data types in server/client communication | • Supports `Date`, `Map`, `Set`, and other complex objects<br>• Automatic serialization/deserialization<br>• Use simple data structures in `getStaticProps` when possible<br>• Complex types may impact performance |
+
+## Important Considerations
+
+### Route Type Safety
+
+```typescript
+// Example of typed route usage
+<Link
+  href={{
+    pathname: "/profile/[bpiId]",
+    query: { bpiId: officerId }
+  }}
+>
+  View Profile
+</Link>
+```
+
+### Data Serialization
+
+-   Keep data structures simple when possible
+-   Monitor performance with complex types
+-   Test serialization with large datasets
+-   Use appropriate data transformation methods
 
 # How to Add New Data
-Updating the data for this project is very important and thus very common (at least annually). To accomplish this, previous engineers have gone to great lengths to make this as painless as possible.   
+
+Updating the data for this project is very important and thus very common (at least annually). To accomplish this, previous engineers have gone to great lengths to make this as painless as possible.
 
 **Please follow these steps to a T when adding new data to the website from PostgreSQL**
 
 ❓Ask a previous engineer for help if you have any questions as this is a very important process❓
 
 ## Creating a New Table
-When you are adding a whole new dataset that isn't already in the website. 
-1. Change properties in `/utility/tableDefinitions`
-     - change `isFake` to `false`
-     - add table query to `tablesFromAnalyzeBoston` or `tablesFromPublicRecordsRequests` arrays
-2. Create 1 GraphQL Query in `lib/graphql/queries`
-    - `GET_NEXT_PAGE_<query_table_name_here>`
-4.  Create response interface in `interfaces/dataResponseInterfaces.ts`
-5.  Add case to `handleQuery` and `executeDataPageQuery` in `utility/queryUtils.ts`
-6. Add `description` attributes to every column that has a known definition in `utility/createMUIGrid.tsx`
-   - if definition is unknown at the moment just add `description: "",`
-7. Add key-value pair to dictionary in `queryUtils.ts` for `tableDateColumnMap` for date column
+
+When adding a new dataset to the website, follow these steps in order:
+
+| Step | File Location                           | Action Required                                                                                                                                                        |
+| ---- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | `/utility/tableDefinitions`             | • Set `isFake` to `false`<br>• Add table query to appropriate array:<br>&nbsp;&nbsp;- `tablesFromAnalyzeBoston`, or<br>&nbsp;&nbsp;- `tablesFromPublicRecordsRequests` |
+| 2    | `/lib/graphql/queries`                  | Create a new query named `GET_NEXT_PAGE_<query_table_name_here>`                                                                                                       |
+| 3    | `/interfaces/dataResponseInterfaces.ts` | Add new interface for the response type                                                                                                                                |
+| 4    | `/utility/queryUtils.ts`                | Add new cases in:<br>• `handleQuery`<br>• `executeDataPageQuery`                                                                                                       |
+| 5    | `/utility/createMUIGrid.tsx`            | Add `description` for each column:<br>• For known definitions, add detailed description<br>• For unknown, use `description: ""`                                        |
+| 6    | `/utility/queryUtils.ts`                | Add entry to `tableDateColumnMap` for date column                                                                                                                      |
 
 ## Updating a Table to a New View
-When your backend engineer has created a new view representing the most up to date data
-1. In `utility/dataViewAliases.ts` swap out view names as you change them. It will automatically adjust the `queries.ts` file but if the schema changes you will need to manually fix those
-2. In `utility/dataViewAliases.ts` add it to the `table_name_to_alias_map` if it isn't already there
 
+When your backend engineer creates a new view with updated data, follow these steps:
 
+| Step | File Location                 | Action Required                  | Notes                                                                                         |
+| ---- | ----------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------- |
+| 1    | `/utility/dataViewAliases.ts` | Update view names in aliases     | • Changes automatically reflect in `queries.ts`<br>• If schema changes, manual updates needed |
+| 2    | `/utility/dataViewAliases.ts` | Add to `table_name_to_alias_map` | • Ensures proper routing and data fetching                                                    |
+
+### Verification Steps
+
+1. Run development server
+2. Navigate to the updated table
+3. Confirm data is loading correctly
+4. Test all existing functionality (sorting, filtering, etc.)
+5. Monitor for any performance changes
 
 # Work to Be Done
-This is a high level description of what needs to be done. To get access to the [Kanban board](https://www.atlassian.com/agile/kanban/boards#:~:text=A%20kanban%20board%20is%20an,order%20in%20their%20daily%20work.) please consult the onboarding materials in Google Drive. Particularly the Project Description.
 
-## 🚀 New Functionality
+This section outlines the current development priorities. For detailed task tracking, check the [Notion board](https://www.atlassian.com/agile/kanban/boards).
 
+## Tasks
 
-### 1. Server-Side Pagination Rollout for `/data`
+### 1. Performance Optimization
 
-To achieve a **60× performance gain**, we are deprecating client-side pagination. As a result, all core features on the `/data` page need to be re-implemented using server-side logic.
+-   [ ] Implement page preloading for smoother pagination
+-   [ ] Add background data loading for adjacent pages
+-   [ ] Optimize GraphQL query execution
 
-**Progress Checklist:**
+### 2. User Experience Improvements
 
-- [x] Single Page Pagination  
-- [x] Exact Filtering (`=`)  
-- [x] Sorting (`ASC` / `DESC`)  
-- [x] Select Columns  
-- [ ] Fuzzy Filtering (`contains`)  
-- [ ] Export Current Columns (active filter only)  
-- [ ] Export Entire Table (*already in progress, check in with backend engineer regarding Google Cloud Storage)
+-   [x] Complete UI redesign
+-   [x] Implement mobile responsiveness
+-   [x] Add drill-down functionality
+-   [x] Implement comprehensive export feature
+-   [ ] Add new data visualization options
+-   [ ] Implement advanced search with autocomplete
+-   [ ] Improve error messaging and user feedback
 
-#### Advice from Previous Engineer on Fuzzy Filtering
-Look into Postgraphile Plugins. They allow fuzzy filtering. You can also use the `ilike ('%' || search || '%')` command, but it is very poorly documented and I have not tried it myself.
+## Completed Features
 
-<ins>Community Plugins:</ins> https://www.graphile.org/postgraphile/community-plugins/ 
+**Recent Improvements:**
 
-<ins>Possible Performance Damage:</ins> https://www.graphile.org/postgraphile/filtering/
+-   ✅ Complete UI/UX redesign
+-   ✅ Mobile-responsive design implementation
+-   ✅ Data drill-down functionality
+-   ✅ Comprehensive export capabilities
 
-### 2. UX Enhancements for Server-Side Pagination
+## Remaining Improvements
 
-Improving user experience alongside functional upgrades.
+-   [ ] Implement page preloading for smoother pagination
+-   [ ] Add additional data visualization options
+-   [ ] Implement advanced search features
 
-**Planned Improvements:**
+## Known Issues
 
-- [ ] Preload next **X** pages to reduce pagination lag  
-- [ ] Add "Drill Down" pages for each row (similar to officer profile pages) 
+### 1. Data Calculation Standardization
 
-## 👷‍♂️ Known Issues to Solve
-### 1. Filtering vs Formatted Data Mismatch
-
-**Problem:**  
-Users see *formatted* data in `/data`, but filters operate on the *raw* data. This causes confusion when filtering doesn’t return expected results.
-
-**Why this happens:**
-- We use **text formatters** to make raw data more legible.
-- Filters are applied to unformatted (raw) values.
-
-**Considered Solutions:**
-
-| Possible Solution                     | Drawbacks                                                                                          |
-|--------------------------------------|-----------------------------------------------------------------------------------------------------|
-| Change backend data to be legible    | Not sustainable. Every new dataset would need transformation. Risk of losing important raw details. |
-| Abandon all text formatters          | Reduces readability. Raw data may be inconsistently typed (e.g., `"T"`/`"F"` strings vs booleans).  |
-
----
-
-### 2. Pagination Limits Export and Performance
+**Priority: Medium**
 
 **Problem:**  
-The data page only loads the **currently visible rows** on the frontend.
+Inconsistent percentile calculations between header and histogram displays.
 
-**Implications:**
-- "Export Current Columns" only exports the **current page**.
-- Pagination is **slow** due to data fetching on each page switch.
+**Solution:**
+Standardizing percentile calculation across all components:
 
-### 3. Miscalculation Between Backend + Frontend Calculations of Officer Total Pay Percentile
+```typescript
+percentile = (totalNumberOfRecordsBelowValue / totalNumberOfRecords) * 100;
+```
 
-**Problem:**  
-The profile page header **displays a different percentile than the Individual Officer Pay Histogram for the same value** -- Total Pay in the most current year.
+### 2. Component Architecture
 
-**Causes:**
-- The percentile in the header is pulled directly from the Homepage materialized view created by the backend engineer
-- The percentile in the histogram is calculated on the fly in the frontend in `/components/profileVisualizations/(histogram)/Histogram.tsx` in `const percentile = useMemo(....`
+**Priority: Medium**
 
-**Solution:**  
-**Make sure these calculate the percentile the same way.* The correct way is `=[(totalNumberOfRecordsBelowValue) / (totalNumberOfRecords)] * 100`
+**Problem:**
+
+-   Tight coupling between data visualization components and data structures
+-   Inconsistent error handling patterns
+-   Some components have hard-coded dimensions affecting responsiveness
+
+**Solution:**
+
+-   Refactor histogram data handling for better separation of concerns
+-   Implement consistent error boundary pattern
+-   Make components fully responsive with dynamic sizing
+
+### 3. Performance Optimization
+
+**Priority: High**
+
+**Problem:**
+
+-   Data loading and pagination performance bottlenecks
+-   Suboptimal GraphQL query execution
+-   Large dataset handling inefficiencies
+
+**Solution:**
+
+```typescript
+// Implement data preloading pattern
+const preloadAdjacentPages = async (currentPage: number) => {
+	const pagesToPreload = [currentPage - 1, currentPage + 1];
+	await Promise.all(pagesToPreload.map((page) => fetchPageData(page)));
+};
+```
+
+### 4. Code Organization
+
+**Priority: Low**
+
+**Problem:**
+
+-   Deprecated code in utility functions
+-   Inconsistent documentation patterns
+-   Missing test coverage for critical features
+
+**Solution:**
+
+-   Clean up utility functions and remove deprecated code
+-   Standardize documentation format
+-   Add unit and integration tests for data processing and visualization components
