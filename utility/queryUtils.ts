@@ -1,5 +1,5 @@
 import apolloClient from "@lib/apollo-client";
-import { GET_NEXT_PAGE_COURT_OVERTIMES, GET_NEXT_PAGE_CRIME_INCIDENTS, GET_NEXT_PAGE_DETAIL_RECORDS, GET_NEXT_PAGE_FIO_RECORDS, GET_NEXT_PAGE_OFFICER_IA } from "@lib/graphql/queries";
+import { GET_NEXT_PAGE_BOSTON_ARRESTS, GET_NEXT_PAGE_COURT_OVERTIMES, GET_NEXT_PAGE_CRIME_INCIDENTS, GET_NEXT_PAGE_DETAIL_RECORDS, GET_NEXT_PAGE_FIO_RECORDS, GET_NEXT_PAGE_OFFICER_IA } from "@lib/graphql/queries";
 import { table_name_to_alias_map } from "./dataViewAliases";
 
 export const handleQuery = (table_name) => {
@@ -20,6 +20,9 @@ export const handleQuery = (table_name) => {
 			break;
 		case "fio_record":
 			query = GET_NEXT_PAGE_FIO_RECORDS;
+			break;
+		case "boston_arrest":
+			query = GET_NEXT_PAGE_BOSTON_ARRESTS;
 			break;
 	}
 	return query;
@@ -53,6 +56,9 @@ export const executeDataPageQuery = async (table_name, query, variables) => {
 			case "fio_record":
 				data = (await apolloClient.query<FIORecordResponse>({ query: query, variables: variables })).data[viewName];
 				break;
+			case "boston_arrest":
+				data = (await apolloClient.query<BostonArrestsResponse>({ query: query, variables: variables })).data[viewName];
+				break;
 		}
 		return data;
 	} catch (error) {
@@ -79,5 +85,6 @@ export const tableDateColumnMap = {
 	court_overtime: "otDate",
 	officer_misconduct: "occuredDate",
 	fio_record: "year",
+	boston_arrest: "year",
 };
 

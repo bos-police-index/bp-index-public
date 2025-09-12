@@ -1026,6 +1026,232 @@ const fio_record_columns = () => {
 	return cols;
 };
 
+const boston_arrest_columns = () => {
+	const cols: GridColDef[] = [
+		{
+			field: "id",
+			hideable: true,
+			headerName: "ID",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+			filterable: false,
+		},
+		{
+			field: "arrestNum",
+			headerName: "Arrest Number",
+			description: "Unique identifier for the arrest record",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "objectid",
+			headerName: "Object ID",
+			description: "Object identifier for the arrest record",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "incNum",
+			headerName: "Incident Number",
+			description: "Incident number associated with the arrest",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "chargeCode",
+			headerName: "Charge Code",
+			description: "Legal code for the charge",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 120,
+		},
+		{
+			field: "chargeDesc",
+			headerName: "Charge Description",
+			description: "Description of the criminal charge",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 250,
+		},
+		{
+			field: "arrDate",
+			headerName: "Arrest Date",
+			description: "Date when the arrest occurred",
+			type: "date",
+			valueFormatter: formatDateShort,
+			width: 150,
+		},
+		{
+			field: "genderDesc",
+			headerName: "Gender",
+			description: "Gender of the arrested individual",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+		},
+		{
+			field: "raceDesc",
+			headerName: "Race",
+			description: "Race of the arrested individual",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 120,
+		},
+		{
+			field: "ethnicityDesc",
+			headerName: "Ethnicity",
+			description: "Ethnicity of the arrested individual",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "age",
+			headerName: "Age",
+			description: "Age of the arrested individual at time of arrest",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 80,
+		},
+		{
+			field: "juvenile",
+			headerName: "Juvenile",
+			description: "Whether the arrested individual was a juvenile",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+		},
+		{
+			field: "hourOfDay",
+			headerName: "Hour",
+			description: "Hour of day when arrest occurred (0-23)",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 80,
+		},
+		{
+			field: "dayOfWeek",
+			headerName: "Day of Week",
+			description: "Day of week when arrest occurred",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 120,
+		},
+		{
+			field: "year",
+			headerName: "Year",
+			description: "Year when arrest occurred",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 80,
+		},
+		{
+			field: "quarter",
+			headerName: "Quarter",
+			description: "Quarter of year when arrest occurred",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 90,
+		},
+		{
+			field: "month",
+			headerName: "Month",
+			description: "Month when arrest occurred",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 80,
+		},
+		{
+			field: "neighborhood",
+			headerName: "Neighborhood",
+			description: "Neighborhood where arrest occurred",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "district",
+			headerName: "District",
+			description: "Police district where arrest occurred",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+		},
+		{
+			field: "nibrsCode",
+			headerName: "NIBRS Code",
+			description: "National Incident-Based Reporting System code",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 120,
+		},
+		{
+			field: "nibrsDesc",
+			headerName: "NIBRS Description",
+			description: "Description of the NIBRS offense category",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "chargeSeqNum",
+			headerName: "Charge Sequence",
+			description: "Sequence number for multiple charges in same arrest",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 140,
+		},
+	];
+
+	return cols;
+};
+
 const crime_incident_columns = () => {
 	const cleanYamlString = (str: string | null) => {
 		if (!str) return '';
@@ -1212,6 +1438,7 @@ export const functionMapping = {
 	court_overtime: court_overtime_columns(),
 	officer_misconduct: officer_misconduct_columns(),
 	fio_record: fio_record_columns(),
+	boston_arrest: boston_arrest_columns(),
 };
 
 // THE BELOW TABLE DEFINITIONS ARE DEPRECATED BUT **may be helpful** later

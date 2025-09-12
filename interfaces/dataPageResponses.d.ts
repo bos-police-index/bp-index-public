@@ -174,6 +174,39 @@ declare global {
 			totalCount: number;
 		};
 	}
+
+	/* ------------------- BOSTON ARRESTS ---------------------*/
+	interface BostonArrestRecord {
+		pkey: number;
+		objectid: string;
+		arrestNum: string;
+		incNum: string;
+		chargeSeqNum: number;
+		chargeCode: string;
+		chargeDesc: string;
+		nibrsCode: string;
+		nibrsDesc: string;
+		arrDate: string;
+		genderDesc: string;
+		raceDesc: string;
+		ethnicityDesc: string;
+		age: number;
+		juvenile: string;
+		hourOfDay: number;
+		dayOfWeek: number;
+		year: number;
+		quarter: number;
+		month: number;
+		neighborhood: string;
+		district: string;
+	}
+
+	interface BostonArrestsResponse {
+		records: {
+			nodes: BostonArrestRecord[];
+			totalCount: number;
+		};
+	}
 }
 
 // Added to prevent TS from considering this a legacy script and fail in prod

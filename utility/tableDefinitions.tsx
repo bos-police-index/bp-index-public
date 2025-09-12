@@ -8,6 +8,7 @@ import LocalParkingIcon from "@mui/icons-material/LocalParking";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import FindInPageIcon from "@mui/icons-material/FindInPage";
+import HandcuffsIcon from "@mui/icons-material/Security";
 
 import { CSSProperties } from "react";
 import { bpi_deep_green } from "@styles/theme/lightTheme";
@@ -29,7 +30,7 @@ const IconWrapper = ({ Icon, fontSize = "48px", color = bpi_deep_green }: IconWr
 
 // TODO:! As more data is added be sure to add the source they are from to this
 const tablesFromAnalyzeBoston = ["fio_record"];
-const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "officer_misconduct"];
+const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "officer_misconduct", "boston_arrest"];
 const tablesFromWokeWindows = ["crime_incident"];
 
 // Date ranges for specific tables
@@ -102,6 +103,16 @@ const rawTableDefinitions = [
 		shortDescription: "Records of internal affair complaints against Boston Police Department officers, detailing allegation types and final dispositions",
 		longDescription:
 			"The Officer Misconduct (IAs) dataset provides detailed records of all internal affair complaints filed against officers of the Boston Police Department. It includes information on the types of allegations made, the investigative process, and the final disposition of each complaint. This dataset is crucial for transparency and accountability, offering insights into the nature and outcomes of misconduct allegations within the police force.",
+	},
+
+	{
+		table: "Boston Arrests",
+		query: "boston_arrest",
+		image: { component: <IconWrapper Icon={HandcuffsIcon} />, src: HandcuffsIcon },
+		isFake: false,
+		shortDescription: "Records of arrests made by Boston Police Department officers, including suspect information and charges filed",
+		longDescription:
+			"The Boston Arrests dataset provides comprehensive records of arrests made by officers of the Boston Police Department. It includes detailed information about the suspect demographics, charges filed, arrest location and time, and case details. This dataset offers insights into arrest patterns, charge types, and law enforcement practices within the Boston Police Department, helping to understand crime trends and judicial outcomes.",
 	},
 
 	{

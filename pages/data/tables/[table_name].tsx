@@ -23,9 +23,20 @@ export const dataToColumns = (data, table_name: string) => {
 	let dataArr: any[] = [];
 	let rowCount: number;
 
-	if (data && data[viewName]?.nodes) {
-		rowCount = data[viewName].totalCount;
-		dataArr = data[viewName]?.nodes.map((item, index) => {
+	if (data && data[viewName]) {
+		// Handle both 'nodes' structure and 'edges.node' structure
+		let records: any[] = [];
+		if (data[viewName].nodes) {
+			// Standard structure: { nodes: [...], totalCount: ... }
+			records = data[viewName].nodes;
+			rowCount = data[viewName].totalCount;
+		} else if (data[viewName].edges) {
+			// GraphQL Relay structure: { edges: [{ node: ... }], totalCount: ... }
+			records = data[viewName].edges.map(edge => edge.node);
+			rowCount = data[viewName].totalCount;
+		}
+
+		dataArr = records.map((item, index) => {
 			const { ...rest } = item;
 
 			if (!date_row_name) {
@@ -36,7 +47,7 @@ export const dataToColumns = (data, table_name: string) => {
 			} else {
 				return {
 					id: index + 1,
-					year: getYearFromDate(rest[date_row_name as keyof DetailRecord] as string),
+					year: rest[date_row_name] ? getYearFromDate(rest[date_row_name as keyof typeof rest] as string) : null,
 					...rest,
 				};
 			}
@@ -71,13 +82,31 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		while (earliestNeeded || latestNeeded) {
 			const dateRange = await apolloClient.query({ query: GET_YEAR_RANGE_OF_DATASET(table_name, tableDateColumnMap[table_name], offset, earliestNeeded, latestNeeded) });
 
-			if (earliestNeeded && dateRange.data.earliest.nodes[0] != null ? dateRange.data.earliest.nodes[0][tableDateColumnMap[table_name]] : false) {
-				dates.earliest = dateRange.data.earliest.nodes[0][tableDateColumnMap[table_name]];
-				earliestNeeded = false;
+			// Handle both nodes and edges.node structures
+			const getDateValue = (data, field) => {
+				let value = null;
+				if (data?.nodes?.[0]) {
+					value = data.nodes[0][field];
+				} else if (data?.edges?.[0]?.node) {
+					value = data.edges[0].node[field];
+				}
+				// Return null if value is null, undefined, or empty string
+				return value && value.trim ? value.trim() : value;
+			};
+
+			if (earliestNeeded) {
+				const earliestDate = getDateValue(dateRange.data.earliest, tableDateColumnMap[table_name]);
+				if (earliestDate && earliestDate !== "Invalid Date") {
+					dates.earliest = earliestDate;
+					earliestNeeded = false;
+				}
 			}
-			if (latestNeeded && dateRange.data.latest.nodes[0] != null ? dateRange.data.latest.nodes[0][tableDateColumnMap[table_name]] : false) {
-				dates.latest = dateRange.data.latest.nodes[0][tableDateColumnMap[table_name]];
-				latestNeeded = false;
+			if (latestNeeded) {
+				const latestDate = getDateValue(dateRange.data.latest, tableDateColumnMap[table_name]);
+				if (latestDate && latestDate !== "Invalid Date") {
+					dates.latest = latestDate;
+					latestNeeded = false;
+				}
 			}
 			offset == 0 ? (offset += 2) : (offset *= 2);
 		}

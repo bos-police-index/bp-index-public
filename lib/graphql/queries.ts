@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, fio_record_alias_name, homepage_alias_name, officer_financial_alias_name, officer_ia_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map } from "@utility/dataViewAliases";
+import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, fio_record_alias_name, homepage_alias_name, officer_financial_alias_name, officer_ia_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map } from "@utility/dataViewAliases";
 import { DocumentNode } from "graphql";
 
 export const DATA_PAGE_SIZE = 25;
@@ -359,6 +359,40 @@ export const GET_NEXT_PAGE_CRIME_INCIDENTS: DocumentNode = gql`
 	}
 `;
 
+export const GET_NEXT_PAGE_BOSTON_ARRESTS: DocumentNode = gql`
+	query MyQuery($offset: Int, $page_size: Int, $order_by: [${removeAllPrefix(boston_arrest_alias_name)}OrderBy!], $filters: ${removePluralSuffix(removeAllPrefix(boston_arrest_alias_name))}Condition) {
+		${boston_arrest_alias_name}(first: $page_size, offset: $offset, orderBy: $order_by, condition: $filters) {
+			totalCount
+			edges {
+				node {
+					pkey
+					objectid
+					arrestNum
+					incNum
+					chargeSeqNum
+					chargeCode
+					chargeDesc
+					nibrsCode
+					nibrsDesc
+					arrDate
+					genderDesc
+					raceDesc
+					ethnicityDesc
+					age
+					juvenile
+					hourOfDay
+					dayOfWeek
+					year
+					quarter
+					month
+					neighborhood
+					district
+				}
+			}
+		}
+	}
+`;
+
 export const GET_IA_CASE_BY_NUMBER = (iaNumber: string) => {
 	return gql`
 		query MyQuery {
@@ -394,19 +428,41 @@ export const GET_YEAR_RANGE_OF_DATASET = (table_name: string, date_column_name: 
 
 	let query_string = `query {`;
 
+	const usesEdgesStructure = table_name === "boston_arrest";
+
 	if (queryEarliest) {
-		query_string += `\n earliest: ${query_source}(orderBy: ${capitalized_date_col}_ASC, first: 1, offset: ${offset}) {
-							nodes{
-								${date_column_name}
-							}
-						}`;
+		if (usesEdgesStructure) {
+			query_string += `\n earliest: ${query_source}(orderBy: ${capitalized_date_col}_ASC, first: 1, offset: ${offset}) {
+								edges {
+									node {
+										${date_column_name}
+									}
+								}
+							}`;
+		} else {
+			query_string += `\n earliest: ${query_source}(orderBy: ${capitalized_date_col}_ASC, first: 1, offset: ${offset}) {
+								nodes{
+									${date_column_name}
+								}
+							}`;
+		}
 	}
 	if (queryLatest) {
-		query_string += `\n latest: ${query_source}(orderBy: ${capitalized_date_col}_DESC, first: 1, , offset: ${offset}) {
+		if (usesEdgesStructure) {
+			query_string += `\n latest: ${query_source}(orderBy: ${capitalized_date_col}_DESC, first: 1, offset: ${offset}) {
+								edges {
+									node {
+										${date_column_name}
+									}
+								}
+							}`;
+		} else {
+			query_string += `\n latest: ${query_source}(orderBy: ${capitalized_date_col}_DESC, first: 1, offset: ${offset}) {
 								nodes{
-								${date_column_name}
-							}
-						}`;
+									${date_column_name}
+								}
+							}`;
+		}
 	}
 
 	query_string += " }";

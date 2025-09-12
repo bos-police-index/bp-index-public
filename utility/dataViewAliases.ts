@@ -11,6 +11,7 @@ export const court_overtime_alias_name = "allVwCourtOvertimes";
 // export const officer_ia_alias_name  = "allLinkSu24EmployeeIas" (replace if they arent the same )
 export const fio_record_alias_name = "allVwFieldInterrogationAndObservations";
 export const crime_incident_alias_name = "allVwIncidentsWithOfficerDetailsWws";
+export const boston_arrest_alias_name = "allVwBostonArrests";
 
 // PROFILE PAGE
 export const homepage_alias_name = "allHomepages";
@@ -24,6 +25,7 @@ export const table_name_to_alias_map = {
 	officer_misconduct: officer_ia_alias_name,
 	fio_record: fio_record_alias_name,
 	crime_incident: crime_incident_alias_name,
+	boston_arrest: boston_arrest_alias_name,
 };
 
 
