@@ -14,6 +14,7 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
 import { 
 	DataGrid, 
 	GridToolbarContainer,
@@ -30,6 +31,8 @@ import {
 import { bpi_light_green, bpi_deep_green } from "@styles/theme/lightTheme";
 import { dataToColumns } from "@pages/data/tables/[table_name]";
 import { functionMapping } from "@utility/createMUIGrid";
+import { executeDataPageQuery, tableDateColumnMap } from "@utility/queryUtils";
+import { getYearFromDate } from "@utility/textFormatHelpers";
 
 import EmptyState from "./EmptyState";
 
@@ -93,6 +96,7 @@ export default function DataTable({
 		const [densityMenuAnchor, setDensityMenuAnchor] = useState<null | HTMLElement>(null);
 		const [filterValues, setFilterValues] = useState<Record<string, string>>({});
 		const [pendingFilterValues, setPendingFilterValues] = useState<Record<string, string>>({});
+		const [isExportingAll, setIsExportingAll] = useState<boolean>(false);
 
 		// Custom icons
 		const ExportIcon = createSvgIcon(<path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z" />, "SaveAlt");
@@ -145,11 +149,130 @@ export default function DataTable({
 
 		const handleExport = (exportAllColumns?: boolean) => {
 			const csvExportOptions: GridCsvExportOptions = {
-				fileName: `${table_name}.csv`,
+				fileName: `${table_name}`,
 				getRowsToExport: getRowsToExportHandler,
 				allColumns: exportAllColumns === true, 
 			};
 			apiRef.current.exportDataAsCsv(csvExportOptions);
+		};
+
+		const handleExportAll = async () => {
+			if (!isServerSideRendered || !query) {
+				// For client-side tables, just export all data
+				handleExport(false);
+				return;
+			}
+
+			setIsExportingAll(true);
+			try {
+				// Fetch all data without pagination
+				const allData = await executeDataPageQuery(table_name, query, {
+					offset: 0,
+					page_size: 999999, // Large number to get all records
+					order_by: ["NATURAL"],
+					filters: {}
+				});
+
+				if (allData) {
+					let records = [];
+					// Handle both 'nodes' structure and 'edges.node' structure
+					if (allData.nodes) {
+						records = allData.nodes;
+					} else if (allData.edges) {
+						records = allData.edges.map(edge => edge.node);
+					}
+
+					if (records.length > 0) {
+						// Format the data similar to dataToColumns
+						const date_row_name = tableDateColumnMap[table_name];
+						const formattedData = records.map((item, index) => {
+							const { ...rest } = item;
+
+							let formattedItem;
+							if (!date_row_name) {
+								formattedItem = {
+									id: index + 1,
+									...rest,
+								};
+							} else {
+								formattedItem = {
+									id: index + 1,
+									year: rest[date_row_name] ? getYearFromDate(rest[date_row_name]) : null,
+									...rest,
+								};
+							}
+
+							// Remove officer_photo for employee table
+							if (table_name === "employee" && formattedItem["officer_photo"]) {
+								delete formattedItem["officer_photo"];
+							}
+
+							return formattedItem;
+						});
+
+						// Create a temporary CSV export
+						const csvContent = convertToCSV(formattedData, cols);
+						downloadCSV(csvContent, `${table_name}_all.csv`);
+					} else {
+						console.error('No records found in export data');
+						alert('No data available to export.');
+					}
+				} else {
+					console.error('No data returned from export query');
+					alert('Failed to export data. Please try again.');
+				}
+			} catch (error) {
+				console.error('Export error:', error);
+				alert('Failed to export data. Please try again.');
+			} finally {
+				setIsExportingAll(false);
+				setExportMenuAnchor(null);
+			}
+		};
+
+		const convertToCSV = (data: any[], columns: GridColDef[]) => {
+			const headers = columns
+				.filter(col => col.field !== 'id')
+				.map(col => col.headerName || col.field);
+
+			const fields = columns
+				.filter(col => col.field !== 'id')
+				.map(col => col.field);
+
+			// Create CSV content
+			const csvRows = [headers.join(',')];
+
+			data.forEach(row => {
+				const values = fields.map(field => {
+					let value = row[field];
+					if (value === null || value === undefined) {
+						value = '';
+					}
+					// Escape quotes and wrap in quotes if contains comma
+					value = String(value).replace(/"/g, '""');
+					if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+						value = `"${value}"`;
+					}
+					return value;
+				});
+				csvRows.push(values.join(','));
+			});
+
+			return csvRows.join('\n');
+		};
+
+		const downloadCSV = (csvContent: string, fileName: string) => {
+			const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+			const link = document.createElement('a');
+			if (link.download !== undefined) {
+				const url = URL.createObjectURL(blob);
+				link.setAttribute('href', url);
+				link.setAttribute('download', fileName);
+				link.style.visibility = 'hidden';
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+			}
 		};
 
 
@@ -473,25 +596,54 @@ export default function DataTable({
 						<Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#374151', mb: 1 }}>
 							Export Options
 						</Typography>
-						<Typography variant="caption" sx={{ color: '#6b7280', display: 'block' }}>
-							• If rows are selected: Only selected rows will be exported
-						</Typography>
-						<Typography variant="caption" sx={{ color: '#6b7280', display: 'block' }}>
-							• If no selection: Current page will be exported
-						</Typography>
-						<Typography variant="caption" sx={{ color: '#6b7280', display: 'block' }}>
-							• If all rows selected: Entire dataset will be exported
-						</Typography>
+					{isServerSideRendered ? (
+						<>
+							<Typography variant="caption" sx={{ color: '#6b7280', display: 'block' }}>
+								• Standard Export: Selected rows or current page
+							</Typography>
+							<Typography variant="caption" sx={{ color: '#6b7280', display: 'block' }}>
+								• Full Export: Downloads entire dataset (may take time)
+							</Typography>
+						</>
+					) : (
+						<>
+							<Typography variant="caption" sx={{ color: '#6b7280', display: 'block' }}>
+								• If rows are selected: Only selected rows will be exported
+							</Typography>
+							<Typography variant="caption" sx={{ color: '#6b7280', display: 'block' }}>
+								• If no selection: Current page will be exported
+							</Typography>
+							<Typography variant="caption" sx={{ color: '#6b7280', display: 'block' }}>
+								• If all rows selected: Entire dataset will be exported
+							</Typography>
+						</>
+					)}
 					</Box>
-					<MenuItem onClick={() => {
-						handleExport(false);
-						setExportMenuAnchor(null);
-					}}>
+				<MenuItem onClick={() => {
+					handleExport(false);
+					setExportMenuAnchor(null);
+				}}>
+					<ListItemIcon>
+						<CsvIcon fontSize="small" />
+					</ListItemIcon>
+					<ListItemText>
+						{isServerSideRendered ? 'Export Current View' : 'Export as CSV'}
+					</ListItemText>
+				</MenuItem>
+				{isServerSideRendered && (
+					<MenuItem onClick={handleExportAll} disabled={isExportingAll}>
 						<ListItemIcon>
-							<CsvIcon fontSize="small" />
+							{isExportingAll ? (
+								<CircularProgress size={20} />
+							) : (
+								<CsvIcon fontSize="small" />
+							)}
 						</ListItemIcon>
-						<ListItemText>Export as CSV</ListItemText>
+						<ListItemText>
+							{isExportingAll ? 'Exporting...' : 'Export Full Dataset'}
+						</ListItemText>
 					</MenuItem>
+				)}
 				</Menu>
 			</GridToolbarContainer>
 		);
