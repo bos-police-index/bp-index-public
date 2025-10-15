@@ -332,7 +332,7 @@ export default function Home() {
 								<h3 className="text-lg sm:text-xl font-bold text-gray-900 ml-3 sm:ml-4">Community Resource</h3>
 							</div>
 							<p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-								Supporting journalists, policy makers, and citizens in understanding police accountability.
+								Supporting journalists, policy makers, and people in understanding police accountability.
 							</p>
 						</div>
 					</div>
