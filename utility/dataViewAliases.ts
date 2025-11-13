@@ -16,7 +16,8 @@ export const boston_arrest_alias_name = "allVwBostonArrests";
 // PROFILE PAGE
 export const homepage_alias_name = "allHomepages";
 export const officer_financial_alias_name = "allVwEmployeeFinancials";
-export const officer_ia_alias_name = "allVwEmployeeIaNews";
+export const officer_ia_alias_name = "allVwEmployeeIaFall2025S";
+export const employee_alias_name = "allVwEmployeeRosterFall2025S";
 
 // Use in `[table_name].tsx`
 export const table_name_to_alias_map = {
@@ -26,14 +27,26 @@ export const table_name_to_alias_map = {
 	fio_record: fio_record_alias_name,
 	crime_incident: crime_incident_alias_name,
 	boston_arrest: boston_arrest_alias_name,
+	employee: employee_alias_name,
 };
 
 
 /* Used to work with GraphQL type enums better in queries */
 export const removeAllPrefix = (alias:string) =>{
+	if (!alias) {
+		throw new Error("removeAllPrefix: alias is undefined or null");
+	}
 	return alias.replace("all","");
 }
 
 export const removePluralSuffix = (alias: string) => {
-	return alias.trim().endsWith("s") ? alias.slice(0, -1) : alias;
+	if (!alias) {
+		throw new Error("removePluralSuffix: alias is undefined or null");
+	}
+	const trimmed = alias.trim();
+	// Remove trailing 's' or 'S' if present
+	if (trimmed.toLowerCase().endsWith("s")) {
+		return trimmed.slice(0, -1);
+	}
+	return trimmed;
 };

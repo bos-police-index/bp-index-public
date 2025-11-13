@@ -26,14 +26,17 @@ export const dataToColumns = (data, table_name: string) => {
 	if (data && data[viewName]) {
 		// Handle both 'nodes' structure and 'edges.node' structure
 		let records: any[] = [];
-		if (data[viewName].nodes) {
+		if (data[viewName].nodes && Array.isArray(data[viewName].nodes)) {
 			// Standard structure: { nodes: [...], totalCount: ... }
 			records = data[viewName].nodes;
-			rowCount = data[viewName].totalCount;
-		} else if (data[viewName].edges) {
+			rowCount = data[viewName].totalCount || 0;
+		} else if (data[viewName].edges && Array.isArray(data[viewName].edges)) {
 			// GraphQL Relay structure: { edges: [{ node: ... }], totalCount: ... }
 			records = data[viewName].edges.map(edge => edge.node);
-			rowCount = data[viewName].totalCount;
+			rowCount = data[viewName].totalCount || 0;
+		} else {
+			// No valid data structure found
+			return { formattedData: [], rowCount: 0 };
 		}
 
 		dataArr = records.map((item, index) => {
@@ -77,7 +80,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	let dates = { earliest: "", latest: "" };
 	let earliestNeeded = true;
 	let latestNeeded = true;
-	if (tableDateColumnMap[table_name] != "") {
+	if (tableDateColumnMap[table_name] && tableDateColumnMap[table_name] != "") {
 		let offset = 0;
 		while (earliestNeeded || latestNeeded) {
 			const dateRange = await apolloClient.query({ query: GET_YEAR_RANGE_OF_DATASET(table_name, tableDateColumnMap[table_name], offset, earliestNeeded, latestNeeded) });

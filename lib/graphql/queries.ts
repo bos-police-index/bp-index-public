@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, fio_record_alias_name, homepage_alias_name, officer_financial_alias_name, officer_ia_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map } from "@utility/dataViewAliases";
+import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, employee_alias_name, fio_record_alias_name, homepage_alias_name, officer_financial_alias_name, officer_ia_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map } from "@utility/dataViewAliases";
 import { DocumentNode } from "graphql";
 
 export const DATA_PAGE_SIZE = 25;
@@ -97,21 +97,24 @@ export const INDIVIDUAL_OFFICER_IA = (bpiId: string) => {
 	return gql`
 		query MyQuery {
 			${officer_ia_alias_name}(condition: {bpiId: "${bpiId}"}) {
-				nodes {
-					iaNumber
-					badgeNo
-					incidentType
-					receivedDate
-					allegation
-					finding
-					actionTaken
-					leaDisposition
-					disposition
-					occuredDate
-					allegationDetails
-					allegationSubtype
-					allegationType
-					disciplines
+				edges {
+					node {
+						bpiId
+						employeeId
+						badgeNo
+						firstName
+						lastName
+						titleRank
+						race
+						sex
+						iaNumber
+						incidentType
+						receivedDate
+						allegation
+						finding
+						actionTaken
+						daysHoursSuspended
+					}
 				}
 			}
 		}
@@ -254,29 +257,29 @@ export const GET_NEXT_PAGE_COURT_OVERTIMES: DocumentNode = gql`
 	}
 `;
 
-export const GET_NEXT_PAGE_OFFICER_IA = gql`
+export const GET_NEXT_PAGE_OFFICER_IA: DocumentNode = gql`
 	query MyQuery($offset: Int, $page_size: Int, $order_by: [${removeAllPrefix(officer_ia_alias_name)}OrderBy!], $filters: ${removePluralSuffix(removeAllPrefix(officer_ia_alias_name))}Condition) {
 		${officer_ia_alias_name}(first: $page_size, offset: $offset, orderBy: $order_by, condition: $filters) {
-			nodes {
-			 	iaNumber
-				badgeNo
-				incidentType
-				receivedDate
-				firstName
-				lastName
-				allegation
-				finding
-				actionTaken
-				leaDisposition
-				disposition
-				occuredDate
-				allegationDetails
-				allegationSubtype
-				allegationType
-				disciplines
-				bpiId
-   		 	}
-				totalCount
+			edges {
+				node {
+					bpiId
+					employeeId
+					badgeNo
+					firstName
+					lastName
+					titleRank
+					race
+					sex
+					iaNumber
+					incidentType
+					receivedDate
+					allegation
+					finding
+					actionTaken
+					daysHoursSuspended
+				}
+			}
+			totalCount
 		}
 	}
 `;
@@ -393,29 +396,54 @@ export const GET_NEXT_PAGE_BOSTON_ARRESTS: DocumentNode = gql`
 	}
 `;
 
+export const GET_NEXT_PAGE_EMPLOYEE: DocumentNode = (() => {
+	if (!employee_alias_name) {
+		throw new Error("employee_alias_name is not defined");
+	}
+	return gql`
+		query MyQuery($offset: Int, $page_size: Int, $order_by: [${removeAllPrefix(employee_alias_name)}OrderBy!], $filters: ${removePluralSuffix(removeAllPrefix(employee_alias_name))}Condition) {
+			${employee_alias_name}(first: $page_size, offset: $offset, orderBy: $order_by, condition: $filters) {
+				totalCount
+				edges {
+					node {
+						bpiId
+						employeeId
+						nameId
+						lastName
+						firstName
+						salPlan
+						jobTitle
+					}
+				}
+			}
+		}
+	`;
+})();
+
 export const GET_IA_CASE_BY_NUMBER = (iaNumber: string) => {
 	return gql`
-		query MyQuery {
-			${officer_ia_alias_name}(condition: {iaNumber: "${iaNumber}"}) {
-				nodes {
-					iaNumber
-					badgeNo
-					incidentType
-					receivedDate
-					firstName
-					lastName
-					allegation
-					finding
-					actionTaken
-					leaDisposition
-					disposition
-					occuredDate
-					allegationDetails
-					allegationSubtype
-					allegationType
-					disciplines
-					bpiId
+		query MyQuery($filters: ${removePluralSuffix(removeAllPrefix(officer_ia_alias_name))}Condition) {
+			${officer_ia_alias_name}(first: 1, condition: $filters) {
+				edges {
+					node {
+						bpiId
+						employeeId
+						badgeNo
+						firstName
+						lastName
+						titleRank
+						race
+						sex
+						iaNumber
+						incidentType
+						receivedDate
+						allegation
+						finding
+						actionTaken
+						daysHoursSuspended
+					}
 				}
+				totalCount
 			}
 		}
 	`;
@@ -424,11 +452,17 @@ export const GET_IA_CASE_BY_NUMBER = (iaNumber: string) => {
 // Get Year range of the dataset
 export const GET_YEAR_RANGE_OF_DATASET = (table_name: string, date_column_name: string, offset: number, queryEarliest: boolean, queryLatest: boolean): DocumentNode => {
 	const query_source = table_name_to_alias_map[table_name];
+	
+	// If no date column is provided, return an empty query
+	if (!date_column_name) {
+		return gql`query { }`;
+	}
+	
 	const capitalized_date_col = toUpperSnakeCase(date_column_name);
 
 	let query_string = `query {`;
 
-	const usesEdgesStructure = table_name === "boston_arrest";
+	const usesEdgesStructure = table_name === "boston_arrest" || table_name === "officer_misconduct";
 
 	if (queryEarliest) {
 		if (usesEdgesStructure) {
@@ -473,5 +507,8 @@ export const GET_YEAR_RANGE_OF_DATASET = (table_name: string, date_column_name: 
 };
 
 function toUpperSnakeCase(camelCaseStr) {
+	if (!camelCaseStr) {
+		return "";
+	}
 	return camelCaseStr.replace(/([a-z])([A-Z])/g, "$1_$2").toUpperCase();
 }

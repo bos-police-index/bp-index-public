@@ -106,11 +106,29 @@ export function extractEmployeeFinancialRowsFromIndividualEmployeeFinancialQuery
 
 /* 
 Add artificial id for MUI purposes
+Handles both nodes and edges.node structures
 */
 export function addIdToRows(rows, alias_name) {
 	let rowId = 1;
-	const newRows = rows.data[alias_name].nodes.map((node) => {
-		return { id: rowId++, ...node };
+	let dataArray = [];
+	
+	if (rows.data[alias_name]?.edges) {
+		// Handle edges structure
+		dataArray = rows.data[alias_name].edges.map((edge) => edge.node);
+	} else if (rows.data[alias_name]?.nodes) {
+		// Handle nodes structure
+		dataArray = rows.data[alias_name].nodes;
+	} else {
+		return [];
+	}
+	
+	const newRows = dataArray.map((node) => {
+		// Map titleRank to rank for backward compatibility
+		const mappedNode = { ...node };
+		if (mappedNode.titleRank && !mappedNode.rank) {
+			mappedNode.rank = mappedNode.titleRank;
+		}
+		return { id: rowId++, ...mappedNode };
 	});
 	return newRows;
 }

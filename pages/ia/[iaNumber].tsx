@@ -14,12 +14,56 @@ import DataTable from "@components/DataTable";
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const iaNumber = context.params?.iaNumber as string;
   
+  if (!iaNumber) {
+    return {
+      notFound: true
+    };
+  }
+
   try {
-    const { data } = await apolloClient.query({
-      query: GET_IA_CASE_BY_NUMBER(iaNumber)
+    const { data, error, errors } = await apolloClient.query({
+      query: GET_IA_CASE_BY_NUMBER(iaNumber),
+      variables: {
+        filters: {
+          iaNumber: iaNumber
+        }
+      },
+      errorPolicy: 'all',
+      fetchPolicy: 'network-only'
     });
 
-    const iaCase = data[officer_ia_alias_name]?.nodes?.[0];
+    if (error) {
+      console.error('GraphQL error fetching IA case:', error);
+    }
+    
+    if (errors && errors.length > 0) {
+      console.error('GraphQL errors:', errors);
+    }
+
+    // Handle both edges and nodes structures
+    let iaCase;
+    if (data?.[officer_ia_alias_name]?.edges?.length > 0) {
+      // If multiple edges, find the one matching the IA number (in case condition didn't work)
+      const matchingEdge = data[officer_ia_alias_name].edges.find(
+        edge => edge.node?.iaNumber === iaNumber
+      );
+      iaCase = matchingEdge?.node || data[officer_ia_alias_name].edges[0].node;
+    } else if (data?.[officer_ia_alias_name]?.nodes?.length > 0) {
+      // If multiple nodes, find the one matching the IA number
+      const matchingNode = data[officer_ia_alias_name].nodes.find(
+        node => node?.iaNumber === iaNumber
+      );
+      iaCase = matchingNode || data[officer_ia_alias_name].nodes[0];
+    }
+    
+    // Map titleRank to rank for backward compatibility
+    // Create a new object since Apollo objects are frozen
+    if (iaCase && iaCase.titleRank && !iaCase.rank) {
+      iaCase = {
+        ...iaCase,
+        rank: iaCase.titleRank
+      };
+    }
     
     if (!iaCase) {
       return {
@@ -34,6 +78,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   } catch (error) {
     console.error('Error fetching IA case:', error);
+    console.error('Error details:', {
+      message: error?.message,
+      graphQLErrors: error?.graphQLErrors,
+      networkError: error?.networkError
+    });
     return {
       notFound: true
     };
@@ -62,29 +111,57 @@ export default function IACase({ iaCase }: InferGetServerSidePropsType<typeof ge
 
   const iaCaseRow = {
     id: iaCase.iaNumber || 'unknown',
+    iaNumber: iaCase.iaNumber,
     bpiId: iaCase.bpiId,
     firstName: iaCase.firstName,
     lastName: iaCase.lastName,
     fullName: `${iaCase.firstName} ${iaCase.lastName}`,
     badgeNo: iaCase.badgeNo,
-    rank: iaCase.rank,
-    allegationType: iaCase.allegationType,
-    allegationSubtype: iaCase.allegationSubtype,
+    rank: iaCase.rank || iaCase.titleRank,
+    titleRank: iaCase.titleRank || iaCase.rank,
     allegation: iaCase.allegation,
-    allegationDetails: iaCase.allegationDetails,
     finding: iaCase.finding,
-    occuredDate: iaCase.occuredDate,
     receivedDate: iaCase.receivedDate,
-    disposition: iaCase.disposition,
     actionTaken: iaCase.actionTaken,
-    disciplines: iaCase.disciplines,
+    daysHoursSuspended: iaCase.daysHoursSuspended,
+    incidentType: iaCase.incidentType,
+    race: iaCase.race,
+    sex: iaCase.sex,
   };
 
   const cols: GridColDef[] = [
+    {
+      field: 'iaNumber',
+      headerName: 'IA Number',
+      width: 150,
+      renderCell: (params) => (
+        <Link 
+          href={{
+            pathname: "/ia/[iaNumber]",
+            query: { iaNumber: params.value }
+          }}
+          className="text-emerald-600"
+        >
+          {params.value}
+        </Link>
+      )
+    },
+    {
+      field: 'incidentType',
+      headerName: 'Incident Type',
+      width: 180,
+    },
+    {
+      field: 'receivedDate',
+      headerName: 'Date Received',
+      width: 140,
+      type: 'date',
+      valueFormatter: (params) => formatDate(params.value),
+    },
     { 
       field: 'fullName', 
-      headerName: 'Officer', 
-      flex: 1.5,
+      headerName: 'Officer Name', 
+      width: 180,
       renderCell: (params) => params.row.bpiId ? (
         <Link 
           href={{
@@ -98,17 +175,20 @@ export default function IACase({ iaCase }: InferGetServerSidePropsType<typeof ge
       ) : params.value
     },
     {
-      field: 'badgeRank',
-      headerName: 'Badge/Rank',
-      flex: 1,
-      valueGetter: (params) => `${params.row.badgeNo || 'N/A'} / ${params.row.rank || 'N/A'}`,
+      field: 'badgeNo',
+      headerName: 'Officer Badge',
+      width: 120,
+      type: 'number',
     },
-    { field: 'allegationType', headerName: 'Allegation Type', flex: 1.5 },
-    { field: 'allegationSubtype', headerName: 'Allegation Subtype', flex: 1.5 },
+    {
+      field: 'allegation',
+      headerName: 'Allegation',
+      width: 220,
+    },
     { 
       field: 'finding', 
       headerName: 'Finding', 
-      flex: 1,
+      width: 140,
       renderCell: (params) => (
         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(params.value)}`}>
           {params.value || 'N/A'}
@@ -116,14 +196,14 @@ export default function IACase({ iaCase }: InferGetServerSidePropsType<typeof ge
       )
     },
     {
-      field: 'allegationDetails',
-      headerName: 'Allegation Details',
-      flex: 2,
-      renderCell: (params) => (
-        <div className="line-clamp-3 text-xs">
-          {params.value || 'No details available'}
-        </div>
-      )
+      field: 'actionTaken',
+      headerName: 'Action Taken',
+      width: 180,
+    },
+    {
+      field: 'daysHoursSuspended',
+      headerName: 'Days/Hours Suspended',
+      width: 160,
     }
   ];
 
@@ -209,13 +289,15 @@ export default function IACase({ iaCase }: InferGetServerSidePropsType<typeof ge
                 <div className="mt-1 text-gray-900 font-medium">{iaCase.incidentType || 'N/A'}</div>
               </div>
               <div>
-                <div className="text-sm font-medium text-gray-500">Date Occurred</div>
-                <div className="mt-1 text-gray-900 font-medium">{formatDate(iaCase.occuredDate)}</div>
-              </div>
-              <div>
                 <div className="text-sm font-medium text-gray-500">Date Received</div>
                 <div className="mt-1 text-gray-900 font-medium">{formatDate(iaCase.receivedDate)}</div>
               </div>
+              {iaCase.daysHoursSuspended && (
+                <div>
+                  <div className="text-sm font-medium text-gray-500">Days/Hours Suspended</div>
+                  <div className="mt-1 text-gray-900 font-medium">{iaCase.daysHoursSuspended}</div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -229,43 +311,71 @@ export default function IACase({ iaCase }: InferGetServerSidePropsType<typeof ge
               </div>
             </div>
             <div className="space-y-6">
-              <div className="bg-gray-50 p-4 rounded-xl">
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Allegation Details</h3>
-                <p className="text-gray-700 whitespace-pre-wrap">
-                  {iaCase.allegationDetails || 'No details available.'}
-                </p>
-              </div>
+              {iaCase.allegation && (
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">Allegation</h3>
+                  <p className="text-gray-700 whitespace-pre-wrap">
+                    {iaCase.allegation}
+                  </p>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-blue-50 p-4 rounded-xl">
-                  <h3 className="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-blue-100">Allegation Information</h3>
+                  <h3 className="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-blue-100">Officer Information</h3>
                   <div className="space-y-3">
                     <div>
-                      <div className="text-sm font-medium text-gray-500">Type</div>
-                      <div className="mt-1 text-gray-900 font-medium">{iaCase.allegationType || 'N/A'}</div>
+                      <div className="text-sm font-medium text-gray-500">Name</div>
+                      <div className="mt-1 text-gray-900 font-medium">
+                        {iaCase.firstName} {iaCase.lastName}
+                      </div>
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-gray-500">Subtype</div>
-                      <div className="mt-1 text-gray-900 font-medium">{iaCase.allegationSubtype || 'N/A'}</div>
+                      <div className="text-sm font-medium text-gray-500">Badge Number</div>
+                      <div className="mt-1 text-gray-900 font-medium">{iaCase.badgeNo || 'N/A'}</div>
                     </div>
+                    {iaCase.titleRank && (
+                      <div>
+                        <div className="text-sm font-medium text-gray-500">Rank</div>
+                        <div className="mt-1 text-gray-900 font-medium">{iaCase.titleRank}</div>
+                      </div>
+                    )}
+                    {(iaCase.race || iaCase.sex) && (
+                      <div>
+                        <div className="text-sm font-medium text-gray-500">Demographics</div>
+                        <div className="mt-1 text-gray-900 font-medium">
+                          {[iaCase.race, iaCase.sex].filter(Boolean).join(', ')}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="bg-red-50 p-4 rounded-xl">
                   <h3 className="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-red-100">Case Outcome</h3>
                   <div className="space-y-3">
-                    <div>
-                      <div className="text-sm font-medium text-gray-500">Action Taken</div>
-                      <div className="mt-1 text-gray-900 font-medium">{iaCase.actionTaken || 'N/A'}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium text-gray-500">Disposition</div>
-                      <div className="mt-1 text-gray-900 font-medium">{iaCase.disposition || 'N/A'}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium text-gray-500">Disciplines</div>
-                      <div className="mt-1 text-gray-900 font-medium">{iaCase.disciplines || 'N/A'}</div>
-                    </div>
+                    {iaCase.finding && (
+                      <div>
+                        <div className="text-sm font-medium text-gray-500">Finding</div>
+                        <div className="mt-1">
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(iaCase.finding)}`}>
+                            {iaCase.finding}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    {iaCase.actionTaken && (
+                      <div>
+                        <div className="text-sm font-medium text-gray-500">Action Taken</div>
+                        <div className="mt-1 text-gray-900 font-medium">{iaCase.actionTaken}</div>
+                      </div>
+                    )}
+                    {iaCase.daysHoursSuspended && (
+                      <div>
+                        <div className="text-sm font-medium text-gray-500">Days/Hours Suspended</div>
+                        <div className="mt-1 text-gray-900 font-medium">{iaCase.daysHoursSuspended}</div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

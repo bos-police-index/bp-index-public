@@ -81,14 +81,6 @@ const officer_ia_columns = () => {
 			width: 250,
 		},
 		{
-			field: "badgeNo",
-			headerName: "Officer Badge #",
-			description: "The badge number of an officer. Note that this is not necessarily unique.",
-			type: "number",
-			valueFormatter: (params) => params.value,
-			width: 150,
-		},
-		{
 			field: "incidentType",
 			headerName: "Incident Type",
 			description: "The general category of the reported event (e.g., use of force, misconduct, policy violation)",
@@ -140,6 +132,14 @@ const officer_ia_columns = () => {
 			width: 200,
 		},
 		{
+			field: "badgeNo",
+			headerName: "Officer Badge",
+			description: "The badge number of an officer. Note that this is not necessarily unique.",
+			type: "number",
+			valueFormatter: (params) => params.value,
+			width: 150,
+		},
+		{
 			field: "allegation",
 			headerName: "Allegation",
 			description: "The specific accusation or complaint made against the officer(s)",
@@ -170,6 +170,17 @@ const officer_ia_columns = () => {
 			width: 200,
 		},
 		{
+			field: "daysHoursSuspended",
+			headerName: "Days/Hours Suspended",
+			description: "The number of days or hours the officer was suspended as a result of the disciplinary action.",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		// Hidden columns (can be shown via column visibility menu)
+		{
 			field: "disposition",
 			headerName: "Disposition",
 			description: "The final status of the case, including whether it was closed, pending, or referred to another agency.",
@@ -178,6 +189,7 @@ const officer_ia_columns = () => {
 				return params.value;
 			},
 			width: 200,
+			hideable: true,
 		},
 		{
 			field: "occuredDate",
@@ -186,6 +198,7 @@ const officer_ia_columns = () => {
 			type: "date",
 			valueFormatter: formatDateShort,
 			width: 200,
+			hideable: true,
 		},
 		{
 			field: "allegationType",
@@ -196,6 +209,7 @@ const officer_ia_columns = () => {
 				return params.value;
 			},
 			width: 200,
+			hideable: true,
 		},
 		{
 			field: "allegationSubtype",
@@ -206,6 +220,7 @@ const officer_ia_columns = () => {
 				return params.value;
 			},
 			width: 200,
+			hideable: true,
 		},
 		{
 			field: "allegationDetails",
@@ -216,6 +231,7 @@ const officer_ia_columns = () => {
 				return params.value;
 			},
 			width: 200,
+			hideable: true,
 		},
 		{
 			field: "disciplines",
@@ -226,6 +242,7 @@ const officer_ia_columns = () => {
 				return params.value;
 			},
 			width: 200,
+			hideable: true,
 		},
 		{
 			field: "leaDisposition",
@@ -236,6 +253,7 @@ const officer_ia_columns = () => {
 				return params.value;
 			},
 			width: 200,
+			hideable: true,
 		},
 	];
 
@@ -1430,6 +1448,107 @@ const crime_incident_columns = () => {
 	return cols;
 };
 
+const employee_columns = () => {
+	const cols: GridColDef[] = [
+		{
+			field: "id",
+			hideable: true,
+			headerName: "ID",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+			filterable: false,
+		},
+		{
+			field: "employeeId",
+			headerName: "Employee ID",
+			description: "The unique employee identifier",
+			type: "number",
+			width: 150,
+		},
+		{
+			field: "officerName",
+			headerName: "Officer Name",
+			description: "The full name of the employee",
+			valueGetter: (params) => {
+				const firstName = params.row.firstName || "";
+				const lastName = params.row.lastName || "";
+				return `${firstName} ${lastName}`.trim();
+			},
+			renderCell: (params) => {
+				const firstName = params.row.firstName || "";
+				const lastName = params.row.lastName || "";
+				const officerName = `${firstName} ${lastName}`.trim();
+				if (!params.row.bpiId) {
+					return officerName;
+				}
+				return (
+					<Link
+						href={{
+							pathname: "/profile/[bpiId]",
+							query: { bpiId: params.row.bpiId },
+						}}
+						style={{ color: bpi_light_green, textDecoration: "none" }}
+						onClick={(e) => {
+							e.stopPropagation();
+						}}
+					>
+						{officerName}
+					</Link>
+				);
+			},
+			width: 200,
+		},
+		{
+			field: "lastName",
+			headerName: "Last Name",
+			description: "The last name of the employee",
+			type: "string",
+			width: 150,
+		},
+		{
+			field: "firstName",
+			headerName: "First Name",
+			description: "The first name of the employee",
+			type: "string",
+			width: 150,
+		},
+		{
+			field: "jobTitle",
+			headerName: "Job Title",
+			description: "The job title or position of the employee",
+			type: "string",
+			width: 200,
+		},
+		{
+			field: "salPlan",
+			headerName: "Salary Plan",
+			description: "The salary plan classification",
+			type: "string",
+			width: 150,
+		},
+		{
+			field: "nameId",
+			headerName: "Name ID",
+			description: "The formatted name identifier",
+			type: "string",
+			hideable: true,
+			width: 200,
+		},
+		{
+			field: "bpiId",
+			headerName: "BPI ID",
+			description: "The Boston Police Index unique identifier",
+			type: "string",
+			hideable: true,
+			width: 250,
+		},
+	];
+	return cols;
+};
+
 export const functionMapping = {
 	detail_record: detail_record_columns(),
 	crime_incident: crime_incident_columns(), // Using actual crime incident columns now
@@ -1439,6 +1558,7 @@ export const functionMapping = {
 	officer_misconduct: officer_misconduct_columns(),
 	fio_record: fio_record_columns(),
 	boston_arrest: boston_arrest_columns(),
+	employee: employee_columns(),
 };
 
 // THE BELOW TABLE DEFINITIONS ARE DEPRECATED BUT **may be helpful** later

@@ -44,7 +44,7 @@ const rawTableDefinitions = [
 		table: "BPD Employees",
 		query: "employee",
 		image: { component: <IconWrapper Icon={LocalPoliceIcon} />, src: LocalPoliceIcon },
-		isFake: true,
+		isFake: false,
 		shortDescription: "Information about all employees of the Boston Police Department.",
 		longDescription:
 			"Detailed records of all employees working within the Boston Police Department (BPD). This includes information such as employee names, roles, ranks, and other pertinent employment details. This dataset is valuable for understanding the workforce composition and organizational structure of the BPD.",

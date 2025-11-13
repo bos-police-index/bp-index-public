@@ -771,7 +771,21 @@ export default function DataTable({
 			page: 0,
 			pageSize: 25,
 		});
-		const [queryOptions, setQueryOptions] = useState<any>();
+		const getInitialOrderBy = () => {
+			if (table_name === "officer_misconduct") {
+				return ["IA_NUMBER_DESC"]; 
+			}
+			return ["NATURAL"];
+		};
+		const [queryOptions, setQueryOptions] = useState<any>({
+			orderBy: getInitialOrderBy(),
+		});
+		const [sortModel, setSortModel] = useState(() => {
+			if (table_name === "officer_misconduct") {
+				return [{ field: "iaNumber", sort: "desc" as const }];
+			}
+			return [];
+		});
 
 		const getFieldType = (fieldName: string): string => {
 			const fieldType = functionMapping[table_name].find((field) => field.field === fieldName)?.type;
@@ -812,11 +826,17 @@ export default function DataTable({
 			}));
 		}, []);
 
-		const handleSortModelChange = useCallback((sortModel: GridSortModel) => {
+		const handleSortModelChange = useCallback((newSortModel: GridSortModel) => {
+			setSortModel(
+				newSortModel.map(({ field, sort }) => ({
+					field,
+					sort: sort === "desc" ? "desc" : "desc"
+				}))
+			);
 			let orderBy = ["NATURAL"];
 
-			if (sortModel.length > 0) {
-				const { field, sort } = sortModel[0];
+			if (newSortModel.length > 0) {
+				const { field, sort } = newSortModel[0];
 
 				orderBy = [
 					field
@@ -855,7 +875,7 @@ export default function DataTable({
 			});
 		}, [queryOptions, paginationModel.page, paginationModel.pageSize, refetch]);
 
-		let { formattedData, rowCount } = dataToColumns(data, table_name);
+		let { formattedData, rowCount } = dataToColumns(data || {}, table_name);
 		const ToolbarComponent = customToolbar || CustomToolbar;
 
 		return (
@@ -954,6 +974,7 @@ export default function DataTable({
 				filterMode="server"
 				onFilterModelChange={onFilterChange}
 				sortingMode="server"
+				sortModel={sortModel}
 				onSortModelChange={handleSortModelChange}
 				onRowClick={onRowClick}
 				disableColumnMenu={true}

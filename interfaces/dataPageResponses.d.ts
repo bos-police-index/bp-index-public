@@ -70,29 +70,36 @@ declare global {
 	/* ------------------- OFFICER IA ---------------------*/
 
 	interface OfficerIARecord {
-		iaNumber: string;
+		bpiId: string;
+		employeeId: number;
 		badgeNo: number;
-		incidentType: string;
-		receivedDate: string;
 		firstName: string;
 		lastName: string;
+		titleRank: string;
+		race: string;
+		sex: string;
+		iaNumber: string;
+		incidentType: string;
+		receivedDate: string;
 		allegation: string;
 		finding: string;
 		actionTaken: string;
-		leaDisposition: string;
-		disposition: string;
-		occuredDate: string;
-		allegationDetails: string;
-		allegationSubtype: string;
-		allegationType: string;
-		disciplines: string;
+		daysHoursSuspended: string;
+		// Legacy fields 
+		leaDisposition?: string;
+		disposition?: string;
+		occuredDate?: string;
+		allegationDetails?: string;
+		allegationSubtype?: string;
+		allegationType?: string;
+		disciplines?: string;
+		rank?: string; 
 	}
 
 	interface OfficerIAResponse {
-		records: {
-			nodes: OfficerIARecord[];
-			totalCount: number;
-		};
+		edges?: Array<{ node: OfficerIARecord }>;
+		nodes?: OfficerIARecord[];
+		totalCount: number;
 	}
 
 	/* ------------------- FIO Record ---------------------*/
@@ -202,10 +209,25 @@ declare global {
 	}
 
 	interface BostonArrestsResponse {
-		records: {
-			nodes: BostonArrestRecord[];
-			totalCount: number;
-		};
+		edges?: Array<{ node: BostonArrestRecord }>;
+		nodes?: BostonArrestRecord[];
+		totalCount: number;
+	}
+
+	interface EmployeeRecord {
+		bpiId: string;
+		employeeId: number;
+		nameId: string;
+		lastName: string;
+		firstName: string;
+		salPlan: string;
+		jobTitle: string;
+	}
+
+	interface EmployeeResponse {
+		edges?: Array<{ node: EmployeeRecord }>;
+		nodes?: EmployeeRecord[];
+		totalCount: number;
 	}
 }
 
