@@ -46,7 +46,7 @@ export const removePluralSuffix = (alias: string) => {
 		throw new Error("removePluralSuffix: alias is undefined or null");
 	}
 	const trimmed = alias.trim();
-	// Remove trailing 's' or 'S' if present
+	// Remove trailing 's' or 'S' if present 
 	if (trimmed.toLowerCase().endsWith("s")) {
 		return trimmed.slice(0, -1);
 	}
