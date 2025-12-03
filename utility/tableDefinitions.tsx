@@ -9,6 +9,7 @@ import EventNoteIcon from "@mui/icons-material/EventNote";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import FindInPageIcon from "@mui/icons-material/FindInPage";
 import HandcuffsIcon from "@mui/icons-material/Security";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 
 import { CSSProperties } from "react";
 import { bpi_deep_green } from "@styles/theme/lightTheme";
@@ -30,7 +31,7 @@ const IconWrapper = ({ Icon, fontSize = "48px", color = bpi_deep_green }: IconWr
 
 // TODO:! As more data is added be sure to add the source they are from to this
 const tablesFromAnalyzeBoston = ["fio_record"];
-const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "officer_misconduct", "boston_arrest"];
+const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "officer_misconduct", "boston_arrest", "traffic_stop"];
 const tablesFromWokeWindows = ["crime_incident"];
 
 // Date ranges for specific tables
@@ -83,7 +84,16 @@ const rawTableDefinitions = [
 		isFake: false,
 		shortDescription: "Officers' interactions with individuals in the community (interrogations, observations, stops, searches, and others)",
 		longDescription:
-			"The Boston Police Department’s Field Interrogation and Observation (FIO) data documents a broad range of encounters between officers and individuals, including stops, observations, and interrogations conducted in the field. This dataset is released to promote transparency and public accountability in policing practices, offering insights into the scope, frequency, and context of such interactions. While the data provides valuable information for research and oversight, identifying details are withheld to ensure the privacy of the individuals involved.",
+			"The Boston Police Department's Field Interrogation and Observation (FIO) data documents a broad range of encounters between officers and individuals, including stops, observations, and interrogations conducted in the field. This dataset is released to promote transparency and public accountability in policing practices, offering insights into the scope, frequency, and context of such interactions. While the data provides valuable information for research and oversight, identifying details are withheld to ensure the privacy of the individuals involved.",
+	},
+	{
+		table: "Traffic Stops",
+		query: "traffic_stop",
+		image: { component: <IconWrapper Icon={DirectionsCarIcon} />, src: DirectionsCarIcon },
+		isFake: false,
+		shortDescription: "Records of traffic stops conducted by Boston Police Department officers, including stop details and outcomes",
+		longDescription:
+			"The Traffic Stops dataset provides comprehensive records of all traffic stops conducted by officers of the Boston Police Department. This includes information about the time, date, and location of stops, the reason for the stop, demographic information about the driver, and the outcome of the stop such as citations issued or warnings given. This dataset is essential for analyzing traffic enforcement patterns, understanding the nature of police-citizen interactions during traffic stops, and promoting transparency in law enforcement practices.",
 	},
 
 	{

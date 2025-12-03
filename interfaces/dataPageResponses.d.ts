@@ -229,6 +229,33 @@ declare global {
 		nodes?: EmployeeRecord[];
 		totalCount: number;
 	}
+
+	/* ------------------- TRAFFIC STOPS ---------------------*/
+	interface TrafficStopRecord {
+		bpiId: string;
+		officerId: number;
+		eventDate: string;
+		timeHh: string;
+		timeMm: string;
+		amPm: string;
+		violatorType: string;
+		citationNumber: string;
+		citationType: string;
+		offenseCode: string;
+		offenseDescription: string;
+		locationName: string;
+		race: string;
+		gender: string;
+		yearOfBirth: string;
+		searched: string;
+		crash: string;
+	}
+
+	interface TrafficStopsResponse {
+		edges?: Array<{ node: TrafficStopRecord }>;
+		nodes?: TrafficStopRecord[];
+		totalCount: number;
+	}
 }
 
 // Added to prevent TS from considering this a legacy script and fail in prod

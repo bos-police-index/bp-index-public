@@ -12,6 +12,7 @@ export const court_overtime_alias_name = "allVwCourtOvertimes";
 export const fio_record_alias_name = "allVwFieldInterrogationAndObservations";
 export const crime_incident_alias_name = "allVwIncidentsWithOfficerDetailsWws";
 export const boston_arrest_alias_name = "allVwBostonArrests";
+export const traffic_stop_alias_name = "allVwTrafficStopsFall2025S";
 
 // PROFILE PAGE
 export const homepage_alias_name = "allHomepages";
@@ -28,6 +29,7 @@ export const table_name_to_alias_map = {
 	crime_incident: crime_incident_alias_name,
 	boston_arrest: boston_arrest_alias_name,
 	employee: employee_alias_name,
+	traffic_stop: traffic_stop_alias_name,
 };
 
 

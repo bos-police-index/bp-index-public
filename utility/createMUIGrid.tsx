@@ -1549,6 +1549,182 @@ const employee_columns = () => {
 	return cols;
 };
 
+const traffic_stop_columns = () => {
+	const cols: GridColDef[] = [
+		{
+			field: "id",
+			hideable: true,
+			headerName: "ID",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+			filterable: false,
+		},
+		{
+			field: "officerId",
+			headerName: "Officer ID",
+			description: "Officer identification number",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 120,
+		},
+		{
+			field: "eventDate",
+			headerName: "Event Date",
+			description: "Date when the traffic stop occurred",
+			type: "date",
+			valueFormatter: formatDateShort,
+			width: 150,
+		},
+		{
+			field: "timeHh",
+			headerName: "Hour",
+			description: "Hour of the traffic stop",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 80,
+		},
+		{
+			field: "timeMm",
+			headerName: "Minute",
+			description: "Minute of the traffic stop",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 80,
+		},
+		{
+			field: "amPm",
+			headerName: "AM/PM",
+			description: "Time of day (AM or PM)",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+		},
+		{
+			field: "violatorType",
+			headerName: "Violator Type",
+			description: "Type of violator (e.g., OPERATOR, PEDESTRIAN)",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "citationNumber",
+			headerName: "Citation Number",
+			description: "Unique citation number issued for the traffic stop",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "citationType",
+			headerName: "Citation Type",
+			description: "Type of citation issued (e.g., WARN, CITATION)",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "offenseCode",
+			headerName: "Offense Code",
+			description: "Code for the traffic offense",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 120,
+		},
+		{
+			field: "offenseDescription",
+			headerName: "Offense Description",
+			description: "Description of the traffic offense",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 300,
+		},
+		{
+			field: "locationName",
+			headerName: "Location",
+			description: "Location where the traffic stop occurred",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "race",
+			headerName: "Race",
+			description: "Race of the individual stopped",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 120,
+		},
+		{
+			field: "gender",
+			headerName: "Gender",
+			description: "Gender of the individual stopped",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+		},
+		{
+			field: "yearOfBirth",
+			headerName: "Year of Birth",
+			description: "Birth year of the individual stopped",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 130,
+		},
+		{
+			field: "searched",
+			headerName: "Searched",
+			description: "Whether a search was conducted during the stop (Y/N)",
+			type: "boolean",
+			valueFormatter: (params) => {
+				return yAndNToBoolean(params.value);
+			},
+			width: 100,
+		},
+		{
+			field: "crash",
+			headerName: "Crash",
+			description: "Whether a crash was involved in the traffic stop (Y/N)",
+			type: "boolean",
+			valueFormatter: (params) => {
+				return yAndNToBoolean(params.value);
+			},
+			width: 100,
+		},
+	];
+
+	return cols;
+};
+
 export const functionMapping = {
 	detail_record: detail_record_columns(),
 	crime_incident: crime_incident_columns(), // Using actual crime incident columns now
@@ -1559,6 +1735,7 @@ export const functionMapping = {
 	fio_record: fio_record_columns(),
 	boston_arrest: boston_arrest_columns(),
 	employee: employee_columns(),
+	traffic_stop: traffic_stop_columns(),
 };
 
 // THE BELOW TABLE DEFINITIONS ARE DEPRECATED BUT **may be helpful** later
