@@ -1725,6 +1725,262 @@ const traffic_stop_columns = () => {
 	return cols;
 };
 
+const ir_fall_2025_columns = () => {
+	const cols: GridColDef[] = [
+		{
+			field: "id",
+			hideable: true,
+			headerName: "ID",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 100,
+			filterable: false,
+		},
+		{
+			field: "officerName",
+			headerName: "Officer Name",
+			description: "Name of the reporting officer",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "badgeNo",
+			headerName: "Badge Number",
+			description: "Badge number of the reporting officer",
+			type: "number",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "reportingOfficer",
+			headerName: "Reporting Officer",
+			description: "Full name and badge number of the reporting officer",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 250,
+		},
+		{
+			field: "allAssistingOfficersAndAssistTypes",
+			headerName: "Assisting Officers",
+			description: "All assisting officers and their assistance types",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 400,
+		},
+		{
+			field: "weaponForceInvolved",
+			headerName: "Weapon/Force Involved",
+			description: "Information about weapons or force involved in the incident",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "shooting",
+			headerName: "Shooting",
+			description: "Whether a shooting was involved in the incident",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 120,
+		},
+		{
+			field: "eventLocationStreetAddress",
+			headerName: "Event Street Address",
+			description: "Street address where the event occurred",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 250,
+		},
+		{
+			field: "eventLocationCrossStreet1",
+			headerName: "Event Cross Street 1",
+			description: "First cross street for the event location",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "eventLocationCrossStreet2",
+			headerName: "Event Cross Street 2",
+			description: "Second cross street for the event location",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "eventLocationNeighborhood",
+			headerName: "Event Neighborhood",
+			description: "Neighborhood where the event occurred",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "offenseLocationCrossStreet1",
+			headerName: "Offense Cross Street 1",
+			description: "First cross street for the offense location",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "offenseLocationCrossStreet2",
+			headerName: "Offense Cross Street 2",
+			description: "Second cross street for the offense location",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "offenseLocationLat",
+			headerName: "Offense Latitude",
+			description: "Latitude coordinate of the offense location",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "offenseLocationLong",
+			headerName: "Offense Longitude",
+			description: "Longitude coordinate of the offense location",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "offenseLocationNeighborhood",
+			headerName: "Offense Neighborhood",
+			description: "Neighborhood where the offense occurred",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "date",
+			headerName: "Date",
+			description: "Date when the incident occurred",
+			type: "date",
+			valueFormatter: formatDateShort,
+			width: 150,
+		},
+		{
+			field: "time",
+			headerName: "Time",
+			description: "Time when the incident occurred",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 120,
+		},
+		{
+			field: "eventDistrict",
+			headerName: "Event District",
+			description: "Police district where the event occurred",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 150,
+		},
+		{
+			field: "eventNeighborhood",
+			headerName: "Event Neighborhood",
+			description: "Neighborhood classification for the event",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 200,
+		},
+		{
+			field: "suspectCount",
+			headerName: "Suspect Count",
+			description: "Number of suspects involved in the incident",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 130,
+		},
+		{
+			field: "totalCharges",
+			headerName: "Total Charges",
+			description: "Total number of charges filed",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 130,
+		},
+		{
+			field: "chargeI",
+			headerName: "Charge I",
+			description: "First charge filed",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 300,
+		},
+		{
+			field: "chargeIi",
+			headerName: "Charge II",
+			description: "Second charge filed",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 300,
+		},
+		{
+			field: "chargeIii",
+			headerName: "Charge III",
+			description: "Third charge filed",
+			type: "string",
+			valueFormatter: (params) => {
+				return params.value;
+			},
+			width: 300,
+		},
+	];
+
+	return cols;
+};
+
 export const functionMapping = {
 	detail_record: detail_record_columns(),
 	crime_incident: crime_incident_columns(), // Using actual crime incident columns now
@@ -1736,6 +1992,7 @@ export const functionMapping = {
 	boston_arrest: boston_arrest_columns(),
 	employee: employee_columns(),
 	traffic_stop: traffic_stop_columns(),
+	ir_fall_2025: ir_fall_2025_columns(),
 };
 
 // THE BELOW TABLE DEFINITIONS ARE DEPRECATED BUT **may be helpful** later

@@ -31,7 +31,7 @@ const IconWrapper = ({ Icon, fontSize = "48px", color = bpi_deep_green }: IconWr
 
 // TODO:! As more data is added be sure to add the source they are from to this
 const tablesFromAnalyzeBoston = ["fio_record"];
-const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "officer_misconduct", "boston_arrest", "traffic_stop"];
+const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "officer_misconduct", "boston_arrest", "traffic_stop", "ir_fall_2025"];
 const tablesFromWokeWindows = ["crime_incident"];
 
 // Date ranges for specific tables
@@ -142,6 +142,15 @@ const rawTableDefinitions = [
 		shortDescription: "Information on shooting incidents in Boston where victims were hit by bullets, including both fatal and non-fatal cases",
 		longDescription:
 			"The Shooting Reports dataset provides detailed information on shooting incidents within the City of Boston that fall under the jurisdiction of the Boston Police Department. It includes records of incidents where a victim was struck by a bullet, encompassing both fatal and non-fatal cases. This dataset covers the date, time, and location of shootings, as well as victim demographics and other relevant details. It is a vital resource for analyzing gun violence trends and the impact of shootings on the community.",
+	},
+	{
+		table: "Incident Report",
+		query: "ir_fall_2025",
+		image: { component: <IconWrapper Icon={EventNoteIcon} />, src: EventNoteIcon },
+		isFake: false,
+		shortDescription: "Records of incident reports including officer information, location details, charges, and suspect information",
+		longDescription:
+			"The Incident Report dataset provides comprehensive records of incidents reported by Boston Police Department officers. This dataset includes detailed information about the reporting officer, badge numbers, event and offense locations with geographic coordinates, dates and times, charges filed, suspect counts, and information about weapon force involvement and shootings. It offers insights into the nature and scope of police-reported incidents, including the locations where events occurred and where offenses took place, helping to understand incident patterns and law enforcement responses.",
 	},
 ];
 

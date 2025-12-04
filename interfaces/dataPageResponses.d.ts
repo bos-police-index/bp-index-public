@@ -256,6 +256,41 @@ declare global {
 		nodes?: TrafficStopRecord[];
 		totalCount: number;
 	}
+
+	/* ------------------- INCIDENT REPORT FALL 2025 ---------------------*/
+	interface IRFall2025Record {
+		bpiId: string;
+		officerName: string;
+		badgeNo: number;
+		reportingOfficer: string;
+		allAssistingOfficersAndAssistTypes: string | null;
+		weaponForceInvolved: string | null;
+		shooting: string | null;
+		eventLocationStreetAddress: string | null;
+		eventLocationCrossStreet1: string | null;
+		eventLocationCrossStreet2: string | null;
+		eventLocationNeighborhood: string | null;
+		offenseLocationCrossStreet1: string | null;
+		offenseLocationCrossStreet2: string | null;
+		offenseLocationLat: string | null;
+		offenseLocationLong: string | null;
+		offenseLocationNeighborhood: string | null;
+		date: string;
+		time: string | null;
+		eventDistrict: string | null;
+		eventNeighborhood: string | null;
+		suspectCount: string | null;
+		totalCharges: string | null;
+		chargeI: string | null;
+		chargeIi: string | null;
+		chargeIii: string | null;
+	}
+
+	interface IRFall2025Response {
+		edges?: Array<{ node: IRFall2025Record }>;
+		nodes?: IRFall2025Record[];
+		totalCount: number;
+	}
 }
 
 // Added to prevent TS from considering this a legacy script and fail in prod

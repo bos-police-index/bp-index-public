@@ -13,6 +13,7 @@ export const fio_record_alias_name = "allVwFieldInterrogationAndObservations";
 export const crime_incident_alias_name = "allVwIncidentsWithOfficerDetailsWws";
 export const boston_arrest_alias_name = "allVwBostonArrests";
 export const traffic_stop_alias_name = "allVwTrafficStopsFall2025S";
+export const ir_fall_2025_alias_name = "allVwIrFall2025S";
 
 // PROFILE PAGE
 export const homepage_alias_name = "allHomepages";
@@ -30,6 +31,7 @@ export const table_name_to_alias_map = {
 	boston_arrest: boston_arrest_alias_name,
 	employee: employee_alias_name,
 	traffic_stop: traffic_stop_alias_name,
+	ir_fall_2025: ir_fall_2025_alias_name,
 };
 
 

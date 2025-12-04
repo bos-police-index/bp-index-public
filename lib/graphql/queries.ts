@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, employee_alias_name, fio_record_alias_name, homepage_alias_name, officer_financial_alias_name, officer_ia_alias_name, traffic_stop_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map } from "@utility/dataViewAliases";
+import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, employee_alias_name, fio_record_alias_name, homepage_alias_name, ir_fall_2025_alias_name, officer_financial_alias_name, officer_ia_alias_name, traffic_stop_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map } from "@utility/dataViewAliases";
 import { DocumentNode } from "graphql";
 
 export const DATA_PAGE_SIZE = 25;
@@ -449,6 +449,43 @@ export const GET_NEXT_PAGE_TRAFFIC_STOPS: DocumentNode = gql`
 	}
 `;
 
+export const GET_NEXT_PAGE_IR_FALL_2025: DocumentNode = gql`
+	query MyQuery($offset: Int, $page_size: Int, $order_by: [${removeAllPrefix(ir_fall_2025_alias_name)}OrderBy!], $filters: ${removePluralSuffix(removeAllPrefix(ir_fall_2025_alias_name))}Condition) {
+		${ir_fall_2025_alias_name}(first: $page_size, offset: $offset, orderBy: $order_by, condition: $filters) {
+			totalCount
+			edges {
+				node {
+					bpiId
+					officerName
+					badgeNo
+					reportingOfficer
+					allAssistingOfficersAndAssistTypes
+					weaponForceInvolved
+					shooting
+					eventLocationStreetAddress
+					eventLocationCrossStreet1
+					eventLocationCrossStreet2
+					eventLocationNeighborhood
+					offenseLocationCrossStreet1
+					offenseLocationCrossStreet2
+					offenseLocationLat
+					offenseLocationLong
+					offenseLocationNeighborhood
+					date
+					time
+					eventDistrict
+					eventNeighborhood
+					suspectCount
+					totalCharges
+					chargeI
+					chargeIi
+					chargeIii
+				}
+			}
+		}
+	}
+`;
+
 export const GET_IA_CASE_BY_NUMBER = (iaNumber: string) => {
 	return gql`
 		query MyQuery($filters: ${removePluralSuffix(removeAllPrefix(officer_ia_alias_name))}Condition) {
@@ -491,7 +528,7 @@ export const GET_YEAR_RANGE_OF_DATASET = (table_name: string, date_column_name: 
 
 	let query_string = `query {`;
 
-	const usesEdgesStructure = table_name === "boston_arrest" || table_name === "officer_misconduct" || table_name === "traffic_stop";
+	const usesEdgesStructure = table_name === "boston_arrest" || table_name === "officer_misconduct" || table_name === "traffic_stop" || table_name === "ir_fall_2025";
 
 	if (queryEarliest) {
 		if (usesEdgesStructure) {

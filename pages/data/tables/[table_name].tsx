@@ -223,9 +223,16 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 						<div>
 							<p className="text-gray-700 font-medium">
 								{tableDateRanges[props.table_name] || 
-									(props.dataYearRange.earliest === "" 
-										? "Unspecified" 
-										: `${getYearFromAnyFormat(props.dataYearRange.earliest)} - ${getYearFromAnyFormat(props.dataYearRange.latest)}`)
+									(props.dataYearRange.earliest === "" || props.dataYearRange.latest === ""
+										? "" 
+										: (() => {
+											const earliestYear = getYearFromAnyFormat(props.dataYearRange.earliest);
+											const latestYear = getYearFromAnyFormat(props.dataYearRange.latest);
+											if (earliestYear === "Invalid Date" || latestYear === "Invalid Date") {
+												return "";
+											}
+											return `${earliestYear} - ${latestYear}`;
+										})())
 								}
 							</p>
 						</div>
