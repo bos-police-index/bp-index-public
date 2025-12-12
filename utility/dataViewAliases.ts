@@ -19,7 +19,7 @@ export const ir_fall_2025_alias_name = "allVwIrFall2025S";
 export const homepage_alias_name = "allHomepages";
 export const officer_financial_alias_name = "allVwEmployeeFinancials";
 export const officer_ia_alias_name = "allVwEmployeeIaFall2025S";
-export const employee_alias_name = "allVwEmployeeRosterFall2025S";
+export const employee_alias_name = "allVwEmployeeRosterFall20252S";
 
 // Use in `[table_name].tsx`
 export const table_name_to_alias_map = {

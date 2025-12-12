@@ -413,6 +413,8 @@ export const GET_NEXT_PAGE_EMPLOYEE: DocumentNode = (() => {
 						firstName
 						salPlan
 						jobTitle
+						race
+						sex
 					}
 				}
 			}

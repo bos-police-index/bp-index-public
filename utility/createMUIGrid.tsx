@@ -1545,6 +1545,24 @@ const employee_columns = () => {
 			hideable: true,
 			width: 250,
 		},
+		{
+			field: "race",
+			headerName: "Race",
+			description: "The race of the employee",
+			type: "string",
+			valueFormatter: (params) => params.value,
+			align: "center",
+			width: 100,
+		},
+		{
+			field: "sex",
+			headerName: "Sex",
+			description: "The sex of the employee",
+			type: "string",
+			valueFormatter: (params) => params.value,
+			align: "center",
+			width: 100,
+		},
 	];
 	return cols;
 };
