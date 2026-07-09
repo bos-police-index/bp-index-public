@@ -1,0 +1,101 @@
+{
+  "name": "bpi_reconcile_misconduct_from_legacy",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Daily 05:30 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 5 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "pg_run",
+      "name": "Run misconduct-from-legacy reconcile",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM production.run_misconduct_from_legacy();",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "H4bGq6wyGF0YAK2L",
+          "name": "bp-index Railway Postgres"
+        }
+      }
+    },
+    {
+      "id": "pg_log",
+      "name": "Log run",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        680,
+        300
+      ],
+      "executeOnce": true,
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO production.v2_ingest_run (pipeline_name, started_at, finished_at, status, rows_in, rows_out)\nVALUES (\n  'bpi_reconcile_misconduct_from_legacy',\n  now(), now(), 'success',\n  (SELECT COUNT(*) FROM production.raw_employee_ia),\n  (SELECT COUNT(*) FROM production.v2_officer_misconduct WHERE source = 'bpd_iad_internal')\n);",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "H4bGq6wyGF0YAK2L",
+          "name": "bp-index Railway Postgres"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily 05:30 UTC": {
+      "main": [
+        [
+          {
+            "node": "Run misconduct-from-legacy reconcile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run misconduct-from-legacy reconcile": {
+      "main": [
+        [
+          {
+            "node": "Log run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  }
+}

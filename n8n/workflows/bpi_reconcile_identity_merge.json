@@ -1,0 +1,101 @@
+{
+  "name": "bpi_reconcile_identity_merge",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Daily 04:30 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 4 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "pg_merge",
+      "name": "Run identity merge",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        460,
+        380
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM production.run_identity_merge();",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "H4bGq6wyGF0YAK2L",
+          "name": "bp-index Railway Postgres"
+        }
+      }
+    },
+    {
+      "id": "pg_log",
+      "name": "Log run",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        680,
+        380
+      ],
+      "executeOnce": true,
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO production.v2_ingest_run (pipeline_name, started_at, finished_at, status, rows_in, rows_out, error)\nVALUES (\n  'bpi_reconcile_identity_merge',\n  now(), now(), 'success',\n  (SELECT COUNT(*) FROM production.v2_officer_id_map),\n  (SELECT COUNT(*) FROM production.v2_officer_id_map WHERE employee_id IS NOT NULL AND mptc_id IS NOT NULL),\n  NULLIF(\n    'ambiguous_in_review_queue=' || (SELECT COUNT(*) FROM production.v2_reconciliation_review WHERE pipeline_name='identity_merge_ambiguous' AND resolved_bpi_id IS NULL)::text,\n    ''\n  )\n);",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "H4bGq6wyGF0YAK2L",
+          "name": "bp-index Railway Postgres"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily 04:30 UTC": {
+      "main": [
+        [
+          {
+            "node": "Run identity merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run identity merge": {
+      "main": [
+        [
+          {
+            "node": "Log run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  }
+}

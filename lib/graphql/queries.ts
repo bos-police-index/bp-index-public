@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, employee_alias_name, fio_record_alias_name, homepage_alias_name, ir_fall_2025_alias_name, officer_financial_alias_name, officer_ia_alias_name, traffic_stop_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map } from "@utility/dataViewAliases";
+import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, employee_alias_name, fio_record_alias_name, homepage_alias_name, officer_search_alias_name, ir_fall_2025_alias_name, officer_financial_alias_name, officer_ia_alias_name, officer_year_history_alias_name, traffic_stop_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map, v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name } from "@utility/dataViewAliases";
 import { DocumentNode } from "graphql";
 
 export const DATA_PAGE_SIZE = 25;
@@ -7,7 +7,7 @@ export const DATA_PAGE_SIZE = 25;
 // Homepage Query
 export const GET_HOMEPAGE_DATA = gql`
 	query MyQuery {
-		${homepage_alias_name} {
+		${officer_search_alias_name}(first: 6000) {
 			edges {
 				node {
 					employeeId
@@ -139,6 +139,252 @@ export const GET_ALL_OFFICER_FINANCIAL_DATA = gql`
 		}
 	}
 `;
+
+// ---- V2 queries (auto-fed pipeline) ----------------------------------------
+
+export const V2_OFFICER_PROFILE = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_officer_profile_alias_name}(condition: {bpiId: "${bpiId}"}, first: 1) {
+			nodes {
+				bpiId
+				employeeId
+				mptcId
+				badgeNo
+				firstName
+				lastName
+				middleName
+				canonicalName
+				earningsLastUpdated
+				fioLastUpdated
+				postCertLastUpdated
+				postDecertLastUpdated
+				misconductLastUpdated
+				identityConfidence
+				rosterSource
+				identityAsOf
+				rank
+				hireDate
+			}
+		}
+	}
+`;
+
+export const V2_OFFICER_EARNINGS = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_earnings_by_year_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: YEAR_DESC) {
+			nodes {
+				bpiId
+				year
+				departmentName
+				title
+				regularPay
+				retroPay
+				otherPay
+				otPay
+				injuredPay
+				detailPay
+				quinnPay
+				totalPay
+				source
+				asOf
+				linkMethod
+				confirmed
+			}
+		}
+	}
+`;
+
+export const V2_OFFICER_POST_CERTIFICATIONS = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_post_certification_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: AS_OF_DESC) {
+			nodes {
+				bpiId
+				mptcId
+				certification
+				status
+				expiration
+				agency
+				additionalInfo
+				source
+				asOf
+				linkMethod
+				confirmed
+			}
+		}
+	}
+`;
+
+export const V2_OFFICER_MISCONDUCT = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_officer_misconduct_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: RECEIVED_DATE_DESC) {
+			nodes {
+				bpiId
+				caseNumber
+				incidentType
+				allegation
+				finding
+				actionTaken
+				receivedDate
+				completedDate
+				source
+				asOf
+				linkMethod
+				confirmed
+			}
+		}
+	}
+`;
+
+export const V2_OFFICER_FIO = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_fio_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: CONTACT_DATE_DESC) {
+			nodes {
+				bpiId
+				fcNum
+				contactDate
+				location
+				frisked
+				vehicleSearched
+				basis
+				circumstance
+				narrative
+				source
+				asOf
+			}
+		}
+	}
+`;
+
+export const V2_OFFICER_ASSIGNMENTS = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_officer_assignment_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: EFF_DATE_DESC) {
+			nodes {
+				bpiId
+				employeeId
+				workgroup
+				tskprofId
+				descr
+				effDate
+			}
+		}
+	}
+`;
+
+export const V2_OFFICER_PAID_DETAILS = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_paid_detail_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: START_DATE_DESC) {
+			nodes {
+				bpiId
+				trackingNo
+				startDate
+				startTime
+				endTime
+				hoursWorked
+				detailType
+				customerName
+				customerCity
+				street
+				orgDesc
+				payAmount
+				source
+				asOf
+			}
+		}
+	}
+`;
+
+export const V2_OFFICER_TRAFFIC = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_traffic_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: EVENT_DATE_DESC) {
+			nodes {
+				bpiId
+				eventDate
+				citationNumber
+				citationType
+				violationType
+				offenseDesc
+				disposition
+				locationName
+				searched
+				crash
+				subjectRace
+				subjectGender
+				issuingAgency
+				source
+				asOf
+			}
+		}
+	}
+`;
+
+export const V2_OFFICER_INCIDENTS = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_incident_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: OCCURRED_ON_DATE_DESC) {
+			nodes {
+				bpiId
+				incidentNumber
+				occurredOnDate
+				district
+				shooting
+				location
+				natureOfIncident
+				offenses
+				incidentClearance
+				numArrestees
+				numVictims
+				url
+				source
+				asOf
+			}
+		}
+	}
+`;
+
+export const V2_OFFICER_POST_DECERTIFICATIONS = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_post_decertification_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: DECERTIFICATION_DATE_DESC) {
+			nodes {
+				bpiId
+				mptcId
+				decertificationDate
+				reason
+				agency
+				source
+				asOf
+			}
+		}
+	}
+`;
+
+export const INDIVIDUAL_OFFICER_YEAR_HISTORY = (bpiId: string) => {
+	return gql`query MyQuery {
+		${officer_year_history_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: YEAR_DESC) {
+			nodes {
+				bpiId
+				employeeId
+				year
+				lastName
+				firstName
+				badgeNo
+				rank
+				units
+				tskprofIds
+				tskprofDescs
+				jobTitles
+				hrAnnualRate
+				regularPay
+				retroPay
+				otherPay
+				otPay
+				injuredPay
+				detailPay
+				quinnPay
+				totalPay
+				totalPayPercentile
+			}
+		}
+	}`;
+};
 
 export const INDIVIDUAL_OFFICER_COURT_OVERTIMES = (bpiId: string) => {
 	return gql`query MyQuery {

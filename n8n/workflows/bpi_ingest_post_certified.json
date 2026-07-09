@@ -1,0 +1,295 @@
+{
+  "name": "bpi_ingest_post_certified",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Daily 06:00 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "http_listing",
+      "name": "Fetch listing page",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "url": "https://mapostcommission.gov/list-of-officer-status/",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "code_extract_url",
+      "name": "Extract latest CSV URL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        300
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const html = String($input.first().json.data || '');\nconst m = html.match(/https:\\/\\/mapostcommission\\.gov\\/wp-content\\/uploads\\/[^\"\\s>]+OFFICER-DATA-\\d+\\.csv/);\nif (!m) {\n  throw new Error('CSV URL not found on listing page');\n}\nreturn [{ json: { csvUrl: m[0] } }];"
+      }
+    },
+    {
+      "id": "http_download",
+      "name": "Download CSV",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        300
+      ],
+      "parameters": {
+        "url": "={{ $json.csvUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "data"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "extract_csv",
+      "name": "Parse CSV",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        300
+      ],
+      "parameters": {
+        "operation": "csv",
+        "binaryPropertyName": "data",
+        "options": {}
+      }
+    },
+    {
+      "id": "code_normalize",
+      "name": "Normalize columns",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        300
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "return $input.all().map((item) => {\n  const r = item.json;\n  const trim = (v) => (v == null ? null : String(v).trim() || null);\n  return {\n    json: {\n      officer: trim(r['OFFICER']),\n      mptc_id: trim(r['MPTC ID']),\n      certification: trim(r['CERTIFICATION']),\n      status: trim(r['STATUS']),\n      law_enforcement_agency: trim(r['LAW ENFORCEMENT AGENCY']),\n      expiration: trim(r['EXPIRATION']),\n      additional_information: trim(r['ADDITIONAL INFORMATION'])\n    }\n  };\n});"
+      }
+    },
+    {
+      "id": "pg_truncate",
+      "name": "Truncate raw_v2_post_certified",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1560,
+        300
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "TRUNCATE production.raw_v2_post_certified RESTART IDENTITY;",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "H4bGq6wyGF0YAK2L",
+          "name": "bp-index Railway Postgres"
+        }
+      }
+    },
+    {
+      "id": "pg_insert_raw",
+      "name": "Insert raw rows",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1780,
+        300
+      ],
+      "parameters": {
+        "operation": "insert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "production"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "name",
+          "value": "raw_v2_post_certified"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "officer": "={{ $json.officer }}",
+            "mptc_id": "={{ $json.mptc_id }}",
+            "certification": "={{ $json.certification }}",
+            "status": "={{ $json.status }}",
+            "law_enforcement_agency": "={{ $json.law_enforcement_agency }}",
+            "expiration": "={{ $json.expiration }}",
+            "additional_information": "={{ $json.additional_information }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "H4bGq6wyGF0YAK2L",
+          "name": "bp-index Railway Postgres"
+        }
+      }
+    },
+    {
+      "id": "pg_reconcile",
+      "name": "Reconcile + load canonical",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2000,
+        300
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- 1) Upsert officer id map by MPTC ID (canonical_name uses production.canonicalize_name)\nINSERT INTO production.v2_officer_id_map (mptc_id, first_name, last_name, canonical_name)\nSELECT DISTINCT ON (mptc_id)\n  mptc_id,\n  NULLIF(TRIM(SPLIT_PART(officer, ',', 2)), '') AS first_name,\n  NULLIF(TRIM(SPLIT_PART(officer, ',', 1)), '') AS last_name,\n  production.canonicalize_name(officer)\nFROM production.raw_v2_post_certified\nWHERE mptc_id IS NOT NULL AND mptc_id <> ''\nON CONFLICT (mptc_id) WHERE mptc_id IS NOT NULL DO UPDATE\n  SET first_name = EXCLUDED.first_name,\n      last_name = EXCLUDED.last_name,\n      canonical_name = EXCLUDED.canonical_name,\n      updated_at = now();\n\n-- 2) Replace canonical certifications from this source\nDELETE FROM production.v2_post_certification WHERE source = 'mass_post_commission';\n\nINSERT INTO production.v2_post_certification\n  (bpi_id, mptc_id, certification, status, expiration, agency, additional_info, source, as_of)\nSELECT\n  m.bpi_id,\n  r.mptc_id,\n  r.certification,\n  r.status,\n  CASE WHEN r.expiration ~ '^[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}$' THEN TO_DATE(r.expiration, 'FMMM/FMDD/YYYY') ELSE NULL END,\n  r.law_enforcement_agency,\n  r.additional_information,\n  'mass_post_commission',\n  now()\nFROM production.raw_v2_post_certified r\nJOIN production.v2_officer_id_map m ON m.mptc_id = r.mptc_id\nWHERE r.mptc_id IS NOT NULL AND r.mptc_id <> '';\n\n-- 3) Log run\nINSERT INTO production.v2_ingest_run (pipeline_name, started_at, finished_at, status, rows_in, rows_out)\nVALUES (\n  'bpi_ingest_post_certified',\n  now(), now(), 'success',\n  (SELECT COUNT(*) FROM production.raw_v2_post_certified),\n  (SELECT COUNT(*) FROM production.v2_post_certification WHERE source = 'mass_post_commission')\n);",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "H4bGq6wyGF0YAK2L",
+          "name": "bp-index Railway Postgres"
+        }
+      },
+      "executeOnce": true
+    }
+  ],
+  "connections": {
+    "Fetch listing page": {
+      "main": [
+        [
+          {
+            "node": "Extract latest CSV URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract latest CSV URL": {
+      "main": [
+        [
+          {
+            "node": "Download CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download CSV": {
+      "main": [
+        [
+          {
+            "node": "Parse CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse CSV": {
+      "main": [
+        [
+          {
+            "node": "Normalize columns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert raw rows": {
+      "main": [
+        [
+          {
+            "node": "Reconcile + load canonical",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily 06:00 UTC": {
+      "main": [
+        [
+          {
+            "node": "Truncate raw_v2_post_certified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Truncate raw_v2_post_certified": {
+      "main": [
+        [
+          {
+            "node": "Fetch listing page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize columns": {
+      "main": [
+        [
+          {
+            "node": "Insert raw rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  }
+}

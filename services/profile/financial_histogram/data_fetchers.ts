@@ -7,16 +7,17 @@ import { officer_financial_alias_name } from "@utility/dataViewAliases";
 const fetchFinancialsHistogramData = async () => {
 	try {
 		const { data } = await apolloClient.query<EmployeeFinancialsResponse>({ query: GET_ALL_OFFICER_FINANCIAL_DATA });
-		return data[officer_financial_alias_name].nodes;
+		return data?.[officer_financial_alias_name]?.nodes ?? [];
 	} catch (error) {
 		console.error("Error fetching data: ", error);
-		throw new Error("Error fetching data");
+		return [];
 	}
 };
 
 export const fetchFinancialsHistogram = async (rank: String) => {
 	const addNewRecord = (payBucket: PayTypeBuckets, row: any) => {
-		if (!payBucket[row.year] && row.regularPay) {
+		if (row?.year == null) return payBucket;
+		if (!payBucket[row.year]) {
 			payBucket[row.year] = {
 				totalPay: [],
 				detailPay: [],
@@ -86,6 +87,9 @@ export const fetchFinancialsHistogram = async (rank: String) => {
 		return [rankMatchingPayTypeBuckets, nonRankMatchingPayTypeBuckets];
 	} catch (error) {
 		console.error("Error fetching data: ", error);
-		throw new Error("Error fetching data");
+		return [
+			{ [2023]: { totalPay: [], detailPay: [], injuredPay: [], otherPay: [], regularPay: [], quinnPay: [], retroPay: [], otPay: [] } },
+			{ [2023]: { totalPay: [], detailPay: [], injuredPay: [], otherPay: [], regularPay: [], quinnPay: [], retroPay: [], otPay: [] } },
+		] as PayTypeBuckets[];
 	}
 };

@@ -1,6 +1,6 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Link from "next/link";
-import { format } from "date-fns";
+import { format } from "date-fns/format";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import { GridColDef } from "@mui/x-data-grid";
 
@@ -109,13 +109,14 @@ export default function IACase({ iaCase }: InferGetServerSidePropsType<typeof ge
     return 'bg-gray-100 text-gray-800 border border-gray-200';
   };
 
+  const fullName = [iaCase.firstName, iaCase.lastName].filter(Boolean).join(' ').trim();
   const iaCaseRow = {
     id: iaCase.iaNumber || 'unknown',
     iaNumber: iaCase.iaNumber,
     bpiId: iaCase.bpiId,
     firstName: iaCase.firstName,
     lastName: iaCase.lastName,
-    fullName: `${iaCase.firstName} ${iaCase.lastName}`,
+    fullName: fullName || 'Officer name not on file',
     badgeNo: iaCase.badgeNo,
     rank: iaCase.rank || iaCase.titleRank,
     titleRank: iaCase.titleRank || iaCase.rank,
@@ -327,7 +328,7 @@ export default function IACase({ iaCase }: InferGetServerSidePropsType<typeof ge
                     <div>
                       <div className="text-sm font-medium text-gray-500">Name</div>
                       <div className="mt-1 text-gray-900 font-medium">
-                        {iaCase.firstName} {iaCase.lastName}
+                        {fullName || <span className="italic text-gray-400">Not on file</span>}
                       </div>
                     </div>
                     <div>

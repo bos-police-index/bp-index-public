@@ -11,6 +11,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
@@ -493,41 +494,79 @@ export default function DataTable({
 							</Box>
 						</Box>
 
-						{cols.map((col) => (
-							<Box key={col.field} sx={{ px: 1 }}>
-								<Typography variant="caption" sx={{ fontWeight: 500, color: '#374151', mb: 0.5, display: 'block' }}>
-									{col.headerName}
-								</Typography>
-								<TextField
-									fullWidth
-									size="small"
-									placeholder={col.type === 'number' ? 'Enter a number' : 'Type to filter...'}
-									value={pendingFilterValues[col.field] || ''}
-									onChange={(e) => {
-										const value = e.target.value;
-										setPendingFilterValues(prev => ({
-											...prev,
-											[col.field]: value
-										}));
-									}}
-									sx={{
-										backgroundColor: '#ffffff',
-										'& .MuiOutlinedInput-root': {
-											fontSize: '0.875rem',
-											'&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-												borderColor: bpi_light_green,
-											},
-											'&:hover .MuiOutlinedInput-notchedOutline': {
-												borderColor: bpi_light_green,
-											},
-										},
-									}}
-									inputProps={{
-										type: col.type === 'number' ? 'number' : 'text',
-									}}
-								/>
-							</Box>
-						))}
+						{cols.map((col) => {
+							// Build option list from currently-loaded rows for this column
+							const rowModels = apiRef.current?.getRowModels?.();
+							const optionsSet = new Set<string>();
+							if (rowModels) {
+								rowModels.forEach((row) => {
+									const v = (row as any)[col.field];
+									if (v !== null && v !== undefined && v !== "") {
+										optionsSet.add(String(v));
+									}
+								});
+							}
+							const options = Array.from(optionsSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+							const filterInputSx = {
+								backgroundColor: '#ffffff',
+								'& .MuiOutlinedInput-root': {
+									fontSize: '0.875rem',
+									'&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+										borderColor: bpi_light_green,
+									},
+									'&:hover .MuiOutlinedInput-notchedOutline': {
+										borderColor: bpi_light_green,
+									},
+								},
+							};
+
+							return (
+								<Box key={col.field} sx={{ px: 1 }}>
+									<Typography variant="caption" sx={{ fontWeight: 500, color: '#374151', mb: 0.5, display: 'block' }}>
+										{col.headerName}
+									</Typography>
+									<Autocomplete
+										freeSolo
+										fullWidth
+										size="small"
+										options={options}
+										value={pendingFilterValues[col.field] || ''}
+										onChange={(_e, newValue) => {
+											setPendingFilterValues((prev) => ({
+												...prev,
+												[col.field]: newValue ?? '',
+											}));
+										}}
+										onInputChange={(_e, newInput, reason) => {
+											if (reason === 'input' || reason === 'clear') {
+												setPendingFilterValues((prev) => ({
+													...prev,
+													[col.field]: newInput,
+												}));
+											}
+										}}
+										renderInput={(params) => (
+											<TextField
+												{...params}
+												placeholder={
+													col.type === 'number'
+														? 'Enter or pick a number'
+														: options.length > 0
+															? 'Pick from list or type…'
+															: 'Type to filter…'
+												}
+												sx={filterInputSx}
+												inputProps={{
+													...params.inputProps,
+													type: col.type === 'number' ? 'number' : 'text',
+												}}
+											/>
+										)}
+									/>
+								</Box>
+							);
+						})}
 					</Box>
 				</Menu>
 

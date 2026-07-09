@@ -35,7 +35,19 @@ const HistogramRectangle = (props: RectangleProps) => {
 		return null;
 	}
 
-	return <animated.rect x={springProps.x} y={springProps.y} width={springProps.width} height={springProps.height} opacity={0.7} stroke={payCategoryColorMap[mode]} fill={payCategoryColorMap[mode]} fillOpacity={1} strokeWidth={1} rx={1} />;
+	// Newer @react-spring/web tightened SVG prop types — spread the spring values
+	// instead of binding them individually so the AnimatedProps overload matches.
+	return (
+		<animated.rect
+			{...(springProps as any)}
+			opacity={0.7}
+			stroke={payCategoryColorMap[mode]}
+			fill={payCategoryColorMap[mode]}
+			fillOpacity={1}
+			strokeWidth={1}
+			rx={1}
+		/>
+	);
 };
 
 export default HistogramRectangle;

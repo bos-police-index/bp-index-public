@@ -1,7 +1,7 @@
 import Fuse from "fuse.js";
 import apolloClient from "@lib/apollo-client";
 import { GET_HOMEPAGE_DATA } from "@lib/graphql/queries";
-import { homepage_alias_name } from "@utility/dataViewAliases";
+import { officer_search_alias_name } from "@utility/dataViewAliases";
 
 async function fetchHomepageData(): Promise<SearchResponseData[]> {
 	const { data } = await apolloClient.query<HomepageData>({ query: GET_HOMEPAGE_DATA });
@@ -9,7 +9,7 @@ async function fetchHomepageData(): Promise<SearchResponseData[]> {
 	const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 	const isUUID = (str) => uuidRegex.test(str);
 
-	for (const { node } of data[homepage_alias_name].edges) {
+	for (const { node } of data[officer_search_alias_name].edges) {
 		if (rows.has(node.bpiId) && isUUID(node.bpiId)) {
 			const existing = rows.get(node.bpiId);
 			const mergedEmployee: SearchResponseData = {

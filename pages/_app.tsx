@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { ApolloProvider } from "@apollo/client";
 import { ThemeProvider, CssBaseline, createTheme } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
 import NProgress from "nprogress";
 
@@ -78,6 +79,7 @@ const Application: FunctionComponent<ApplicationAppProps> = (props) => {
 	}, [router]);
 
 	return (
+		<SessionProvider session={(pageProps as any).session}>
 		<ApolloProvider client={apolloClient}>
 			<CacheProvider value={emotionCache}>
 				<ThemeProvider theme={lightTheme}>
@@ -120,6 +122,7 @@ const Application: FunctionComponent<ApplicationAppProps> = (props) => {
 				</ThemeProvider>
 			</CacheProvider>
 		</ApolloProvider>
+		</SessionProvider>
 	);
 };
 

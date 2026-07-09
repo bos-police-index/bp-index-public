@@ -1,0 +1,222 @@
+{
+  "name": "bpi_ingest_boston_fio",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Weekly Sun 04:00 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 4 * * 0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "pg_truncate",
+      "name": "Truncate raw_v2_boston_fio",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        460,
+        380
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "TRUNCATE production.raw_v2_boston_fio RESTART IDENTITY;",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "H4bGq6wyGF0YAK2L",
+          "name": "bp-index Railway Postgres"
+        }
+      }
+    },
+    {
+      "id": "http_ckan",
+      "name": "CKAN package_show",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        380
+      ],
+      "parameters": {
+        "url": "https://data.boston.gov/api/3/action/package_show?id=boston-police-department-fio",
+        "options": {}
+      }
+    },
+    {
+      "id": "code_fetch_all",
+      "name": "Fetch + parse FieldContact CSVs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        380
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// Cap to most recent N years on each run. Raise to backfill earlier years.\nconst MAX_YEARS = 3;\n\nconst pkg = $input.first().json.result || {};\nconst resources = pkg.resources || [];\n\n// Multi-line-aware CSV parser. Critical: FIO narratives contain embedded\n// newlines inside quoted fields, so naive line-splitting before quote handling\n// shifts rows out of alignment. This walks the entire stream and treats\n// newlines OUTSIDE of quotes as row separators.\nfunction parseCsv(text) {\n  const rows = [];\n  let row = [];\n  let cur = '';\n  let inQuotes = false;\n  for (let i = 0; i < text.length; i++) {\n    const c = text[i];\n    if (inQuotes) {\n      if (c === '\"') {\n        if (text[i + 1] === '\"') { cur += '\"'; i++; }\n        else { inQuotes = false; }\n      } else cur += c;\n    } else {\n      if (c === '\"') inQuotes = true;\n      else if (c === ',') { row.push(cur); cur = ''; }\n      else if (c === '\\r') { /* skip; handled by \\n */ }\n      else if (c === '\\n') {\n        row.push(cur);\n        if (row.length > 1 || row[0] !== '') rows.push(row);\n        row = []; cur = '';\n      } else cur += c;\n    }\n  }\n  if (cur !== '' || row.length) { row.push(cur); rows.push(row); }\n  return rows;\n}\n\nfunction extractYear(name, url) {\n  const s = (name || '') + ' ' + (url || '');\n  const m = s.match(/(20\\d\\d)/);\n  return m ? parseInt(m[1], 10) : null;\n}\n\nfunction stripBom(s) { return s && s.charCodeAt(0) === 0xFEFF ? s.slice(1) : s; }\n\nconst targets = [];\nfor (const r of resources) {\n  const url = (r && r.url) || '';\n  if (!/\\.csv($|\\?)/i.test(url)) continue;\n  const name_en = ((r && r.name_translated) || {}).en || '';\n  if (/_Name|name_for_public|fio_names|fieldcontactname/i.test(url) || /Name Table/i.test(name_en)) continue;\n  if (/2011 - 2015/i.test(name_en)) continue;\n  const year = extractYear(name_en, url);\n  if (!year) continue;\n  targets.push({ url, year, filename: url.split('/').pop(), label: name_en });\n}\nconst byYear = new Map();\nfor (const t of targets) {\n  const cur = byYear.get(t.year);\n  if (!cur) { byYear.set(t.year, t); continue; }\n  if (/Mark43/i.test(t.label) && !/Mark43/i.test(cur.label)) byYear.set(t.year, t);\n}\nconst sorted = Array.from(byYear.values()).sort((a, b) => b.year - a.year).slice(0, MAX_YEARS);\n\nconst out = [];\nfor (const t of sorted) {\n  const text = stripBom(await this.helpers.httpRequest({ method: 'GET', url: t.url, encoding: 'utf8' }));\n  const rows = parseCsv(String(text));\n  if (rows.length < 2) continue;\n  const header = rows[0].map(h => (h || '').trim());\n  const idx = (k) => header.indexOf(k);\n  const i = {\n    fc_num:               idx('fc_num'),\n    contact_date:         idx('contact_date'),\n    contact_officer:      idx('contact_officer'),\n    contact_officer_name: idx('contact_officer_name'),\n    supervisor:           idx('supervisor'),\n    supervisor_name:      idx('supervisor_name'),\n    street:               idx('street'),\n    city:                 idx('city'),\n    state:                idx('state'),\n    zip:                  idx('zip'),\n    duration:             idx('duration'),\n    circumstance:         idx('circumstance'),\n    basis:                idx('basis'),\n    vehicle_year:         idx('vehicle_year'),\n    vehicle_state:        idx('vehicle_state'),\n    vehicle_model:        idx('vehicle_model'),\n    vehicle_color:        idx('vehicle_color'),\n    vehicle_style:        idx('vehicle_style'),\n    vehicle_type:         idx('vehicle_type'),\n    key_situations:       idx('key_situations'),\n    contact_reason:       idx('contact_reason'),\n  };\n  for (let li = 1; li < rows.length; li++) {\n    const f = rows[li];\n    if (!f || f.length === 0) continue;\n    const cell = (k) => k >= 0 && f[k] != null ? (String(f[k]).trim() || null) : null;\n    const norm = (v) => (v && v !== 'NULL' ? v : null);\n    out.push({ json: {\n      fc_num:               norm(cell(i.fc_num)),\n      contact_date:         norm(cell(i.contact_date)),\n      contact_officer:      norm(cell(i.contact_officer)),\n      contact_officer_name: norm(cell(i.contact_officer_name)),\n      supervisor:           norm(cell(i.supervisor)),\n      supervisor_name:      norm(cell(i.supervisor_name)),\n      street:               norm(cell(i.street)),\n      city:                 norm(cell(i.city)),\n      state:                norm(cell(i.state)),\n      zip:                  norm(cell(i.zip)),\n      duration:             norm(cell(i.duration)),\n      circumstance:         norm(cell(i.circumstance)),\n      basis:                norm(cell(i.basis)),\n      vehicle_year:         norm(cell(i.vehicle_year)),\n      vehicle_state:        norm(cell(i.vehicle_state)),\n      vehicle_model:        norm(cell(i.vehicle_model)),\n      vehicle_color:        norm(cell(i.vehicle_color)),\n      vehicle_style:        norm(cell(i.vehicle_style)),\n      vehicle_type:         norm(cell(i.vehicle_type)),\n      key_situations:       norm(cell(i.key_situations)),\n      contact_reason:       norm(cell(i.contact_reason)),\n      year:                 t.year,\n      source_filename:      t.filename\n    }});\n  }\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "pg_insert_raw",
+      "name": "Insert raw rows",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1120,
+        380
+      ],
+      "parameters": {
+        "operation": "insert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "production"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "name",
+          "value": "raw_v2_boston_fio"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fc_num": "={{ $json.fc_num }}",
+            "contact_date": "={{ $json.contact_date }}",
+            "contact_officer": "={{ $json.contact_officer }}",
+            "contact_officer_name": "={{ $json.contact_officer_name }}",
+            "supervisor": "={{ $json.supervisor }}",
+            "supervisor_name": "={{ $json.supervisor_name }}",
+            "street": "={{ $json.street }}",
+            "city": "={{ $json.city }}",
+            "state": "={{ $json.state }}",
+            "zip": "={{ $json.zip }}",
+            "duration": "={{ $json.duration }}",
+            "circumstance": "={{ $json.circumstance }}",
+            "basis": "={{ $json.basis }}",
+            "vehicle_year": "={{ $json.vehicle_year }}",
+            "vehicle_state": "={{ $json.vehicle_state }}",
+            "vehicle_model": "={{ $json.vehicle_model }}",
+            "vehicle_color": "={{ $json.vehicle_color }}",
+            "vehicle_style": "={{ $json.vehicle_style }}",
+            "vehicle_type": "={{ $json.vehicle_type }}",
+            "key_situations": "={{ $json.key_situations }}",
+            "contact_reason": "={{ $json.contact_reason }}",
+            "year": "={{ $json.year }}",
+            "source_filename": "={{ $json.source_filename }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "H4bGq6wyGF0YAK2L",
+          "name": "bp-index Railway Postgres"
+        }
+      }
+    },
+    {
+      "id": "pg_reconcile",
+      "name": "Reconcile + load canonical",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1340,
+        380
+      ],
+      "executeOnce": true,
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH src AS (\n  SELECT contact_officer_name,\n         CASE\n           WHEN contact_officer IS NULL THEN NULL\n           WHEN length(REGEXP_REPLACE(contact_officer, '[^0-9]', '', 'g')) BETWEEN 1 AND 9\n             THEN REGEXP_REPLACE(contact_officer, '[^0-9]', '', 'g')::int\n           ELSE NULL\n         END AS emp_id\n  FROM production.raw_v2_boston_fio\n  WHERE contact_officer IS NOT NULL\n)\nINSERT INTO production.v2_officer_id_map (employee_id, first_name, last_name, canonical_name)\nSELECT DISTINCT ON (emp_id)\n  emp_id,\n  TRIM(SPLIT_PART(contact_officer_name, ',', 2)),\n  TRIM(SPLIT_PART(contact_officer_name, ',', 1)),\n  production.canonicalize_name(contact_officer_name)\nFROM src\nWHERE emp_id IS NOT NULL\n  AND emp_id NOT IN (SELECT employee_id FROM production.v2_officer_id_map WHERE employee_id IS NOT NULL);\n\nDELETE FROM production.v2_fio WHERE source = 'boston_fio';\n\nWITH src AS (\n  SELECT *,\n         CASE\n           WHEN contact_officer IS NULL THEN NULL\n           WHEN length(REGEXP_REPLACE(contact_officer, '[^0-9]', '', 'g')) BETWEEN 1 AND 9\n             THEN REGEXP_REPLACE(contact_officer, '[^0-9]', '', 'g')::int\n           ELSE NULL\n         END AS emp_id\n  FROM production.raw_v2_boston_fio\n)\nINSERT INTO production.v2_fio\n  (bpi_id, fc_num, contact_date, location, frisked, vehicle_searched,\n   basis, circumstance, narrative, source, as_of)\nSELECT DISTINCT ON (s.fc_num)\n  m.bpi_id,\n  s.fc_num,\n  CASE\n    WHEN s.contact_date IS NULL THEN NULL\n    WHEN s.contact_date ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN s.contact_date::timestamptz\n    ELSE NULL\n  END,\n  CONCAT_WS(', ',\n           NULLIF(s.street, ''),\n           NULLIF(s.city, ''),\n           NULLIF(s.state, ''),\n           NULLIF(s.zip, '')),\n  NULL::boolean,\n  NULL::boolean,\n  s.basis,\n  s.circumstance,\n  s.contact_reason,\n  'boston_fio',\n  now()\nFROM src s\nLEFT JOIN production.v2_officer_id_map m ON\n  (m.employee_id IS NOT NULL AND s.emp_id IS NOT NULL AND m.employee_id = s.emp_id)\n  OR (s.emp_id IS NULL\n      AND m.canonical_name IS NOT NULL\n      AND s.contact_officer_name IS NOT NULL\n      AND m.canonical_name = production.canonicalize_name(s.contact_officer_name))\nWHERE s.fc_num IS NOT NULL\nORDER BY s.fc_num,\n         (m.employee_id IS NOT NULL) DESC,\n         (m.mptc_id IS NOT NULL) DESC,\n         m.created_at NULLS LAST;\n\nINSERT INTO production.v2_ingest_run (pipeline_name, started_at, finished_at, status, rows_in, rows_out)\nVALUES (\n  'bpi_ingest_boston_fio',\n  now(), now(), 'success',\n  (SELECT COUNT(*) FROM production.raw_v2_boston_fio),\n  (SELECT COUNT(*) FROM production.v2_fio WHERE source = 'boston_fio')\n);",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "H4bGq6wyGF0YAK2L",
+          "name": "bp-index Railway Postgres"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Weekly Sun 04:00 UTC": {
+      "main": [
+        [
+          {
+            "node": "Truncate raw_v2_boston_fio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Truncate raw_v2_boston_fio": {
+      "main": [
+        [
+          {
+            "node": "CKAN package_show",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CKAN package_show": {
+      "main": [
+        [
+          {
+            "node": "Fetch + parse FieldContact CSVs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch + parse FieldContact CSVs": {
+      "main": [
+        [
+          {
+            "node": "Insert raw rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert raw rows": {
+      "main": [
+        [
+          {
+            "node": "Reconcile + load canonical",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  }
+}

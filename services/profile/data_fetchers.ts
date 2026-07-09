@@ -8,26 +8,45 @@ Function that fetches the financial data by BPI ID for a specific officer
 export async function getIndividualOfficerFinancial(bpiId: string) {
 	const financial_and_employee_query = INDIVIDUAL_OFFICER_FINANCIAL_AND_EMPLOYEE(bpiId);
 
-	// catch error if invalid bpiID
 	let financialAndEmployeeResponse: any;
 	try {
 		financialAndEmployeeResponse = await apolloClient.query({ query: financial_and_employee_query });
 	} catch (error) {
 		console.error("GraphQL query error:", error);
-		financialAndEmployeeResponse = null;
+		return [];
 	}
 
-	// If the response is invalid, return a 404
-	if (!financialAndEmployeeResponse) {
-		return {
-			notFound: true,
-		};
-	}
-
-	return financialAndEmployeeResponse.data[officer_financial_alias_name].nodes;
+	return financialAndEmployeeResponse?.data?.[officer_financial_alias_name]?.nodes ?? [];
 }
 
+const EMPTY_FINANCIAL: FinancialEmployeeData = {
+	org: "",
+	badgeNo: 0,
+	numOfIa: 0,
+	rank: "",
+	race: "",
+	sex: "",
+	unit: "",
+	unionCode: "",
+	zipCode: "",
+	firstName: "",
+	lastName: "",
+	otPay: 0,
+	otherPay: 0,
+	quinnPay: 0,
+	regularPay: 0,
+	retroPay: 0,
+	totalPay: 0,
+	detailPay: 0,
+	injuredPay: 0,
+	year: 0,
+	totalPayPercentile: 0,
+};
+
 export function getMostRecentOfficerFinancialData(data) {
+	if (!Array.isArray(data) || data.length === 0) {
+		return { ...EMPTY_FINANCIAL };
+	}
 	let mostRecentEmployeeData = data[0];
 	data.slice(0).map((node: any) => {
 		if (mostRecentEmployeeData.year && mostRecentEmployeeData.year < node.year) {
@@ -63,6 +82,10 @@ export function getMostRecentOfficerFinancialData(data) {
 export function extractEmployeeFinancialRowsFromIndividualEmployeeFinancialQuery(data) {
 	const financialCols = ["year", "rank", "otPay", "otherPay", "quinnPay", "regularPay", "retroPay", "totalPay", "detailPay", "injuredPay"];
 	let police_financial_rows = [];
+
+	if (!Array.isArray(data) || data.length === 0) {
+		return { police_financial_rows: [], mostRecentFinancialYear: null };
+	}
 
 	// Extract specific columns to use as financial rows
 	data.forEach((node) => {
@@ -134,8 +157,14 @@ export function addIdToRows(rows, alias_name) {
 }
 
 export async function getOfficerProfileData(query, alias_name) {
-	const response = await apolloClient.query({ query: query });
-	if (!response?.data[alias_name]) {
+	let response;
+	try {
+		response = await apolloClient.query({ query: query });
+	} catch (error) {
+		console.error(`GraphQL query error for ${alias_name}:`, error);
+		return [];
+	}
+	if (!response?.data?.[alias_name]) {
 		return [];
 	}
 	return addIdToRows(response, alias_name);

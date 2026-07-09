@@ -1,0 +1,213 @@
+{
+  "name": "bpi_ingest_boston_earnings",
+  "nodes": [
+    {
+      "id": "trigger",
+      "name": "Weekly Mon 03:00 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 3 * * 1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "pg_truncate",
+      "name": "Truncate raw_v2_boston_earnings",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        460,
+        380
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "TRUNCATE production.raw_v2_boston_earnings RESTART IDENTITY;",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "H4bGq6wyGF0YAK2L",
+          "name": "bp-index Railway Postgres"
+        }
+      }
+    },
+    {
+      "id": "http_ckan",
+      "name": "CKAN package_show",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        380
+      ],
+      "parameters": {
+        "url": "https://data.boston.gov/api/3/action/package_show?id=employee-earnings-report",
+        "options": {}
+      }
+    },
+    {
+      "id": "code_fetch_all",
+      "name": "Fetch + parse all year CSVs (BPD only)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        380
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// Limit to MAX_YEARS most recent CSVs (configurable). Older years can be backfilled\n// later by raising this cap or by a one-off backfill workflow.\nconst MAX_YEARS = 3;\n\nconst pkg = $input.first().json.result || {};\nconst resources = pkg.resources || [];\n\nfunction parseCsvLine(line) {\n  const out = [];\n  let cur = '';\n  let inQuotes = false;\n  for (let i = 0; i < line.length; i++) {\n    const c = line[i];\n    if (inQuotes) {\n      if (c === '\"') {\n        if (line[i + 1] === '\"') { cur += '\"'; i++; }\n        else { inQuotes = false; }\n      } else cur += c;\n    } else {\n      if (c === '\"') inQuotes = true;\n      else if (c === ',') { out.push(cur); cur = ''; }\n      else cur += c;\n    }\n  }\n  out.push(cur);\n  return out;\n}\n\nfunction extractYear(url) {\n  let m = url.match(/(20\\d\\d)/);\n  if (m) return parseInt(m[1], 10);\n  m = url.match(/cy(\\d\\d)/i);\n  if (m) return 2000 + parseInt(m[1], 10);\n  return null;\n}\n\nconst targets = [];\nfor (const r of resources) {\n  const url = (r && r.url) || '';\n  if (!/\\.csv(\\?|$)/i.test(url)) continue;\n  if (/payroll_categories/i.test(url)) continue;\n  const year = extractYear(url);\n  if (!year) continue;\n  targets.push({ url, year, filename: url.split('/').pop() });\n}\ntargets.sort((a, b) => b.year - a.year);\nconst limited = targets.slice(0, MAX_YEARS);\n\nconst out = [];\nfor (const t of limited) {\n  const text = await this.helpers.httpRequest({ method: 'GET', url: t.url, encoding: 'utf8' });\n  const lines = String(text).split(/\\r?\\n/);\n  if (lines.length < 2) continue;\n  const header = parseCsvLine(lines[0]).map(h => h.trim());\n\n  // older CSVs use 'DEPARTMENT NAME', newer use 'DEPARTMENT_NAME'; etc.\n  function findIdx(...candidates) {\n    for (const c of candidates) {\n      const i = header.indexOf(c);\n      if (i >= 0) return i;\n    }\n    return -1;\n  }\n  const iName    = findIdx('NAME');\n  const iDept    = findIdx('DEPARTMENT_NAME', 'DEPARTMENT NAME');\n  const iTitle   = findIdx('TITLE');\n  const iRegular = findIdx('REGULAR');\n  const iRetro   = findIdx('RETRO');\n  const iOther   = findIdx('OTHER');\n  const iOT      = findIdx('OVERTIME');\n  const iInjured = findIdx('INJURED');\n  const iDetail  = findIdx('DETAIL');\n  const iQuinn   = findIdx('QUINN_EDUCATION', 'QUINN/EDUCATION INCENTIVE', 'QUINN');\n  const iTotal   = findIdx('TOTAL GROSS', 'TOTAL_EARNINGS', 'TOTAL EARNINGS', 'TOTAL_GROSS');\n  const iPostal  = findIdx('POSTAL', 'ZIP', 'POSTAL_CODE');\n\n  for (let i = 1; i < lines.length; i++) {\n    const line = lines[i];\n    if (!line || !line.trim()) continue;\n    const f = parseCsvLine(line);\n    const dept = (iDept >= 0 ? f[iDept] : '') || '';\n    if (!/police department/i.test(dept)) continue;\n    const cell = (k) => k >= 0 && f[k] != null ? String(f[k]).trim() || null : null;\n    out.push({ json: {\n      name: cell(iName),\n      department_name: dept.trim(),\n      title: cell(iTitle),\n      regular: cell(iRegular),\n      retro: cell(iRetro),\n      other: cell(iOther),\n      overtime: cell(iOT),\n      injured: cell(iInjured),\n      detail: cell(iDetail),\n      quinn: cell(iQuinn),\n      total_earnings: cell(iTotal),\n      postal: cell(iPostal),\n      year: t.year,\n      source_filename: t.filename\n    }});\n  }\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "pg_insert_raw",
+      "name": "Insert raw rows",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1120,
+        380
+      ],
+      "parameters": {
+        "operation": "insert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "production"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "name",
+          "value": "raw_v2_boston_earnings"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "department_name": "={{ $json.department_name }}",
+            "title": "={{ $json.title }}",
+            "regular": "={{ $json.regular }}",
+            "retro": "={{ $json.retro }}",
+            "other": "={{ $json.other }}",
+            "overtime": "={{ $json.overtime }}",
+            "injured": "={{ $json.injured }}",
+            "detail": "={{ $json.detail }}",
+            "quinn": "={{ $json.quinn }}",
+            "total_earnings": "={{ $json.total_earnings }}",
+            "postal": "={{ $json.postal }}",
+            "year": "={{ $json.year }}",
+            "source_filename": "={{ $json.source_filename }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "H4bGq6wyGF0YAK2L",
+          "name": "bp-index Railway Postgres"
+        }
+      }
+    },
+    {
+      "id": "pg_reconcile",
+      "name": "Reconcile + load canonical",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1340,
+        380
+      ],
+      "executeOnce": true,
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Uses production.parse_money() and production.canonicalize_name() helpers.\n\n-- 1) Insert any new BPD officers from earnings that don't already exist in the id map\nINSERT INTO production.v2_officer_id_map (first_name, last_name, canonical_name)\nSELECT DISTINCT ON (canon)\n  TRIM(SPLIT_PART(name, ',', 2)) AS first_name,\n  TRIM(SPLIT_PART(name, ',', 1)) AS last_name,\n  canon\nFROM (\n  SELECT name, production.canonicalize_name(name) AS canon\n  FROM production.raw_v2_boston_earnings\n  WHERE name IS NOT NULL AND name <> ''\n) src\nWHERE canon IS NOT NULL\n  AND canon NOT IN (\n    SELECT canonical_name FROM production.v2_officer_id_map WHERE canonical_name IS NOT NULL\n  );\n\n-- 2) Replace canonical earnings for source = 'boston_open_data'\nDELETE FROM production.v2_earnings_year WHERE source = 'boston_open_data';\n\nINSERT INTO production.v2_earnings_year\n  (bpi_id, year, department_name, title,\n   regular_pay, retro_pay, other_pay, ot_pay, injured_pay, detail_pay, quinn_pay, total_pay,\n   source, as_of)\nSELECT DISTINCT ON (m.bpi_id, r.year)\n  m.bpi_id, r.year, r.department_name, r.title,\n  production.parse_money(r.regular),\n  production.parse_money(r.retro),\n  production.parse_money(r.other),\n  production.parse_money(r.overtime),\n  production.parse_money(r.injured),\n  production.parse_money(r.detail),\n  production.parse_money(r.quinn),\n  production.parse_money(r.total_earnings),\n  'boston_open_data', now()\nFROM production.raw_v2_boston_earnings r\nJOIN production.v2_officer_id_map m\n  ON m.canonical_name = production.canonicalize_name(r.name)\nWHERE r.name IS NOT NULL AND r.name <> '' AND r.year IS NOT NULL\nORDER BY m.bpi_id, r.year,\n         (m.employee_id IS NOT NULL) DESC,\n         (m.mptc_id IS NOT NULL) DESC,\n         m.created_at;\n\n-- 3) Log run\nINSERT INTO production.v2_ingest_run (pipeline_name, started_at, finished_at, status, rows_in, rows_out)\nVALUES (\n  'bpi_ingest_boston_earnings',\n  now(), now(), 'success',\n  (SELECT COUNT(*) FROM production.raw_v2_boston_earnings),\n  (SELECT COUNT(*) FROM production.v2_earnings_year WHERE source = 'boston_open_data')\n);",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "H4bGq6wyGF0YAK2L",
+          "name": "bp-index Railway Postgres"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Weekly Mon 03:00 UTC": {
+      "main": [
+        [
+          {
+            "node": "Truncate raw_v2_boston_earnings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Truncate raw_v2_boston_earnings": {
+      "main": [
+        [
+          {
+            "node": "CKAN package_show",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CKAN package_show": {
+      "main": [
+        [
+          {
+            "node": "Fetch + parse all year CSVs (BPD only)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch + parse all year CSVs (BPD only)": {
+      "main": [
+        [
+          {
+            "node": "Insert raw rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert raw rows": {
+      "main": [
+        [
+          {
+            "node": "Reconcile + load canonical",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  }
+}

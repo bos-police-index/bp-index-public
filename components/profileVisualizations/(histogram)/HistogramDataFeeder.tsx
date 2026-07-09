@@ -60,20 +60,30 @@ const HistogramDataFeeder = ({ width, height, specificOfficerFinancialData, offi
 	useEffect(() => {
 		const fetchData = async () => {
 			// get data split by filter attribute and add them to the map that works with selectedFilter
-			const [matching, nonMatching]: PayTypeBuckets[] = await fetchFinancialsHistogram(officerDetailData.rank);
+			const [matching, nonMatching]: PayTypeBuckets[] = await fetchFinancialsHistogram(officerDetailData?.rank);
 			setOfficerFinancialDataSplit({ rank: matching, none: nonMatching });
 
-			// set to the most recent year in the data
+			// find the most recent year that actually has regularPay data; bail if none
+			const matchingYears = Object.keys(matching || {});
 			let i = 1;
-			while (matching[Number(Object.keys(matching)[Object.keys(matching).length - i])].regularPay.length == 0) {
+			while (
+				i <= matchingYears.length &&
+				(matching[Number(matchingYears[matchingYears.length - i])]?.regularPay?.length ?? 0) === 0
+			) {
 				i++;
 			}
-			const validYears = Object.keys(specificOfficerFinancialData)
-				.slice(0, Object.keys(matching).length - i + 1)
+			if (i > matchingYears.length) {
+				setValidYears([]);
+				setSelectedYearIndex(undefined);
+				return;
+			}
+			const specificYears = Object.keys(specificOfficerFinancialData || {});
+			const validYears = specificYears
+				.slice(0, Math.max(0, matchingYears.length - i + 1))
 				.map(Number);
 
 			setValidYears(validYears);
-			setSelectedYearIndex(validYears.length - 1);
+			setSelectedYearIndex(validYears.length > 0 ? validYears.length - 1 : undefined);
 		};
 		fetchData();
 		setSelectedCategory(PayCategories.totalPay);
