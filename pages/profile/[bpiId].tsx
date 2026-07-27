@@ -13,9 +13,11 @@ import OrganizationCardV2 from "@components/profileSections/OrganizationCardV2";
 import ProfileSummaryHeaderV2 from "@components/profileSections/ProfileSummaryHeaderV2";
 import PaidDetailTableV2 from "@components/profileSections/PaidDetailTableV2";
 import TrafficCitationTableV2 from "@components/profileSections/TrafficCitationTableV2";
+import SeparationCardV2 from "@components/profileSections/SeparationCardV2";
+import AcademyCardV2 from "@components/profileSections/AcademyCardV2";
 // IncidentJournalTableV2 import removed while the incidents section is hidden (see render note).
-import { V2_OFFICER_PROFILE, V2_OFFICER_EARNINGS, V2_OFFICER_POST_CERTIFICATIONS, V2_OFFICER_POST_DECERTIFICATIONS, V2_OFFICER_FIO, V2_OFFICER_MISCONDUCT, V2_OFFICER_ASSIGNMENTS, V2_OFFICER_PAID_DETAILS, V2_OFFICER_TRAFFIC, V2_OFFICER_INCIDENTS } from "@lib/graphql/queries";
-import { v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name } from "@utility/dataViewAliases";
+import { V2_OFFICER_PROFILE, V2_OFFICER_EARNINGS, V2_OFFICER_POST_CERTIFICATIONS, V2_OFFICER_POST_DECERTIFICATIONS, V2_OFFICER_FIO, V2_OFFICER_MISCONDUCT, V2_OFFICER_ASSIGNMENTS, V2_OFFICER_PAID_DETAILS, V2_OFFICER_TRAFFIC, V2_OFFICER_INCIDENTS, V2_OFFICER_SEPARATION, V2_OFFICER_ACADEMY } from "@lib/graphql/queries";
+import { v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name } from "@utility/dataViewAliases";
 import { getOfficerProfileData } from "../../services/profile/data_fetchers";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -36,6 +38,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	const v2_traffic_rows      = await getOfficerProfileData(V2_OFFICER_TRAFFIC(bpiId),               v2_traffic_alias_name);
 	const v2_incident_rows     = await getOfficerProfileData(V2_OFFICER_INCIDENTS(bpiId),             v2_incident_alias_name);
 	const v2_assignment_rows   = await getOfficerProfileData(V2_OFFICER_ASSIGNMENTS(bpiId),           v2_officer_assignment_alias_name);
+	const v2_separation_rows   = await getOfficerProfileData(V2_OFFICER_SEPARATION(bpiId),            v2_separation_alias_name);
+	const v2_academy_rows      = await getOfficerProfileData(V2_OFFICER_ACADEMY(bpiId),               v2_academy_alias_name);
 	const v2_profile: V2OfficerProfile | null = v2_profile_rows && v2_profile_rows.length > 0 ? v2_profile_rows[0] : null;
 
 	return {
@@ -50,6 +54,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 			v2TrafficRows: v2_traffic_rows,
 			v2IncidentRows: v2_incident_rows,
 			v2AssignmentRows: v2_assignment_rows,
+			v2SeparationRows: v2_separation_rows,
+			v2AcademyRows: v2_academy_rows,
 		},
 	};
 };
@@ -91,12 +97,14 @@ export default function OfficerProfile(props: InferGetServerSidePropsType<typeof
 					/>
 					<IdentityCardV2 profile={v2Profile} />
 					<OrganizationCardV2 rows={p.v2AssignmentRows ?? []} />
+					<AcademyCardV2 rows={p.v2AcademyRows ?? []} />
 					<div id="sec-earnings" className="scroll-mt-4"><EarningsByYearTableV2 rows={p.v2EarningsRows ?? []} /></div>
 					<div id="sec-paid-details" className="scroll-mt-4"><PaidDetailTableV2 rows={p.v2PaidDetailRows ?? []} /></div>
 					<PostStatusCardV2
 						certifications={p.v2PostCertRows ?? []}
 						decertifications={p.v2PostDecertRows ?? []}
 					/>
+					<SeparationCardV2 rows={p.v2SeparationRows ?? []} />
 					<div id="sec-ia" className="scroll-mt-4"><OfficerMisconductTableV2 rows={p.v2MisconductRows ?? []} /></div>
 					<div id="sec-fio" className="scroll-mt-4"><FioTableV2 rows={p.v2FioRows ?? []} /></div>
 					<div id="sec-traffic" className="scroll-mt-4"><TrafficCitationTableV2 rows={p.v2TrafficRows ?? []} /></div>

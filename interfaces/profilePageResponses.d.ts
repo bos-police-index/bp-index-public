@@ -204,6 +204,34 @@ declare global {
 		effDate: string | null;
 	}
 
+	// MA POST / MPTC FOIA data — hard-matched to officers by MPTC ID
+	interface V2SeparationRow {
+		bpiId: string | null;
+		mptcId: string | null;
+		currentEmployer: string | null;
+		formerEmployer: string | null;
+		separationDate: string | null;
+		separationType: string | null;
+		certStatus: string | null;
+		certExpiration: string | null;
+		source: string;
+		asOf: string;
+	}
+
+	interface V2AcademyRow {
+		bpiId: string | null;
+		mptcId: string | null;
+		className: string | null;
+		classEndDate: string | null;
+		sendingOrg: string | null;
+		enrollmentStatus: string | null;
+		gender: string | null;
+		yearOfBirth: number | null;
+		race: string | null;
+		source: string;
+		asOf: string;
+	}
+
 	interface OfficerYearHistoryRow {
 		bpiId: string;
 		employeeId: number;

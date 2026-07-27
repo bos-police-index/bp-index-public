@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, employee_alias_name, fio_record_alias_name, homepage_alias_name, officer_search_alias_name, ir_fall_2025_alias_name, officer_financial_alias_name, officer_ia_alias_name, officer_year_history_alias_name, traffic_stop_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map, v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name } from "@utility/dataViewAliases";
+import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, employee_alias_name, fio_record_alias_name, homepage_alias_name, officer_search_alias_name, ir_fall_2025_alias_name, officer_financial_alias_name, officer_ia_alias_name, officer_year_history_alias_name, traffic_stop_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map, v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name } from "@utility/dataViewAliases";
 import { DocumentNode } from "graphql";
 
 export const DATA_PAGE_SIZE = 25;
@@ -337,6 +337,45 @@ export const V2_OFFICER_INCIDENTS = (bpiId: string) => gql`
 				numArrestees
 				numVictims
 				url
+				source
+				asOf
+			}
+		}
+	}
+`;
+
+export const V2_OFFICER_SEPARATION = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_separation_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: SEPARATION_DATE_DESC) {
+			nodes {
+				bpiId
+				mptcId
+				currentEmployer
+				formerEmployer
+				separationDate
+				separationType
+				certStatus
+				certExpiration
+				source
+				asOf
+			}
+		}
+	}
+`;
+
+export const V2_OFFICER_ACADEMY = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_academy_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: CLASS_END_DATE_DESC) {
+			nodes {
+				bpiId
+				mptcId
+				className
+				classEndDate
+				sendingOrg
+				enrollmentStatus
+				gender
+				yearOfBirth
+				race
 				source
 				asOf
 			}
