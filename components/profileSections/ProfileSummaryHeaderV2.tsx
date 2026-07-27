@@ -88,13 +88,14 @@ export default function ProfileSummaryHeaderV2({ profile, earnings = [], miscond
 					</div>
 				</div>
 
-				<div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-4">
+				<div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-4">
 					<Stat label={`Pay ${latestEarn?.year ?? ""}`.trim()} value={totalPay != null ? `$${formatMoneyNoCents(totalPay)}` : "—"} accent="text-emerald-300" targetId="sec-earnings" />
 					<Stat label="IA cases" value={misconduct.length.toLocaleString()} accent={misconduct.length > 0 ? "text-red-300" : undefined} targetId="sec-ia" />
 					<Stat label="FIO" value={fio.length.toLocaleString()} targetId="sec-fio" />
 					<Stat label="Paid details" value={paidDetail.length.toLocaleString()} targetId="sec-paid-details" />
 					<Stat label="Citations" value={traffic.length.toLocaleString()} targetId="sec-traffic" />
-					<Stat label="Incidents" value={incidents.length.toLocaleString()} targetId="sec-incidents" />
+					{/* Incidents tile hidden with the incidents section (sample-only data). void keeps the prop referenced. */}
+					{void incidents}
 				</div>
 			</div>
 		</div>

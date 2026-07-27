@@ -13,7 +13,7 @@ import OrganizationCardV2 from "@components/profileSections/OrganizationCardV2";
 import ProfileSummaryHeaderV2 from "@components/profileSections/ProfileSummaryHeaderV2";
 import PaidDetailTableV2 from "@components/profileSections/PaidDetailTableV2";
 import TrafficCitationTableV2 from "@components/profileSections/TrafficCitationTableV2";
-import IncidentJournalTableV2 from "@components/profileSections/IncidentJournalTableV2";
+// IncidentJournalTableV2 import removed while the incidents section is hidden (see render note).
 import { V2_OFFICER_PROFILE, V2_OFFICER_EARNINGS, V2_OFFICER_POST_CERTIFICATIONS, V2_OFFICER_POST_DECERTIFICATIONS, V2_OFFICER_FIO, V2_OFFICER_MISCONDUCT, V2_OFFICER_ASSIGNMENTS, V2_OFFICER_PAID_DETAILS, V2_OFFICER_TRAFFIC, V2_OFFICER_INCIDENTS } from "@lib/graphql/queries";
 import { v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name } from "@utility/dataViewAliases";
 import { getOfficerProfileData } from "../../services/profile/data_fetchers";
@@ -100,7 +100,9 @@ export default function OfficerProfile(props: InferGetServerSidePropsType<typeof
 					<div id="sec-ia" className="scroll-mt-4"><OfficerMisconductTableV2 rows={p.v2MisconductRows ?? []} /></div>
 					<div id="sec-fio" className="scroll-mt-4"><FioTableV2 rows={p.v2FioRows ?? []} /></div>
 					<div id="sec-traffic" className="scroll-mt-4"><TrafficCitationTableV2 rows={p.v2TrafficRows ?? []} /></div>
-					<div id="sec-incidents" className="scroll-mt-4"><IncidentJournalTableV2 rows={p.v2IncidentRows ?? []} /></div>
+					{/* Incident Journal hidden until a fuller officer-linked source exists (public crime-incident
+					    data has no officer field; current data is only a Dec2020–Jan2021 sample). Restore: re-add this
+					    div + the IncidentJournalTableV2 import + the header "Incidents" tile. */}
 					<NewsEmbedV2
 						firstName={v2Profile?.firstName ?? undefined}
 						lastName={v2Profile?.lastName ?? undefined}
