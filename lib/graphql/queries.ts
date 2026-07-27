@@ -230,6 +230,10 @@ export const V2_OFFICER_MISCONDUCT = (bpiId: string) => gql`
 				asOf
 				linkMethod
 				confirmed
+				narrative
+				disposition
+				priority
+				occurredDate
 			}
 		}
 	}

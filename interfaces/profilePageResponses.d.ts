@@ -112,6 +112,11 @@ declare global {
 		completedDate: string | null;
 		source: string;
 		asOf: string;
+		// PDF-sourced enrichment (BPD IAD complaints 2020)
+		narrative: string | null;
+		disposition: string | null;
+		priority: string | null;
+		occurredDate: string | null;
 	}
 
 	interface V2FioRow {

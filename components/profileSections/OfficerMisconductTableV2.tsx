@@ -17,13 +17,17 @@ interface V2MisconductRow {
 	asOf: string;
 	linkMethod?: string;
 	confirmed?: boolean;
+	narrative?: string | null;
+	disposition?: string | null;
+	priority?: string | null;
+	occurredDate?: string | null;
 }
 
 interface Props {
 	rows: V2MisconductRow[];
 }
 
-function fmtDate(s: string | null): string {
+function fmtDate(s: string | null | undefined): string {
 	if (!s) return "—";
 	try {
 		return new Date(s).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
@@ -44,54 +48,52 @@ function findingClass(finding: string | null): string {
 	return "bg-gray-100 text-gray-800 border border-gray-200";
 }
 
-const columns: GridColDef[] = [
-	{
-		field: "caseNumber",
-		headerName: "IA #",
-		width: 130,
-		valueFormatter: (p) => p.value || "—",
-	},
-	{
-		field: "receivedDate",
-		headerName: "Received",
-		width: 120,
-		valueFormatter: (p) => fmtDate(p.value as string | null),
-	},
-	{
-		field: "incidentType",
-		headerName: "Type",
-		width: 150,
-		valueFormatter: (p) => p.value || "—",
-	},
-	{
-		field: "allegation",
-		headerName: "Allegation",
-		flex: 1,
-		minWidth: 220,
-		valueFormatter: (p) => p.value || "—",
-	},
-	{
-		field: "finding",
-		headerName: "Finding",
-		width: 150,
-		renderCell: (p) => (
-			<span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${findingClass(p.value as string | null)}`}>
-				{p.value || "—"}
-			</span>
-		),
-	},
-	{
-		field: "actionTaken",
-		headerName: "Action Taken",
-		flex: 0.8,
-		minWidth: 160,
-		valueFormatter: (p) => p.value || "—",
-	},
-];
-
 export default function OfficerMisconductTableV2({ rows }: Props) {
 	const [showSustainedOnly, setShowSustainedOnly] = useState(false);
+	const [openRow, setOpenRow] = useState<V2MisconductRow | null>(null);
 	const latest = rows && rows.length > 0 ? rows[0] : null;
+
+	const columns: GridColDef[] = useMemo(() => [
+		{ field: "caseNumber", headerName: "IA #", width: 130, valueFormatter: (p) => p.value || "—" },
+		{ field: "receivedDate", headerName: "Received", width: 120, valueFormatter: (p) => fmtDate(p.value as string | null) },
+		{ field: "incidentType", headerName: "Type", width: 150, valueFormatter: (p) => p.value || "—" },
+		{ field: "allegation", headerName: "Allegation", flex: 1, minWidth: 200, valueFormatter: (p) => p.value || "—" },
+		{
+			field: "finding",
+			headerName: "Finding",
+			width: 140,
+			renderCell: (p) => (
+				<span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${findingClass(p.value as string | null)}`}>
+					{p.value || "—"}
+				</span>
+			),
+		},
+		{ field: "disposition", headerName: "Disposition", width: 150, valueFormatter: (p) => p.value || "—" },
+		{ field: "actionTaken", headerName: "Action Taken", width: 160, valueFormatter: (p) => p.value || "—" },
+		{
+			field: "narrative",
+			headerName: "Summary",
+			flex: 1.1,
+			minWidth: 240,
+			sortable: false,
+			renderCell: (p) => {
+				const v = p.value as string | null;
+				if (!v) return <span className="text-gray-300">—</span>;
+				if (v === "[redacted]") return <span className="text-gray-400 italic text-xs">[redacted]</span>;
+				return (
+					<button
+						type="button"
+						onClick={() => setOpenRow(p.row as V2MisconductRow)}
+						title="Read full summary"
+						className="text-left text-xs text-gray-700 hover:text-red-700 leading-snug w-full"
+						style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+					>
+						{v}
+					</button>
+				);
+			},
+		},
+	], []);
 
 	const visibleRows = useMemo(() => {
 		if (!showSustainedOnly) return rows;
@@ -110,6 +112,8 @@ export default function OfficerMisconductTableV2({ rows }: Props) {
 		}
 		return c;
 	}, [rows]);
+
+	const withNarrative = useMemo(() => rows.filter((r) => r.narrative && r.narrative !== "[redacted]").length, [rows]);
 
 	return (
 		<div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
@@ -161,6 +165,12 @@ export default function OfficerMisconductTableV2({ rows }: Props) {
 							{counts.pending} Pending
 						</span>
 					)}
+					{withNarrative > 0 && (
+						<span className="inline-flex items-center gap-1 text-xs text-gray-500" title="Complaint summaries available — click a Summary cell to read">
+							<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+							{withNarrative} with summary
+						</span>
+					)}
 					<label className="ml-auto inline-flex items-center gap-1.5 cursor-pointer">
 						<input
 							type="checkbox"
@@ -191,6 +201,7 @@ export default function OfficerMisconductTableV2({ rows }: Props) {
 						rows={visibleRows.map((r, i) => ({ id: i, ...r }))}
 						columns={columns}
 						autoHeight
+						getRowHeight={() => "auto"}
 						disableRowSelectionOnClick
 						initialState={{
 							sorting: { sortModel: [{ field: "receivedDate", sort: "desc" }] },
@@ -205,12 +216,54 @@ export default function OfficerMisconductTableV2({ rows }: Props) {
 								fontWeight: 600,
 							},
 							"& .MuiDataGrid-row:hover": { backgroundColor: "#fef2f2" },
-							"& .MuiDataGrid-cell": { borderColor: "rgba(0,0,0,0.06)" },
+							"& .MuiDataGrid-cell": { borderColor: "rgba(0,0,0,0.06)", paddingTop: "8px", paddingBottom: "8px" },
+							"& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within": { outline: "none" },
 						}}
 					/>
 				</>
 				)}
 			</div>
+
+			{/* Full-summary reader */}
+			{openRow && (
+				<div
+					className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+					role="dialog"
+					aria-modal="true"
+					onClick={() => setOpenRow(null)}
+				>
+					<div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+						<div className="px-5 py-4 border-b border-gray-200 bg-gradient-to-r from-red-50 to-rose-50 flex items-start justify-between gap-3">
+							<div>
+								<div className="flex items-center gap-2 flex-wrap">
+									<span className="font-semibold text-gray-900">{openRow.caseNumber || "IA case"}</span>
+									{openRow.finding && (
+										<span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${findingClass(openRow.finding)}`}>{openRow.finding}</span>
+									)}
+									{openRow.linkMethod === "name" && !openRow.confirmed && (
+										<span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 text-[10px] font-semibold">matched by name — unconfirmed</span>
+									)}
+								</div>
+								<div className="text-xs text-gray-600 mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
+									{openRow.allegation && <span><span className="text-gray-400">Allegation:</span> {openRow.allegation}</span>}
+									{openRow.disposition && <span><span className="text-gray-400">Disposition:</span> {openRow.disposition}</span>}
+									<span><span className="text-gray-400">Received:</span> {fmtDate(openRow.receivedDate)}</span>
+									{openRow.occurredDate && <span><span className="text-gray-400">Occurred:</span> {fmtDate(openRow.occurredDate)}</span>}
+								</div>
+							</div>
+							<button onClick={() => setOpenRow(null)} className="text-gray-400 hover:text-gray-700 flex-shrink-0" aria-label="Close">
+								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+							</button>
+						</div>
+						<div className="px-5 py-4 overflow-y-auto">
+							<p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">{openRow.narrative}</p>
+							<p className="mt-4 text-[11px] text-gray-400 italic">
+								Verbatim complaint summary from the BPD IAD 2020 records; spelling/wording as recorded in the source.
+							</p>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
