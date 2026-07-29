@@ -82,6 +82,7 @@ export default function ProfileSummaryHeaderV2({ profile, earnings = [], miscond
 								<span className="inline-flex items-center gap-1"><MilitaryTechIcon className="w-4 h-4 text-slate-400" />{profile.rank || "Rank unknown"}</span>
 								<span>{profile.badgeNo ? `Badge #${profile.badgeNo}` : "Badge n/a"}</span>
 								{profile.employeeId != null && <span className="text-slate-400">Emp #{profile.employeeId}</span>}
+								{profile.mptcId && <span className="text-slate-400">POST {profile.mptcId}</span>}
 								{asOf && <span className="text-slate-400">· as of {asOf}{profile.rosterSource ? ` (${ROSTER_SOURCE_LABELS[profile.rosterSource] || profile.rosterSource})` : ""}</span>}
 							</div>
 						</div>
@@ -93,7 +94,7 @@ export default function ProfileSummaryHeaderV2({ profile, earnings = [], miscond
 					<Stat label="IA cases" value={misconduct.length.toLocaleString()} accent={misconduct.length > 0 ? "text-red-300" : undefined} targetId="sec-ia" />
 					<Stat label="FIO" value={fio.length.toLocaleString()} targetId="sec-fio" />
 					<Stat label="Paid details" value={paidDetail.length.toLocaleString()} targetId="sec-paid-details" />
-					<Stat label="Citations" value={traffic.length.toLocaleString()} targetId="sec-traffic" />
+					<Stat label="MVCs" value={traffic.length.toLocaleString()} targetId="sec-traffic" />
 					{/* Incidents tile hidden with the incidents section (sample-only data). void keeps the prop referenced. */}
 					{void incidents}
 				</div>

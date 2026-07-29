@@ -95,22 +95,24 @@ export default function OfficerProfile(props: InferGetServerSidePropsType<typeof
 						traffic={p.v2TrafficRows ?? []}
 						incidents={p.v2IncidentRows ?? []}
 					/>
+					{/* Section order follows the design-review spec (docs/review-backlog.md, Epic 1).
+					    Tenure + split-overtime sections are pending (data work); Incidents stays hidden. */}
 					<IdentityCardV2 profile={v2Profile} />
 					<OrganizationCardV2 rows={p.v2AssignmentRows ?? []} />
-					<AcademyCardV2 rows={p.v2AcademyRows ?? []} />
-					<div id="sec-earnings" className="scroll-mt-4"><EarningsByYearTableV2 rows={p.v2EarningsRows ?? []} /></div>
-					<div id="sec-paid-details" className="scroll-mt-4"><PaidDetailTableV2 rows={p.v2PaidDetailRows ?? []} /></div>
+					<div id="sec-ia" className="scroll-mt-4"><OfficerMisconductTableV2 rows={p.v2MisconductRows ?? []} /></div>
 					<PostStatusCardV2
 						certifications={p.v2PostCertRows ?? []}
 						decertifications={p.v2PostDecertRows ?? []}
 					/>
-					<SeparationCardV2 rows={p.v2SeparationRows ?? []} />
-					<div id="sec-ia" className="scroll-mt-4"><OfficerMisconductTableV2 rows={p.v2MisconductRows ?? []} /></div>
 					<div id="sec-fio" className="scroll-mt-4"><FioTableV2 rows={p.v2FioRows ?? []} /></div>
-					<div id="sec-traffic" className="scroll-mt-4"><TrafficCitationTableV2 rows={p.v2TrafficRows ?? []} /></div>
 					{/* Incident Journal hidden until a fuller officer-linked source exists (public crime-incident
-					    data has no officer field; current data is only a Dec2020–Jan2021 sample). Restore: re-add this
-					    div + the IncidentJournalTableV2 import + the header "Incidents" tile. */}
+					    data has no officer field; current data is only a Dec2020–Jan2021 sample). Restore: re-add
+					    <div id="sec-incidents"><IncidentJournalTableV2 rows={p.v2IncidentRows ?? []} /></div> + its import + the header tile. */}
+					<div id="sec-traffic" className="scroll-mt-4"><TrafficCitationTableV2 rows={p.v2TrafficRows ?? []} /></div>
+					<div id="sec-earnings" className="scroll-mt-4"><EarningsByYearTableV2 rows={p.v2EarningsRows ?? []} /></div>
+					<div id="sec-paid-details" className="scroll-mt-4"><PaidDetailTableV2 rows={p.v2PaidDetailRows ?? []} /></div>
+					<SeparationCardV2 rows={p.v2SeparationRows ?? []} />
+					<AcademyCardV2 rows={p.v2AcademyRows ?? []} />
 					<NewsEmbedV2
 						firstName={v2Profile?.firstName ?? undefined}
 						lastName={v2Profile?.lastName ?? undefined}
