@@ -2,9 +2,7 @@
 import DescriptionIcon from "@mui/icons-material/Description";
 import BalanceIcon from "@mui/icons-material/Balance";
 import LocalPoliceIcon from "@mui/icons-material/LocalPolice";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import CrisisAlertIcon from "@mui/icons-material/CrisisAlert";
-import LocalParkingIcon from "@mui/icons-material/LocalParking";
+import GavelIcon from "@mui/icons-material/Gavel";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import FindInPageIcon from "@mui/icons-material/FindInPage";
@@ -107,15 +105,6 @@ const rawTableDefinitions = [
 			"This dataset holds motor-vehicle citations where the issuing officer's id in the source did not match any officer in our roster, so the citation cannot be reliably attributed to a specific officer. It is presented separately, and explicitly labeled as non-attributed, so these records are visible for transparency without implying an officer match we cannot verify. All other citations appear, attributed, under Traffic Citations (MVC).",
 	},
 	{
-		table: "Officer Earnings",
-		query: "police_financial",
-		image: { component: <IconWrapper Icon={AttachMoneyIcon} />, src: AttachMoneyIcon },
-		isFake: true,
-		shortDescription: "This dataset includes detailed records of officers' hourly earnings and various earning types such as regular pay and overtime.",
-		longDescription:
-			"The Officer Earnings dataset provides comprehensive information on the earnings of police officers. It includes hourly wage data and categorizes earnings into various types, including but not limited to regular pay, overtime, and other compensations. This dataset is crucial for analyzing the financial aspects of police officer employment and understanding the distribution of earnings within the department.",
-	},
-	{
 		table: "Internal Affairs Cases",
 		query: "officer_misconduct",
 		image: { component: <IconWrapper Icon={ReportProblemIcon} />, src: ReportProblemIcon },
@@ -136,22 +125,13 @@ const rawTableDefinitions = [
 	},
 
 	{
-		table: "Parking Tickets",
-		query: "parking_ticket",
-		image: { component: <IconWrapper Icon={LocalParkingIcon} />, src: LocalParkingIcon },
+		table: "Court Cases involving BPD",
+		query: "court_case",
+		image: { component: <IconWrapper Icon={GavelIcon} />, src: GavelIcon },
 		isFake: true,
-		shortDescription: "The Parking Tickets dataset includes records of all parking citations issued in the City of Boston",
+		shortDescription: "Court cases involving the Boston Police Department and its officers — coming soon.",
 		longDescription:
-			"The Parking Tickets dataset comprises comprehensive records of all parking citations issued in the City of Boston. This includes data on the time, date, location, and nature of each parking violation, as well as any fines assessed. This dataset is essential for analyzing parking enforcement patterns, identifying problem areas, and understanding the city's approach to managing parking regulations.",
-	},
-	{
-		table: "Shooting Report",
-		query: "shooting_report",
-		image: { component: <IconWrapper Icon={CrisisAlertIcon} />, src: CrisisAlertIcon },
-		isFake: true,
-		shortDescription: "Information on shooting incidents in Boston where victims were hit by bullets, including both fatal and non-fatal cases",
-		longDescription:
-			"The Shooting Reports dataset provides detailed information on shooting incidents within the City of Boston that fall under the jurisdiction of the Boston Police Department. It includes records of incidents where a victim was struck by a bullet, encompassing both fatal and non-fatal cases. This dataset covers the date, time, and location of shootings, as well as victim demographics and other relevant details. It is a vital resource for analyzing gun violence trends and the impact of shootings on the community.",
+			"The Court Cases dataset will capture court cases involving the Boston Police Department and its officers, including civil suits, criminal matters, and related litigation. This dataset is not yet available; it is planned for a future release.",
 	},
 	{
 		table: "Incident Report",
