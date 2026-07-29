@@ -6,6 +6,10 @@
 --   * activity counts:  num_of_detail (paid details), num_of_fio (FIOs), num_of_mvc (traffic citations)
 --   * identity:         mptc_id AS post_id (statewide POST cert id)
 --   * start_date:       earliest academy class_end_date, used as a start-date proxy where available
+--   * is_current_roster: TRUE when the identity came from the fall-2025 roster snapshot; drives
+--                        the home-page "Current roster" default filter. ("Active 2020-2025" is
+--                        derived client-side from `year` — the latest earnings year, always in
+--                        2020-2025 when present, since earnings are backfilled exactly to 2020.)
 --
 -- The earnings block is a LATERAL that already picks the officer's most-recent year of
 -- earnings, so every pay column is for that same latest year. Idempotent (CREATE OR REPLACE).
@@ -40,7 +44,8 @@ SELECT m.bpi_id,
            FROM production.v2_traffic_citation t
           WHERE t.bpi_id = m.bpi_id) AS num_of_mvc,
     acad.start_date,
-    m.mptc_id AS post_id
+    m.mptc_id AS post_id,
+    (m.roster_source = 'fall_2025_roster') AS is_current_roster
    FROM production.v2_officer_id_map m
      LEFT JOIN LATERAL ( SELECT e_1.total_pay,
             e_1.ot_pay,

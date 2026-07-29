@@ -37,6 +37,7 @@ async function fetchHomepageData(): Promise<SearchResponseData[]> {
 				numOfMvc: existing.numOfMvc || node.numOfMvc,
 				race: existing.race || node.race,
 				sex: existing.sex || node.sex,
+				isCurrentRoster: existing.isCurrentRoster || node.isCurrentRoster,
 			};
 			rows.set(node.bpiId, mergedEmployee);
 		} else {

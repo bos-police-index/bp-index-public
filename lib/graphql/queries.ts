@@ -33,6 +33,7 @@ export const GET_HOMEPAGE_DATA = gql`
 					numOfMvc
 					startDate
 					postId
+					isCurrentRoster
 				}
 			}
 		}

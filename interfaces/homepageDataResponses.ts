@@ -45,6 +45,7 @@ declare global {
 		numOfMvc: number | null;
 		race: string | null;
 		sex: string | null;
+		isCurrentRoster: boolean | null;
 	}
 
 	type HomepageData = {

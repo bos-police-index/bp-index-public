@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { Tooltip } from "@mui/material";
+import { Tooltip, Chip } from "@mui/material";
 import { 
 	GridColDef, 
 	gridFilteredSortedRowIdsSelector, 
@@ -16,18 +16,21 @@ import { bpi_light_green } from "@styles/theme/lightTheme";
 
 export default function Home() {
 	const [keyword, setKeyword] = useState<string>("");
-	const [searchResData, setSearchResData] = useState<Array<any>>([]);
+	const [allData, setAllData] = useState<Array<any>>([]);
 	const [loading, setLoading] = useState<boolean>(true);
+	// Default view: current BPD roster, officers with data in our targeted 2020–2025 range.
+	const [currentRosterOnly, setCurrentRosterOnly] = useState<boolean>(true);
+	const [activeRecentOnly, setActiveRecentOnly] = useState<boolean>(true);
 
 	useEffect(() => {
 		setLoading(true);
 		fetchHompage({ keyword: keyword as string | string[] })
 			.then((data) => {
-				const formattedData = data.map((row, index) => ({
+				const formattedData = data.map((row) => ({
 					...row,
 					id: row.bpiId
 				}));
-				setSearchResData(formattedData);
+				setAllData(formattedData);
 			})
 			.catch((error) => {
 				console.error("Failed to fetch data", error);
@@ -36,6 +39,35 @@ export default function Home() {
 				setLoading(false);
 			});
 	}, []);
+
+	// Data-richness score: how many attributes/activities back this officer.
+	// Drives the default sort so complete profiles surface above sparse historical rows.
+	const coverageScore = (r: any): number => {
+		let s = 0;
+		if (r.badgeNo && r.badgeNo !== "Unknown Badge") s++;
+		if (r.rank) s++;
+		if (r.org) s++;
+		if (r.postId) s++;
+		if (r.startDate) s++;
+		if (r.employeeId) s++;
+		if (r.race) s++;
+		if (r.sex) s++;
+		if (r.year != null) s += 2; // has earnings on file (2020–2025)
+		if (r.numOfIa > 0) s++;
+		if (r.numOfDetail > 0) s++;
+		if (r.numOfFio > 0) s++;
+		if (r.numOfMvc > 0) s++;
+		return s;
+	};
+
+	// Displayed rows = filters (current roster / active 2020–2025) + coverage sort.
+	// Coverage order is the default; clicking any column header overrides it in the grid.
+	const searchResData = useMemo(() => {
+		let rows = allData;
+		if (currentRosterOnly) rows = rows.filter((r) => r.isCurrentRoster);
+		if (activeRecentOnly) rows = rows.filter((r) => r.year != null);
+		return [...rows].sort((a, b) => coverageScore(b) - coverageScore(a));
+	}, [allData, currentRosterOnly, activeRecentOnly]);
 
 	const cols: GridColDef[] = [
 		{
@@ -441,8 +473,8 @@ export default function Home() {
 									<span className="text-emerald-300 font-bold">Loading...</span>
 								) : (
 									<>
-										<AnimatedCounter 
-											endValue={searchResData.length} 
+										<AnimatedCounter
+											endValue={allData.length}
 											duration={2000}
 											animation="easeInOut" 
 											className="text-emerald-300 font-bold mr-1 sm:mr-2" 
@@ -513,6 +545,40 @@ export default function Home() {
 								<p className="text-gray-600 text-sm sm:text-base">
 									Search and explore comprehensive data on Boston Police Department officers.
 								</p>
+							</div>
+
+							{/* Filters: default to the current roster within our targeted 2020–2025 data range */}
+							<div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+								<span className="text-sm text-gray-700">
+									Showing{" "}
+									<span className="font-semibold text-gray-900">{searchResData.length.toLocaleString()}</span>
+									{" "}of {allData.length.toLocaleString()} officers
+								</span>
+								<div className="flex flex-wrap gap-2">
+									<Tooltip title="Only officers on the current (fall 2025) BPD roster. Toggle off to include historical and public-records identities.">
+										<Chip
+											label={`${currentRosterOnly ? "✓ " : ""}Current roster`}
+											onClick={() => setCurrentRosterOnly((v) => !v)}
+											color={currentRosterOnly ? "success" : "default"}
+											variant={currentRosterOnly ? "filled" : "outlined"}
+											size="small"
+										/>
+									</Tooltip>
+									<Tooltip title="Only officers with data in our targeted 2020–2025 range (earnings on file). Toggle off to include officers with no recent data.">
+										<Chip
+											label={`${activeRecentOnly ? "✓ " : ""}Active 2020–2025`}
+											onClick={() => setActiveRecentOnly((v) => !v)}
+											color={activeRecentOnly ? "success" : "default"}
+											variant={activeRecentOnly ? "filled" : "outlined"}
+											size="small"
+										/>
+									</Tooltip>
+								</div>
+								{(currentRosterOnly || activeRecentOnly) && (
+									<span className="text-xs text-gray-400">
+										Sorted by data completeness. Toggle filters off to include historical &amp; unmatched records.
+									</span>
+								)}
 							</div>
 							<DataTable
 								cols={cols}
