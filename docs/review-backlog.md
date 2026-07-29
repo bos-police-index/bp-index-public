@@ -55,6 +55,23 @@ Every table leads with the same block, then table-specific fields:
 - [ ] "RMS" → plain-language label — needs the column relabel in `createMUIGrid.tsx` functionMapping
 - [ ] "tracking #" → "Detail tracking #" — same
 
+## Epic 2 — execution blueprint (from the 8-agent analysis workflow)
+Shared source built: `production.v2_officer_identity_block` (bpi_id → officer_name, badge, POST id,
+employee_id, rank, current_unit). Apply centrally (views + queries + config are shared):
+
+**Per table — prepend identity block, then existing columns:**
+- `detail_record` (join ok): prepend all 6; DROP dup plain cols nameId/badgeNo/empRank (but officerName MUST keep the profile-link + fixNameOrdering the old nameId had). relabel trackingNo → "Detail Tracking Number".
+- `court_overtime` (join ok): prepend all 6; drop dup name/rank (preserve profile link on officerName).
+- `crime_incident` (join ok): prepend all 6; relabel incidentNumber → "Incident #"; **remove the internal "key" column**; **fix horizontal scroll** (too-wide/among columns).
+- `fio_record` (join ok): prepend all 6; keep existing contactOfficerName link; relabel any "RMS" → "Records Mgmt System (RMS)".
+- `traffic_stop` (join ok): prepend all 6; relabel "RMS"; (title already "Traffic Citations (MVC)").
+- `officer_misconduct` (join ok): prepend badge/POST/emp/rank/unit (officerName already present).
+- `ir_fall_2025` (join ok): prepend badge/POST/emp/rank/unit (officerName already present); ensure first/last split + Incident # present.
+- `boston_arrest`: **NOT joinable** — view has no officer key; leave as non-officer-attributed (label it).
+
+**Mechanics:** (1) migration extends the 7 joinable views with the identity-block cols (skip a col if the view already has that exact name, e.g. ir_fall_2025 officer_name); (2) add the new fields to each `GET_NEXT_PAGE_*` query in queries.ts; (3) shared `identityColumns` GridColDef[] in createMUIGrid.tsx (officerName renderCell links to /profile/[bpiId], matching the existing pattern) prepended per table; (4) relabels + crime-incident scroll/key fix; (5) tsc + verify.
+**Decisions for reviewer:** existing per-event `rank`/`empRank` may be *rank at time of event* — keep (relabel "Rank at …") vs. drop in favor of current officerRank? Default: drop (current rank in identity block); flag if point-in-time needed.
+
 ## Epic 2 notes (recon done)
 Column config lives in `utility/createMUIGrid.tsx` (`functionMapping`, per-table `field:` arrays);
 titles in `utility/tableDefinitions.tsx`. Explorer views vary in identity coverage:
