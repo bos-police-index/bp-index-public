@@ -87,7 +87,7 @@ const rawTableDefinitions = [
 			"The Boston Police Department's Field Interrogation and Observation (FIO) data documents a broad range of encounters between officers and individuals, including stops, observations, and interrogations conducted in the field. This dataset is released to promote transparency and public accountability in policing practices, offering insights into the scope, frequency, and context of such interactions. While the data provides valuable information for research and oversight, identifying details are withheld to ensure the privacy of the individuals involved.",
 	},
 	{
-		table: "Traffic Stops",
+		table: "Traffic Citations (MVC)",
 		query: "traffic_stop",
 		image: { component: <IconWrapper Icon={DirectionsCarIcon} />, src: DirectionsCarIcon },
 		isFake: false,
@@ -106,7 +106,7 @@ const rawTableDefinitions = [
 			"The Officer Earnings dataset provides comprehensive information on the earnings of police officers. It includes hourly wage data and categorizes earnings into various types, including but not limited to regular pay, overtime, and other compensations. This dataset is crucial for analyzing the financial aspects of police officer employment and understanding the distribution of earnings within the department.",
 	},
 	{
-		table: "Officer Misconduct (IAs)",
+		table: "Internal Affairs Cases",
 		query: "officer_misconduct",
 		image: { component: <IconWrapper Icon={ReportProblemIcon} />, src: ReportProblemIcon },
 		isFake: false,

@@ -50,10 +50,17 @@ Every table leads with the same block, then table-specific fields:
 - [ ] Incident Reports (separate first/last name; then Incident #, Date, …)
 
 ## Epic 3 — Renames & consistent labels
-- [ ] "Traffic Stops" → **"Traffic Citations (MVC)"** everywhere
-- [ ] "Officer Misconduct / IA" → **"Internal Affairs Cases"**
-- [ ] "RMS" → plain-language label ("Records Management System")
-- [ ] "tracking #" → "Detail tracking #"
+- [x] "Traffic Stops" → **"Traffic Citations (MVC)"** (explorer table title; profile section already MVC)
+- [x] "Officer Misconduct (IAs)" → **"Internal Affairs Cases"** (explorer + profile)
+- [ ] "RMS" → plain-language label — needs the column relabel in `createMUIGrid.tsx` functionMapping
+- [ ] "tracking #" → "Detail tracking #" — same
+
+## Epic 2 notes (recon done)
+Column config lives in `utility/createMUIGrid.tsx` (`functionMapping`, per-table `field:` arrays);
+titles in `utility/tableDefinitions.tsx`. Explorer views vary in identity coverage:
+`vw_court_overtime` already has badge_no/employee_id/rank; `vw_traffic_stops_fall_2025` has only
+`officer_id` → needs a LEFT JOIN to `v2_officer_id_map` for badge/POST/rank/unit. So each of the 8
+tables = (view join where missing) + prepend the standard identity columns in functionMapping.
 
 ## Epic 4 — New columns / data
 - [ ] Overtime-type breakdown (Court / Special Events / Extended Day / Replacement Duty / Other)
