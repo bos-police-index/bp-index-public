@@ -31,7 +31,7 @@ Target section order (top → bottom), visualizations where possible (WokeWindow
 - [x] Sections placed & renamed: Internal Affairs Cases, POST, FIOs, Traffic Citations (MVC), Paid Details, Agency & Separation, Academy, News
 - [!] **Special Events / Other Overtime** — no comprehensive non-court OT source (`police_overtime` is only a 999-row sample). Needs a full OT dataset.
 - [!] **Rank per assignment** (Organization card) — the assignment/tskprof data has **no rank column**. Needs a source with per-assignment rank.
-- [!] **Tenure** start date — no hire-date source (`hire_date` empty). End-of-tenure available from separation data.
+- [~] **Tenure** section built — start = academy graduation (MPTC proxy, ~619 officers, clearly labeled), end/status from separation records, else "Active". Full-coverage *start* still needs a BPD hire-date / POST appointment-date source.
 - [!] **Officer Identity race + gender** — only ~619 officers (academy). Needs a broader source.
 - [!] **Incidents** — hidden; needs a fuller officer-linked source (internal journal exports).
 - [ ] **Visualizations** per WokeWindows (earnings-over-time, etc.) — design work, data-ready
