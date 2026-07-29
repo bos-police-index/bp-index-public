@@ -41,6 +41,7 @@ export const v2_traffic_alias_name               = "allVwV2TrafficCitations";
 export const v2_incident_alias_name              = "allVwV2Incidents";
 export const v2_separation_alias_name            = "allVwV2OfficerSeparations";
 export const v2_academy_alias_name               = "allVwV2OfficerAcademies";
+export const v2_court_overtime_alias_name        = "allVwV2CourtOvertimes";
 
 // Use in `[table_name].tsx`
 export const table_name_to_alias_map = {

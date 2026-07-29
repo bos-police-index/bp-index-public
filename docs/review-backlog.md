@@ -23,26 +23,18 @@ updates checkboxes as items ship. Tackle one epic per working session.
 ## Epic 1 — Officer profile redesign  ← STARTING HERE
 Target section order (top → bottom), visualizations where possible (WokeWindows-style):
 
-- [x] **Section order set to review spec** (existing sections). Tenure, split-overtime, Incidents still pending.
-- [~] **Black box (summary header):** added POST ID + employee ID + renamed Citations→MVCs. Existing tiles: Pay, IA, FIO, Paid Details, MVCs. `# Incidents` tile pending (section hidden).
-- [ ] **Tenure:** start date → end date, or current status (retired / active). `[!]` start date blocked — no hire-date source (hire_date empty); end can come from separation_date
-- [ ] **Officer Identity:** add **race + gender** `[!]` only ~619 officers have it (academy) — needs source decision
-- [ ] **Organization & Assignments:** add **rank per assignment** + flag when things changed
-- [ ] **Internal Affairs Cases** (renamed from Officer Misconduct/IA)
-- [ ] **POST Commission Status**
-- [ ] **FIOs**
-- [ ] **Incidents** `[!]` currently hidden — needs fuller officer-linked source
-- [ ] **Traffic Citations (MVC)** (from WokeWindows if we lack it — we have it)
-- [ ] **Earnings** — including **ranking vs other officers** (percentile)
-- [ ] **Court Overtime** `[!]` new section — wire `police_overtime`/`overtime_category`
-- [ ] **Special Events Overtime** `[!]` new section
-- [ ] **Other Overtime** `[!]` new section
-- [ ] **Paid Details**
-- [ ] **Agency & Separation History** (built)
-- [ ] **Academy & Trainings** (built)
-- [ ] **News & Articles**
-- [ ] **"Time period updated" box** (top-right) — coverage/as-of indicator
-- [ ] Add **visualizations** per WokeWindows where sensible
+- [x] **Section order** set to review spec (existing sections)
+- [~] **Black box:** POST ID + employee ID + "Data through {year}" added; Citations→MVCs. `# Incidents` tile pending (section hidden)
+- [x] **Earnings ranking** — per-year rank / population / percentile ("#762 of 2,551 · top 30%")
+- [x] **Court Overtime** section — 75,838 records / 1,881 officers (2020–2024), employee-id matched
+- [x] **"Time period updated" box** — top-right "Data through {latest year}"
+- [x] Sections placed & renamed: Internal Affairs Cases, POST, FIOs, Traffic Citations (MVC), Paid Details, Agency & Separation, Academy, News
+- [!] **Special Events / Other Overtime** — no comprehensive non-court OT source (`police_overtime` is only a 999-row sample). Needs a full OT dataset.
+- [!] **Rank per assignment** (Organization card) — the assignment/tskprof data has **no rank column**. Needs a source with per-assignment rank.
+- [!] **Tenure** start date — no hire-date source (`hire_date` empty). End-of-tenure available from separation data.
+- [!] **Officer Identity race + gender** — only ~619 officers (academy). Needs a broader source.
+- [!] **Incidents** — hidden; needs a fuller officer-linked source (internal journal exports).
+- [ ] **Visualizations** per WokeWindows (earnings-over-time, etc.) — design work, data-ready
 
 ## Epic 2 — Shared officer-identity columns on every /data table
 Every table leads with the same block, then table-specific fields:

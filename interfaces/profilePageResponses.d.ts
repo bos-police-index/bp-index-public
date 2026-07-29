@@ -83,6 +83,21 @@ declare global {
 		totalPay: number | null;
 		source: string;
 		asOf: string;
+		payRank?: number | null;
+		payPop?: number | null;
+		payPercentile?: number | null;
+	}
+
+	interface V2CourtOvertimeRow {
+		bpiId: string | null;
+		otDate: string | null;
+		otCode: number | null;
+		description: string | null;
+		assignedDesc: string | null;
+		chargedDesc: string | null;
+		workedHours: number | null;
+		source: string;
+		asOf: string;
 	}
 
 	interface V2PostCertificationRow {

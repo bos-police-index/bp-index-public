@@ -38,6 +38,23 @@ const columns: GridColDef[] = [
 		valueFormatter: (p) => moneyCell(p.value as number | null),
 		cellClassName: "font-semibold",
 	},
+	{
+		field: "payRank",
+		headerName: "Rank (of BPD)",
+		width: 170,
+		sortable: false,
+		renderCell: (p) => {
+			const r = p.row as V2EarningsRow;
+			if (r.payRank == null || r.payPop == null) return <span className="text-gray-300">—</span>;
+			const pct = r.payPercentile;
+			return (
+				<span className="text-xs text-gray-700">
+					#{r.payRank.toLocaleString()} of {r.payPop.toLocaleString()}
+					{pct != null && <span className="ml-1 text-emerald-700 font-medium">· top {Math.max(1, 100 - pct)}%</span>}
+				</span>
+			);
+		},
+	},
 ];
 
 export default function EarningsByYearTableV2({ rows }: Props) {

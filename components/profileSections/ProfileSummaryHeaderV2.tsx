@@ -61,6 +61,12 @@ export default function ProfileSummaryHeaderV2({ profile, earnings = [], miscond
 	const totalPay = latestEarn?.totalPay ?? null;
 	const confirmed = profile.identityConfidence === "confirmed";
 	const asOf = fmtAsOf(profile.identityAsOf);
+	const latestYear = Math.max(
+		0,
+		...earnings.map((e) => e.year ?? 0),
+		...traffic.map((t) => (t.eventDate ? new Date(t.eventDate).getFullYear() : 0)),
+		...fio.map((f) => (f.contactDate ? new Date(f.contactDate).getFullYear() : 0)),
+	) || null;
 
 	return (
 		<div className="rounded-2xl overflow-hidden shadow-lg bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white">
@@ -89,7 +95,12 @@ export default function ProfileSummaryHeaderV2({ profile, earnings = [], miscond
 					</div>
 				</div>
 
-				<div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-4">
+				{latestYear && (
+						<div className="text-right text-[11px] text-slate-400 mt-3 -mb-1">
+							Data through <span className="text-slate-200 font-semibold">{latestYear}</span>
+						</div>
+					)}
+					<div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-4">
 					<Stat label={`Pay ${latestEarn?.year ?? ""}`.trim()} value={totalPay != null ? `$${formatMoneyNoCents(totalPay)}` : "—"} accent="text-emerald-300" targetId="sec-earnings" />
 					<Stat label="IA cases" value={misconduct.length.toLocaleString()} accent={misconduct.length > 0 ? "text-red-300" : undefined} targetId="sec-ia" />
 					<Stat label="FIO" value={fio.length.toLocaleString()} targetId="sec-fio" />

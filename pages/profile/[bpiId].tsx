@@ -15,9 +15,10 @@ import PaidDetailTableV2 from "@components/profileSections/PaidDetailTableV2";
 import TrafficCitationTableV2 from "@components/profileSections/TrafficCitationTableV2";
 import SeparationCardV2 from "@components/profileSections/SeparationCardV2";
 import AcademyCardV2 from "@components/profileSections/AcademyCardV2";
+import CourtOvertimeCardV2 from "@components/profileSections/CourtOvertimeCardV2";
 // IncidentJournalTableV2 import removed while the incidents section is hidden (see render note).
-import { V2_OFFICER_PROFILE, V2_OFFICER_EARNINGS, V2_OFFICER_POST_CERTIFICATIONS, V2_OFFICER_POST_DECERTIFICATIONS, V2_OFFICER_FIO, V2_OFFICER_MISCONDUCT, V2_OFFICER_ASSIGNMENTS, V2_OFFICER_PAID_DETAILS, V2_OFFICER_TRAFFIC, V2_OFFICER_INCIDENTS, V2_OFFICER_SEPARATION, V2_OFFICER_ACADEMY } from "@lib/graphql/queries";
-import { v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name } from "@utility/dataViewAliases";
+import { V2_OFFICER_PROFILE, V2_OFFICER_EARNINGS, V2_OFFICER_POST_CERTIFICATIONS, V2_OFFICER_POST_DECERTIFICATIONS, V2_OFFICER_FIO, V2_OFFICER_MISCONDUCT, V2_OFFICER_ASSIGNMENTS, V2_OFFICER_PAID_DETAILS, V2_OFFICER_TRAFFIC, V2_OFFICER_INCIDENTS, V2_OFFICER_SEPARATION, V2_OFFICER_ACADEMY, V2_OFFICER_COURT_OVERTIME } from "@lib/graphql/queries";
+import { v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name, v2_court_overtime_alias_name } from "@utility/dataViewAliases";
 import { getOfficerProfileData } from "../../services/profile/data_fetchers";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -40,6 +41,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	const v2_assignment_rows   = await getOfficerProfileData(V2_OFFICER_ASSIGNMENTS(bpiId),           v2_officer_assignment_alias_name);
 	const v2_separation_rows   = await getOfficerProfileData(V2_OFFICER_SEPARATION(bpiId),            v2_separation_alias_name);
 	const v2_academy_rows      = await getOfficerProfileData(V2_OFFICER_ACADEMY(bpiId),               v2_academy_alias_name);
+	const v2_court_ot_rows     = await getOfficerProfileData(V2_OFFICER_COURT_OVERTIME(bpiId),        v2_court_overtime_alias_name);
 	const v2_profile: V2OfficerProfile | null = v2_profile_rows && v2_profile_rows.length > 0 ? v2_profile_rows[0] : null;
 
 	return {
@@ -56,6 +58,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 			v2AssignmentRows: v2_assignment_rows,
 			v2SeparationRows: v2_separation_rows,
 			v2AcademyRows: v2_academy_rows,
+			v2CourtOtRows: v2_court_ot_rows,
 		},
 	};
 };
@@ -110,6 +113,8 @@ export default function OfficerProfile(props: InferGetServerSidePropsType<typeof
 					    <div id="sec-incidents"><IncidentJournalTableV2 rows={p.v2IncidentRows ?? []} /></div> + its import + the header tile. */}
 					<div id="sec-traffic" className="scroll-mt-4"><TrafficCitationTableV2 rows={p.v2TrafficRows ?? []} /></div>
 					<div id="sec-earnings" className="scroll-mt-4"><EarningsByYearTableV2 rows={p.v2EarningsRows ?? []} /></div>
+					<CourtOvertimeCardV2 rows={p.v2CourtOtRows ?? []} />
+					{/* Special Events / Other overtime sections pending — no comprehensive non-court OT source yet (see backlog Epic 6). */}
 					<div id="sec-paid-details" className="scroll-mt-4"><PaidDetailTableV2 rows={p.v2PaidDetailRows ?? []} /></div>
 					<SeparationCardV2 rows={p.v2SeparationRows ?? []} />
 					<AcademyCardV2 rows={p.v2AcademyRows ?? []} />
