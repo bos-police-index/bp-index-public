@@ -23,7 +23,7 @@ const ROSTER_SOURCE_LABELS: Record<string, string> = {
 
 function fmtAsOf(s: string | null | undefined): string | null {
 	if (!s) return null;
-	try { return new Date(s).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }); }
+	try { return new Date(String(s).slice(0,10)+"T00:00:00Z").toLocaleDateString(undefined, { timeZone: "UTC", year: "numeric", month: "short", day: "numeric" }); }
 	catch { return s; }
 }
 

@@ -15,9 +15,9 @@ const SOURCE_LABELS: Record<string, string> = {
 function formatAsOf(asOf: string | Date | null | undefined): string {
 	if (!asOf) return "";
 	try {
-		const d = typeof asOf === "string" ? new Date(asOf) : asOf;
+		const d = typeof asOf === "string" ? new Date(String(asOf).slice(0, 10) + "T00:00:00Z") : asOf;
 		if (isNaN(d.getTime())) return "";
-		return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+		return d.toLocaleDateString(undefined, { timeZone: "UTC", year: "numeric", month: "short", day: "numeric" });
 	} catch {
 		return "";
 	}

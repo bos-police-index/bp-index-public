@@ -30,7 +30,7 @@ interface Props {
 function fmtDate(s: string | null | undefined): string {
 	if (!s) return "—";
 	try {
-		return new Date(s).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+		return new Date(String(s).slice(0,10)+"T00:00:00Z").toLocaleDateString(undefined, { timeZone: "UTC", year: "numeric", month: "short", day: "numeric" });
 	} catch {
 		return s;
 	}
