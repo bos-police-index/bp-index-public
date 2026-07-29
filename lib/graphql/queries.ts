@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, employee_alias_name, fio_record_alias_name, homepage_alias_name, officer_search_alias_name, ir_fall_2025_alias_name, officer_financial_alias_name, officer_ia_alias_name, officer_year_history_alias_name, traffic_stop_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map, v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name, v2_court_overtime_alias_name } from "@utility/dataViewAliases";
+import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, employee_alias_name, fio_record_alias_name, homepage_alias_name, officer_search_alias_name, ir_fall_2025_alias_name, officer_financial_alias_name, officer_ia_alias_name, officer_year_history_alias_name, traffic_stop_alias_name, traffic_unattributed_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map, v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name, v2_court_overtime_alias_name } from "@utility/dataViewAliases";
 import { DocumentNode } from "graphql";
 
 export const DATA_PAGE_SIZE = 25;
@@ -791,6 +791,36 @@ export const GET_NEXT_PAGE_TRAFFIC_STOPS: DocumentNode = gql`
 					yearOfBirth
 					searched
 					crash
+				}
+			}
+		}
+	}
+`;
+
+export const GET_NEXT_PAGE_TRAFFIC_UNATTRIBUTED: DocumentNode = gql`
+	query MyQuery($offset: Int, $page_size: Int, $order_by: [${removeAllPrefix(traffic_unattributed_alias_name)}OrderBy!], $filters: ${removePluralSuffix(removeAllPrefix(traffic_unattributed_alias_name))}Condition) {
+		${traffic_unattributed_alias_name}(first: $page_size, offset: $offset, orderBy: $order_by, condition: $filters) {
+			totalCount
+			edges {
+				node {
+					officerId
+					eventDate
+					timeHh
+					timeMm
+					amPm
+					violatorType
+					citationNumber
+					citationType
+					offenseCode
+					offenseDescription
+					locationName
+					race
+					gender
+					yearOfBirth
+					searched
+					crash
+					plateType
+					vehicleState
 				}
 			}
 		}

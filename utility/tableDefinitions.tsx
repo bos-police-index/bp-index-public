@@ -31,7 +31,7 @@ const IconWrapper = ({ Icon, fontSize = "48px", color = bpi_deep_green }: IconWr
 
 // TODO:! As more data is added be sure to add the source they are from to this
 const tablesFromAnalyzeBoston = ["fio_record"];
-const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "officer_misconduct", "boston_arrest", "traffic_stop", "ir_fall_2025"];
+const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "officer_misconduct", "boston_arrest", "traffic_stop", "traffic_unattributed", "ir_fall_2025"];
 const tablesFromWokeWindows = ["crime_incident"];
 
 // Date ranges for specific tables
@@ -96,6 +96,15 @@ const rawTableDefinitions = [
 			"The Traffic Stops dataset provides comprehensive records of all traffic stops conducted by officers of the Boston Police Department. This includes information about the time, date, and location of stops, the reason for the stop, demographic information about the driver, and the outcome of the stop such as citations issued or warnings given. This dataset is essential for analyzing traffic enforcement patterns, understanding the nature of police-citizen interactions during traffic stops, and promoting transparency in law enforcement practices.",
 	},
 
+	{
+		table: "Traffic Citations (MVC) — Unattributed",
+		query: "traffic_unattributed",
+		image: { component: <IconWrapper Icon={DirectionsCarIcon} />, src: DirectionsCarIcon },
+		isFake: false,
+		shortDescription: "MVC citations (2020–2025) whose issuing officer could NOT be matched to a roster officer — shown separately as non-attributed data.",
+		longDescription:
+			"This dataset holds motor-vehicle citations where the issuing officer's id in the source did not match any officer in our roster, so the citation cannot be reliably attributed to a specific officer. It is presented separately, and explicitly labeled as non-attributed, so these records are visible for transparency without implying an officer match we cannot verify. All other citations appear, attributed, under Traffic Citations (MVC).",
+	},
 	{
 		table: "Officer Earnings",
 		query: "police_financial",

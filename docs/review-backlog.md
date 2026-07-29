@@ -34,7 +34,7 @@ Target section order (top → bottom), visualizations where possible (WokeWindow
 - [~] **Tenure** section built — start = academy graduation (MPTC proxy, ~619 officers, clearly labeled), end/status from separation records, else "Active". Full-coverage *start* still needs a BPD hire-date / POST appointment-date source.
 - [!] **Officer Identity race + gender** — only ~619 officers (academy). Needs a broader source.
 - [!] **Incidents** — hidden; needs a fuller officer-linked source (internal journal exports).
-- [ ] **Visualizations** per WokeWindows (earnings-over-time, etc.) — design work, data-ready
+- [x] **Visualizations** — earnings pay-by-year bar chart (overtime portion highlighted) in the Earnings section
 
 ## Epic 2 — Shared officer-identity columns on every /data table
 Every table leads with the same block, then table-specific fields:
@@ -81,7 +81,7 @@ tables = (view join where missing) + prepend the standard identity columns in fu
 
 ## Epic 4 — New columns / data
 - [ ] Overtime-type breakdown (Court / Special Events / Extended Day / Replacement Duty / Other)
-- [ ] Non-attributed traffic table (2020–25) — clearly labeled; consolidate with officer listings if feasible
+- [x] Non-attributed traffic table (2020–25) — new "Traffic Citations (MVC) — Unattributed" explorer table (~36k citations, officer not matched)
 - [ ] Incident # column on Incident Reports
 - [ ] Media reports `[!]` needs a curated source (vs current Google-News embed)
 - [ ] "Time period updated" box on the core spreadsheet (top-right)

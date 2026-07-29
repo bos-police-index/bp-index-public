@@ -3,6 +3,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import MissingData from "@components/MissingData";
 import SourceBadgeV2 from "@components/SourceBadgeV2";
 import NameMatchNotice from "@components/profileSections/NameMatchNotice";
+import EarningsTrendChartV2 from "@components/profileSections/EarningsTrendChartV2";
 import { formatMoneyNoCents } from "@utility/textFormatHelpers";
 import { bpi_deep_green, bpi_light_green } from "@styles/theme/lightTheme";
 
@@ -86,10 +87,11 @@ export default function EarningsByYearTableV2({ rows }: Props) {
 					<MissingData
 						variant="card"
 						title="No earnings on file (v2)"
-						message="This officer doesn't appear in the data.boston.gov Employee Earnings dataset for the years currently ingested. The pipeline is capped to the most recent 3 years; older years can be backfilled by raising MAX_YEARS."
+						message="This officer doesn't appear in the data.boston.gov Employee Earnings dataset (currently 2020–2025). Officers who left before 2020, or whose payroll name doesn't match, won't show earnings here."
 					/>
 				) : (
 					<>
+					<EarningsTrendChartV2 rows={rows} />
 					<NameMatchNotice rows={rows} />
 					<DataGrid
 						rows={rows.map((r, i) => ({ id: i, ...r }))}

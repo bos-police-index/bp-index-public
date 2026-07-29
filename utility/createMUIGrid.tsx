@@ -1999,6 +1999,24 @@ const ir_fall_2025_columns = () => {
 	return cols;
 };
 
+// Non-attributed MVC citations: issuing officer_id could not be matched to a
+// roster officer. Deliberately has NO officer-identity block.
+const traffic_unattributed_columns = (): GridColDef[] => [
+	{ field: "officerId", headerName: "Officer ID (unmatched)", description: "Issuing officer id from the source that did not match any roster officer", width: 160, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "eventDate", headerName: "Event Date", type: "date", valueFormatter: formatDateShort, width: 130 },
+	{ field: "citationNumber", headerName: "Citation Number", width: 150, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "citationType", headerName: "Citation Type", width: 130, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "offenseDescription", headerName: "Offense", flex: 1, minWidth: 240, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "locationName", headerName: "Location", width: 140, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "violatorType", headerName: "Violator Type", width: 140, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "race", headerName: "Race", width: 110, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "gender", headerName: "Gender", width: 100, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "searched", headerName: "Searched", width: 110, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "crash", headerName: "Crash", width: 100, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "plateType", headerName: "Plate Type", width: 120, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "vehicleState", headerName: "Vehicle State", width: 120, valueFormatter: (p) => p.value ?? "—" },
+];
+
 // --- Shared officer-identity block, prepended to each joinable explorer table ---
 // Reads the officer_* fields the /data views now expose via v2_officer_identity_block.
 const identityColumns = (): GridColDef[] => [
@@ -2061,6 +2079,7 @@ export const functionMapping = {
 	boston_arrest: boston_arrest_columns(),
 	employee: employee_columns(),
 	traffic_stop: withIdentity("traffic_stop", traffic_stop_columns()),
+	traffic_unattributed: traffic_unattributed_columns(),
 	ir_fall_2025: withIdentity("ir_fall_2025", ir_fall_2025_columns()),
 };
 
