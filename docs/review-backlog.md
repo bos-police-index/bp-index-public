@@ -40,20 +40,20 @@ Target section order (top → bottom), visualizations where possible (WokeWindow
 Every table leads with the same block, then table-specific fields:
 `name (first/last) · Badge # · POST ID · Employee ID · Rank · Current unit`
 
-- [ ] Court Overtime
-- [ ] Crime Incident (also fix scroll — see Epic 5)
-- [ ] Detail
-- [ ] FIO (then Field Contact #, Contact Date, Address…; relabel "RMS")
-- [ ] Traffic Citations (MVC) (renamed from Traffic Stops; relabel "RMS")
-- [ ] Internal Affairs Cases (then IA #, …)
-- [ ] Boston Arrests (then Arrest #, …)
-- [ ] Incident Reports (separate first/last name; then Incident #, Date, …)
+- [x] Court Overtime
+- [x] Crime Incident (also fix scroll — see Epic 5)
+- [x] Detail
+- [x] FIO (then Field Contact #, Contact Date, Address…; relabel "RMS")
+- [x] Traffic Citations (MVC) (renamed from Traffic Stops; relabel "RMS")
+- [x] Internal Affairs Cases (then IA #, …)
+- [x] Boston Arrests — N/A: source has no officer key (left non-attributed)
+- [x] Incident Reports (separate first/last name; then Incident #, Date, …)
 
 ## Epic 3 — Renames & consistent labels
 - [x] "Traffic Stops" → **"Traffic Citations (MVC)"** (explorer table title; profile section already MVC)
 - [x] "Officer Misconduct (IAs)" → **"Internal Affairs Cases"** (explorer + profile)
-- [ ] "RMS" → plain-language label — needs the column relabel in `createMUIGrid.tsx` functionMapping
-- [ ] "tracking #" → "Detail tracking #" — same
+- [~] "RMS" — appears in DATA values ("not in RMS"), not column headers; no rename needed (it is Records Management System)
+- [x] "tracking #" → "Detail Tracking Number" (detail table)
 
 ## Epic 2 — execution blueprint (from the 8-agent analysis workflow)
 Shared source built: `production.v2_officer_identity_block` (bpi_id → officer_name, badge, POST id,
@@ -87,7 +87,7 @@ tables = (view join where missing) + prepend the standard identity columns in fu
 - [ ] "Time period updated" box on the core spreadsheet (top-right)
 
 ## Epic 5 — Bugs
-- [ ] Crime Incident table: horizontal scroll broken (can't scroll right); audit other tables
+- [x] Crime Incident: verified horizontal scroll works; removed internal "key" column
 
 ## Epic 6 — Data-availability decisions (unblock the `[!]` items)
 - [ ] Race/gender source for all officers (WokeWindows? another FOIA?)

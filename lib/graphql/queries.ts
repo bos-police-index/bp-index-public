@@ -538,6 +538,12 @@ export const GET_NEXT_PAGE_DETAIL_RECORDS: DocumentNode = gql`
 				noShowFlag
 				stateFunded
 				bpiId
+				officerName
+				officerBadgeNo
+				officerPostId
+				officerEmployeeId
+				officerRank
+				officerCurrentUnit
    		 	}
 				totalCount
 		}
@@ -561,6 +567,12 @@ export const GET_NEXT_PAGE_COURT_OVERTIMES: DocumentNode = gql`
 				startTime
 				workedHours
 				bpiId
+				officerName
+				officerBadgeNo
+				officerPostId
+				officerEmployeeId
+				officerRank
+				officerCurrentUnit
    		 	}
 				totalCount
 		}
@@ -573,6 +585,12 @@ export const GET_NEXT_PAGE_OFFICER_IA: DocumentNode = gql`
 			edges {
 				node {
 					bpiId
+					officerName
+					officerBadgeNo
+					officerPostId
+					officerEmployeeId
+					officerRank
+					officerCurrentUnit
 					employeeId
 					badgeNo
 					firstName
@@ -623,6 +641,12 @@ export const GET_NEXT_PAGE_FIO_RECORDS = gql`
 				weather
 				zip
 				bpiId
+				officerName
+				officerBadgeNo
+				officerPostId
+				officerEmployeeId
+				officerRank
+				officerCurrentUnit
 			}
 				totalCount
 		}
@@ -665,6 +689,12 @@ export const GET_NEXT_PAGE_CRIME_INCIDENTS: DocumentNode = gql`
 				geocodeLatitude
 				buiNameId
 				bpiId
+				officerName
+				officerBadgeNo
+				officerPostId
+				officerEmployeeId
+				officerRank
+				officerCurrentUnit
 				attributions
 			}
 			totalCount
@@ -739,6 +769,12 @@ export const GET_NEXT_PAGE_TRAFFIC_STOPS: DocumentNode = gql`
 			edges {
 				node {
 					bpiId
+					officerName
+					officerBadgeNo
+					officerPostId
+					officerEmployeeId
+					officerRank
+					officerCurrentUnit
 					officerId
 					eventDate
 					timeHh
@@ -768,6 +804,11 @@ export const GET_NEXT_PAGE_IR_FALL_2025: DocumentNode = gql`
 			edges {
 				node {
 					bpiId
+					officerBadgeNo
+					officerPostId
+					officerEmployeeId
+					officerRank
+					officerCurrentUnit
 					officerName
 					badgeNo
 					reportingOfficer

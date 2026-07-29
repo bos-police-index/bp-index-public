@@ -1999,18 +1999,69 @@ const ir_fall_2025_columns = () => {
 	return cols;
 };
 
+// --- Shared officer-identity block, prepended to each joinable explorer table ---
+// Reads the officer_* fields the /data views now expose via v2_officer_identity_block.
+const identityColumns = (): GridColDef[] => [
+	{
+		field: "officerName",
+		headerName: "Officer Name",
+		description: "Officer (canonical identity) — links to their profile",
+		width: 190,
+		valueGetter: (params) => params.row.officerName || "",
+		renderCell: (params) => {
+			const n = params.row.officerName || "";
+			if (!n || !params.row.bpiId) return n;
+			return (
+				<Link
+					href={{ pathname: "/profile/[bpiId]", query: { bpiId: params.row.bpiId } }}
+					style={{ color: bpi_light_green, textDecoration: "none" }}
+					onClick={(e) => e.stopPropagation()}
+				>
+					{n}
+				</Link>
+			);
+		},
+	},
+	{ field: "officerBadgeNo", headerName: "Badge #", description: "Officer badge number (current)", width: 100 },
+	{ field: "officerPostId", headerName: "POST ID", description: "MA POST / MPTC certification id", width: 120 },
+	{ field: "officerEmployeeId", headerName: "Employee ID", description: "BPD/PeopleSoft employee id", width: 120 },
+	{ field: "officerRank", headerName: "Rank", description: "Officer rank (current)", width: 150 },
+	{ field: "officerCurrentUnit", headerName: "Current Unit", description: "Most recent unit assignment", width: 180 },
+];
+
+// Per-table: columns to drop (duplicated by the identity block) + header relabels.
+const IDENTITY_CONFIG: Record<string, { drop?: string[]; relabel?: Record<string, string> }> = {
+	detail_record: { drop: ["nameId", "badgeNo", "empRank"], relabel: { trackingNo: "Detail Tracking Number" } },
+	court_overtime: { drop: ["name", "rank"] },
+	crime_incident: { drop: ["key"], relabel: { incidentNumber: "Incident #" } },
+	fio_record: {},
+	traffic_stop: {},
+	officer_misconduct: { drop: ["badgeNo", "officerName"] },
+	ir_fall_2025: { drop: ["badgeNo", "officerName"] },
+};
+
+const withIdentity = (key: string, cols: GridColDef[]): GridColDef[] => {
+	const cfg = IDENTITY_CONFIG[key];
+	if (!cfg) return cols;
+	const relabel = cfg.relabel || {};
+	const kept = cols
+		.filter((c) => !(cfg.drop || []).includes(c.field))
+		.map((c) => (relabel[c.field] ? { ...c, headerName: relabel[c.field] } : c));
+	return [...identityColumns(), ...kept];
+};
+
 export const functionMapping = {
-	detail_record: detail_record_columns(),
-	crime_incident: crime_incident_columns(), // Using actual crime incident columns now
+	detail_record: withIdentity("detail_record", detail_record_columns()),
+	crime_incident: withIdentity("crime_incident", crime_incident_columns()),
 	officer_ia: officer_ia_columns(),
 	police_financial: police_financial_columns(),
-	court_overtime: court_overtime_columns(),
-	officer_misconduct: officer_misconduct_columns(),
-	fio_record: fio_record_columns(),
+	court_overtime: withIdentity("court_overtime", court_overtime_columns()),
+	officer_misconduct: withIdentity("officer_misconduct", officer_misconduct_columns()),
+	fio_record: withIdentity("fio_record", fio_record_columns()),
 	boston_arrest: boston_arrest_columns(),
 	employee: employee_columns(),
-	traffic_stop: traffic_stop_columns(),
-	ir_fall_2025: ir_fall_2025_columns(),
+	traffic_stop: withIdentity("traffic_stop", traffic_stop_columns()),
+	ir_fall_2025: withIdentity("ir_fall_2025", ir_fall_2025_columns()),
 };
 
 // THE BELOW TABLE DEFINITIONS ARE DEPRECATED BUT **may be helpful** later
