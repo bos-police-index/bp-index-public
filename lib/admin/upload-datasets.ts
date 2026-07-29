@@ -11,12 +11,16 @@
  */
 
 export type UploadColumn = {
-	/** Canonical column name the file header must map to (case/space-insensitive). */
+	/** Canonical column name (must equal the raw-table column). File headers map to
+	 *  it case/space/underscore-insensitively. */
 	name: string;
 	/** Required columns must be present in the file or the upload is rejected. */
 	required: boolean;
 	/** Short human hint shown in the schema panel. */
 	note?: string;
+	/** Known source-file header variants that also map to this column (e.g. a POST
+	 *  export's "Certification Expiration Date"). Matched after the canonical name. */
+	aliases?: string[];
 };
 
 export type UploadDataset = {
@@ -208,6 +212,46 @@ export const UPLOAD_DATASETS: UploadDataset[] = [
 			{ name: "number_of_victims", required: false },
 			{ name: "number_of_offenders", required: false },
 			{ name: "url", required: false },
+		],
+	},
+	{
+		key: "post_separation",
+		label: "POST separation & agency changes",
+		description: "MA POST Commission agency changes + nature of separation (why/when officers left a department). Statewide; attaches to officers by MPTC ID.",
+		rawTable: "production.raw_v2_mptc_separation",
+		reconciler: "production.run_separation_from_raw()",
+		matchOn: "MPTC ID (hard key)",
+		columns: [
+			{ name: "mptc_id", required: true, aliases: ["MPTC ID"], note: "POST/MPTC id — the match key" },
+			{ name: "first_name", required: false, aliases: ["First Name"] },
+			{ name: "last_name", required: false, aliases: ["Last Name"] },
+			{ name: "cert_number", required: false, aliases: ["Certification Number"] },
+			{ name: "cert_status", required: false, aliases: ["Certification Status"] },
+			{ name: "cert_expiration", required: false, aliases: ["Certification Expiration Date"], note: "ISO or MM/DD/YYYY" },
+			{ name: "current_employer", required: false, aliases: ["Current Employer"] },
+			{ name: "separation_date", required: false, aliases: ["Separation Date"], note: "ISO or MM/DD/YYYY" },
+			{ name: "former_employer", required: false, aliases: ["Former Employer"] },
+			{ name: "separation_type", required: false, aliases: ["Separation Type"], note: "e.g. Resigned, Terminated, In Lieu of Discipline, Listed in NDI" },
+		],
+	},
+	{
+		key: "mptc_academy",
+		label: "MPTC academy graduates",
+		description: "MPTC recruit-academy graduation records (class, graduation date, sending agency, demographics). Statewide; attaches to officers by MPTC ID.",
+		rawTable: "production.raw_v2_mptc_academy",
+		reconciler: "production.run_academy_from_raw()",
+		matchOn: "MPTC ID (hard key)",
+		columns: [
+			{ name: "mptc_id", required: true, aliases: ["Person User ID", "MPTC ID"], note: "MPTC / Person User id — the match key" },
+			{ name: "first_name", required: false, aliases: ["Person First Name", "First Name"] },
+			{ name: "last_name", required: false, aliases: ["Person Last Name", "Last Name"] },
+			{ name: "gender", required: false, aliases: ["Person Gender"] },
+			{ name: "year_of_birth", required: false, aliases: ["Year of Birth"] },
+			{ name: "race", required: false, aliases: ["Person UDF - Race", "Race"] },
+			{ name: "enrollment_status", required: false, aliases: ["Enrollment Status"] },
+			{ name: "sending_org", required: false, aliases: ["Sending Organization Name", "Sending Organization"] },
+			{ name: "class_name", required: false, aliases: ["Class Name"] },
+			{ name: "class_end_date", required: false, aliases: ["Class End Date"], note: "graduation date; ISO or MM/DD/YYYY" },
 		],
 	},
 ];

@@ -52,10 +52,15 @@ export function validateAgainstSchema(dataset: UploadDataset, parsed: ParsedFile
 	const usedNorm = new Set<string>();
 
 	for (const col of dataset.columns) {
-		const norm = normalizeHeader(col.name);
-		const hit = fileByNorm.get(norm) ?? null;
+		// Match the canonical name first, then any declared aliases (source-file
+		// header variants). First hit wins.
+		let hit: string | null = null;
+		for (const cand of [col.name, ...(col.aliases ?? [])]) {
+			const norm = normalizeHeader(cand);
+			const h = fileByNorm.get(norm);
+			if (h) { hit = h; usedNorm.add(norm); break; }
+		}
 		mapping[col.name] = hit;
-		if (hit) usedNorm.add(norm);
 		if (!hit && col.required) missingRequired.push(col.name);
 	}
 
