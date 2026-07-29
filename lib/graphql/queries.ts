@@ -765,6 +765,16 @@ export const GET_NEXT_PAGE_EMPLOYEE: DocumentNode = (() => {
 						jobTitle
 						race
 						sex
+						badgeNo
+						postId
+						currentUnit
+						startDate
+						residenceZip
+						numOfFio
+						numOfIncident
+						numOfMvc
+						overtimePay
+						courtOtHours
 					}
 				}
 			}

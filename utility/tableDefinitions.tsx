@@ -37,6 +37,7 @@ const tablesFromWokeWindows = ["crime_incident"];
 // Date ranges for specific tables
 export const tableDateRanges = {
     "crime_incident": "1930 - 2021",
+    "employee": "Roster: Fall 2025 · Earnings & activity: 2020–2025",
     // Add more fixed date ranges for other tables here as needed
 };
 

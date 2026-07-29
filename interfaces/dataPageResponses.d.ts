@@ -222,6 +222,18 @@ declare global {
 		firstName: string;
 		salPlan: string;
 		jobTitle: string;
+		race: string | null;
+		sex: string | null;
+		badgeNo: string | null;
+		postId: string | null;
+		currentUnit: string | null;
+		startDate: string | null;
+		residenceZip: string | null;
+		numOfFio: number | null;
+		numOfIncident: number | null;
+		numOfMvc: number | null;
+		overtimePay: number | null;
+		courtOtHours: number | null;
 	}
 
 	interface EmployeeResponse {
