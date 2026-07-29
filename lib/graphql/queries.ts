@@ -24,6 +24,15 @@ export const GET_HOMEPAGE_DATA = gql`
 					rank
 					sex
 					race
+					regularPay
+					retroPay
+					injuredPay
+					quinnPay
+					numOfDetail
+					numOfFio
+					numOfMvc
+					startDate
+					postId
 				}
 			}
 		}

@@ -25,11 +25,24 @@ declare global {
 		fullName: string | null;
 		org: string | null;
 		badge_no: number | null;
+		badgeNo: string | null;
+		employeeId: string | null;
+		rank: string | null;
+		postId: string | null;
+		startDate: string | null;
+		year: number | null;
 		totalPay: number | null;
 		overtimePay: number | null;
 		detailPay: number | null;
 		otherPay: number | null;
+		regularPay: number | null;
+		retroPay: number | null;
+		injuredPay: number | null;
+		quinnPay: number | null;
 		numOfIa: number | null;
+		numOfDetail: number | null;
+		numOfFio: number | null;
+		numOfMvc: number | null;
 		race: string | null;
 		sex: string | null;
 	}

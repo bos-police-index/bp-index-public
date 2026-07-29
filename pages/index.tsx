@@ -66,6 +66,20 @@ export default function Home() {
 				</Tooltip>
 			),
 		}, {
+			field: "employeeId",
+			headerName: "Emp #",
+			width: 110,
+			minWidth: 90,
+			type: "string",
+			renderCell: (params) => (
+				<span className="text-gray-700 font-mono text-sm">{params.value || "—"}</span>
+			),
+			renderHeader: (params) => (
+				<Tooltip title="The officer's BPD employee (payroll) number">
+					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		}, {
 			field: "badgeNo",
 			headerName: "Badge No.",
 			width: 120,
@@ -124,6 +138,20 @@ export default function Home() {
 				</Tooltip>
 			),
 		}, {
+			field: "postId",
+			headerName: "POST ID",
+			width: 130,
+			minWidth: 110,
+			type: "string",
+			renderCell: (params) => (
+				<span className="text-gray-700 font-mono text-sm">{params.value || "—"}</span>
+			),
+			renderHeader: (params) => (
+				<Tooltip title="Statewide POST (Peace Officer Standards & Training) certification ID">
+					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		}, {
 			field: "org",
 			headerName: "Organization",
 			width: 250,
@@ -135,6 +163,23 @@ export default function Home() {
 			),
 			renderHeader: (params) => (
 				<Tooltip title="The department or unit within the Boston Police Department where the officer works">
+					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		}, {
+			field: "startDate",
+			headerName: "Start Date",
+			width: 120,
+			minWidth: 100,
+			type: "string",
+			renderCell: (params) => {
+				const v = params.value;
+				if (!v) return <span className="text-gray-400">—</span>;
+				const d = new Date(String(v).slice(0, 10) + "T00:00:00Z");
+				return <span className="text-gray-700 text-sm">{d.toLocaleDateString(undefined, { timeZone: "UTC", year: "numeric", month: "short", day: "numeric" })}</span>;
+			},
+			renderHeader: (params) => (
+				<Tooltip title="Academy graduation date (earliest known), used as a proxy for BPD start date where available">
 					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
@@ -159,6 +204,51 @@ export default function Home() {
 				</Tooltip>
 			),
 		}, {
+			field: "numOfDetail",
+			headerName: "Details",
+			width: 100,
+			minWidth: 80,
+			type: "number",
+			renderCell: (params) => {
+				const count = params.row.numOfDetail;
+				return <span className={`font-medium ${count > 0 ? "text-gray-800" : "text-gray-400"}`}>{count ?? 0}</span>;
+			},
+			renderHeader: (params) => (
+				<Tooltip title="Number of paid-detail assignments linked to the officer">
+					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		}, {
+			field: "numOfFio",
+			headerName: "FIOs",
+			width: 90,
+			minWidth: 70,
+			type: "number",
+			renderCell: (params) => {
+				const count = params.row.numOfFio;
+				return <span className={`font-medium ${count > 0 ? "text-gray-800" : "text-gray-400"}`}>{count ?? 0}</span>;
+			},
+			renderHeader: (params) => (
+				<Tooltip title="Number of Field Interrogation & Observation reports linked to the officer">
+					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		}, {
+			field: "numOfMvc",
+			headerName: "MVCs",
+			width: 90,
+			minWidth: 70,
+			type: "number",
+			renderCell: (params) => {
+				const count = params.row.numOfMvc;
+				return <span className={`font-medium ${count > 0 ? "text-gray-800" : "text-gray-400"}`}>{count ?? 0}</span>;
+			},
+			renderHeader: (params) => (
+				<Tooltip title="Number of motor-vehicle citations (traffic stops) linked to the officer">
+					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		}, {
 			field: "totalPay",
 			headerName: "Total Pay",
 			width: 130,
@@ -172,43 +262,43 @@ export default function Home() {
 				return <span className="text-gray-400">—</span>;
 			},
 			renderHeader: (params) => (
-				<Tooltip title="The total gross earnings of the police officer for the specified period">
+				<Tooltip title="Total gross earnings for the latest year we have on file">
 					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
 		}, {
-			field: "overtimePay",
-			headerName: "Overtime",
+			field: "regularPay",
+			headerName: "Regular",
 			width: 120,
 			minWidth: 100,
 			type: "number",
 			renderCell: (params) => {
 				const { row } = params;
-				if (row.overtimePay != null && row.overtimePay !== undefined) {
-					return <span className="font-medium text-blue-600">${row.overtimePay.toLocaleString()}</span>;
+				if (row.regularPay != null && row.regularPay !== undefined) {
+					return <span className="font-medium text-gray-800">${row.regularPay.toLocaleString()}</span>;
 				}
 				return <span className="text-gray-400">—</span>;
 			},
 			renderHeader: (params) => (
-				<Tooltip title="Earnings from overtime work">
+				<Tooltip title="Regular (base salary) earnings for the latest year on file">
 					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
 		}, {
-			field: "detailPay",
-			headerName: "Detail Pay",
-			width: 120,
-			minWidth: 100,
+			field: "retroPay",
+			headerName: "Retro",
+			width: 110,
+			minWidth: 90,
 			type: "number",
 			renderCell: (params) => {
 				const { row } = params;
-				if (row.detailPay != null && row.detailPay !== undefined) {
-					return <span className="font-medium text-purple-600">${row.detailPay.toLocaleString()}</span>;
+				if (row.retroPay != null && row.retroPay !== undefined) {
+					return <span className="font-medium text-teal-600">${row.retroPay.toLocaleString()}</span>;
 				}
 				return <span className="text-gray-400">—</span>;
 			},
 			renderHeader: (params) => (
-				<Tooltip title="Earnings from detailed assignments or special duties">
+				<Tooltip title="Retroactive pay (e.g. back pay from contract settlements) for the latest year on file">
 					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
@@ -226,7 +316,79 @@ export default function Home() {
 				return <span className="text-gray-400">—</span>;
 			},
 			renderHeader: (params) => (
-				<Tooltip title="Other types of earnings not classified elsewhere">
+				<Tooltip title="Other earnings not classified elsewhere, for the latest year on file">
+					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		}, {
+			field: "overtimePay",
+			headerName: "Overtime",
+			width: 120,
+			minWidth: 100,
+			type: "number",
+			renderCell: (params) => {
+				const { row } = params;
+				if (row.overtimePay != null && row.overtimePay !== undefined) {
+					return <span className="font-medium text-blue-600">${row.overtimePay.toLocaleString()}</span>;
+				}
+				return <span className="text-gray-400">—</span>;
+			},
+			renderHeader: (params) => (
+				<Tooltip title="Overtime earnings for the latest year on file">
+					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		}, {
+			field: "injuredPay",
+			headerName: "Injured",
+			width: 110,
+			minWidth: 90,
+			type: "number",
+			renderCell: (params) => {
+				const { row } = params;
+				if (row.injuredPay != null && row.injuredPay !== undefined) {
+					return <span className="font-medium text-red-500">${row.injuredPay.toLocaleString()}</span>;
+				}
+				return <span className="text-gray-400">—</span>;
+			},
+			renderHeader: (params) => (
+				<Tooltip title="Injured-on-duty pay for the latest year on file">
+					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		}, {
+			field: "detailPay",
+			headerName: "Detail Pay",
+			width: 120,
+			minWidth: 100,
+			type: "number",
+			renderCell: (params) => {
+				const { row } = params;
+				if (row.detailPay != null && row.detailPay !== undefined) {
+					return <span className="font-medium text-purple-600">${row.detailPay.toLocaleString()}</span>;
+				}
+				return <span className="text-gray-400">—</span>;
+			},
+			renderHeader: (params) => (
+				<Tooltip title="Paid-detail earnings for the latest year on file">
+					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
+				</Tooltip>
+			),
+		}, {
+			field: "quinnPay",
+			headerName: "Quinn",
+			width: 110,
+			minWidth: 90,
+			type: "number",
+			renderCell: (params) => {
+				const { row } = params;
+				if (row.quinnPay != null && row.quinnPay !== undefined) {
+					return <span className="font-medium text-amber-600">${row.quinnPay.toLocaleString()}</span>;
+				}
+				return <span className="text-gray-400">—</span>;
+			},
+			renderHeader: (params) => (
+				<Tooltip title="Quinn Bill (educational incentive) pay for the latest year on file">
 					<span className="font-semibold text-gray-700">{params.colDef.headerName}</span>
 				</Tooltip>
 			),
