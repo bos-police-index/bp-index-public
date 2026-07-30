@@ -271,6 +271,29 @@ declare global {
 		totalCount: number;
 	}
 
+	/* ------------------- POLICE OVERTIME (by category) ---------------------*/
+	interface OvertimeRecord {
+		bpiId: string;
+		officerName: string | null;
+		officerBadgeNo: string | null;
+		officerPostId: string | null;
+		officerEmployeeId: string | null;
+		officerRank: string | null;
+		officerCurrentUnit: string | null;
+		category: string | null;
+		description: string | null;
+		hours: number | null;
+		otDate: string | null;
+		fy: number | null;
+		otCode: number | null;
+	}
+
+	interface OvertimeResponse {
+		edges?: Array<{ node: OvertimeRecord }>;
+		nodes?: OvertimeRecord[];
+		totalCount: number;
+	}
+
 	/* ------------------- INCIDENT REPORT FALL 2025 ---------------------*/
 	interface IRFall2025Record {
 		bpiId: string;

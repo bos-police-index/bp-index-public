@@ -3,6 +3,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import BalanceIcon from "@mui/icons-material/Balance";
 import LocalPoliceIcon from "@mui/icons-material/LocalPolice";
 import GavelIcon from "@mui/icons-material/Gavel";
+import MoreTimeIcon from "@mui/icons-material/MoreTime";
 import EventNoteIcon from "@mui/icons-material/EventNote";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import FindInPageIcon from "@mui/icons-material/FindInPage";
@@ -29,7 +30,7 @@ const IconWrapper = ({ Icon, fontSize = "48px", color = bpi_deep_green }: IconWr
 
 // TODO:! As more data is added be sure to add the source they are from to this
 const tablesFromAnalyzeBoston = ["fio_record"];
-const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "officer_misconduct", "boston_arrest", "traffic_stop", "traffic_unattributed", "ir_fall_2025"];
+const tablesFromPublicRecordsRequests = ["detail_record", "court_overtime", "overtime", "officer_misconduct", "boston_arrest", "traffic_stop", "traffic_unattributed", "ir_fall_2025"];
 const tablesFromWokeWindows = ["crime_incident"];
 
 // Date ranges for specific tables
@@ -57,6 +58,15 @@ const rawTableDefinitions = [
 		shortDescription: "Detailed information about police overtime related to court appearances, including tasks performed outside regular duty hours.",
 		longDescription:
 			"The Court Overtime dataset captures detailed information about police officers’ overtime associated with court-related activities. These activities include attending trials, hearings, and case preparation sessions, which are typically required outside an officer’s standard duty schedule. This dataset provides insights into the allocation of police resources for judicial proceedings, capturing data on officers’ roles, case types, time worked, and associated overtime costs. It reflects how police personnel are utilized to fulfill judicial obligations while maintaining public safety and accountability.",
+	},
+	{
+		table: "Police Overtime",
+		query: "overtime",
+		image: { component: <IconWrapper Icon={MoreTimeIcon} />, src: MoreTimeIcon },
+		isFake: false,
+		shortDescription: "Sworn-officer overtime hours broken down by category — Special Events, Court, Extended Tours, Replacement Personnel, and Additional Tour/Call-out.",
+		longDescription:
+			"The Police Overtime dataset captures sworn-officer overtime, line item by line item, with each entry classified into an overtime category: Special Events, Court, Extended Tours, Replacement Personnel, or Additional Tour / Call-out. Each record includes the officer, date, category, a description of the activity, the fiscal year, and the number of overtime hours paid (the dataset reports hours, not dollars). It covers fiscal years 2023 through 2026 (year-to-date) and is matched to officers by employee id, enabling analysis of how overtime is used across the department and by individual officers.",
 	},
 	{
 		table: "Crime Incident",

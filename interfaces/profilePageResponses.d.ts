@@ -100,6 +100,15 @@ declare global {
 		asOf: string;
 	}
 
+	interface V2OvertimeCategoryRow {
+		bpiId: string | null;
+		categoryLabel: string | null;
+		totalHours: number | null;
+		lineItems: number | null;
+		firstFy: number | null;
+		lastFy: number | null;
+	}
+
 	interface V2PostCertificationRow {
 		linkMethod?: V2LinkMethod;
 		confirmed?: boolean;

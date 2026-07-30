@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, employee_alias_name, fio_record_alias_name, homepage_alias_name, officer_search_alias_name, ir_fall_2025_alias_name, officer_financial_alias_name, officer_ia_alias_name, officer_year_history_alias_name, traffic_stop_alias_name, traffic_unattributed_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map, v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name, v2_court_overtime_alias_name } from "@utility/dataViewAliases";
+import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, employee_alias_name, fio_record_alias_name, homepage_alias_name, officer_search_alias_name, ir_fall_2025_alias_name, officer_financial_alias_name, officer_ia_alias_name, officer_year_history_alias_name, traffic_stop_alias_name, traffic_unattributed_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map, v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name, v2_court_overtime_alias_name, overtime_alias_name, v2_overtime_by_category_alias_name } from "@utility/dataViewAliases";
 import { DocumentNode } from "graphql";
 
 export const DATA_PAGE_SIZE = 25;
@@ -220,6 +220,21 @@ export const V2_OFFICER_COURT_OVERTIME = (bpiId: string) => gql`
 				workedHours
 				source
 				asOf
+			}
+		}
+	}
+`;
+
+export const V2_OFFICER_OVERTIME_BY_CATEGORY = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_overtime_by_category_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: TOTAL_HOURS_DESC) {
+			nodes {
+				bpiId
+				categoryLabel
+				totalHours
+				lineItems
+				firstFy
+				lastFy
 			}
 		}
 	}
@@ -585,6 +600,29 @@ export const GET_NEXT_PAGE_COURT_OVERTIMES: DocumentNode = gql`
 				officerCurrentUnit
    		 	}
 				totalCount
+		}
+	}
+`;
+
+export const GET_NEXT_PAGE_OVERTIME: DocumentNode = gql`
+	query MyQuery($offset: Int, $page_size: Int, $order_by: [${removeAllPrefix(overtime_alias_name)}OrderBy!], $filters: ${removePluralSuffix(removeAllPrefix(overtime_alias_name))}Condition) {
+		${overtime_alias_name}(first: $page_size, offset: $offset, orderBy: $order_by, condition: $filters) {
+			nodes {
+				officerName
+				officerBadgeNo
+				officerPostId
+				officerEmployeeId
+				officerRank
+				officerCurrentUnit
+				category
+				description
+				hours
+				otDate
+				fy
+				otCode
+				bpiId
+			}
+			totalCount
 		}
 	}
 `;

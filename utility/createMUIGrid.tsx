@@ -2162,6 +2162,17 @@ const withIdentity = (key: string, cols: GridColDef[]): GridColDef[] => {
 	return [...identityColumns(), ...kept];
 };
 
+// Police Overtime — the view already carries the identity block, so use identityColumns() directly.
+const overtime_columns = (): GridColDef[] => [
+	...identityColumns(),
+	{ field: "category", headerName: "Category", description: "Overtime category (Special Events, Court, Extended Tours, Replacement Personnel, Additional Tour/Call-out)", type: "string", width: 200 },
+	{ field: "description", headerName: "Description", description: "Specific overtime activity/reason", type: "string", width: 230 },
+	{ field: "hours", headerName: "Hours", description: "Overtime hours paid for this line item", type: "number", width: 90 },
+	{ field: "otDate", headerName: "Date", description: "Date of the overtime", type: "date", valueFormatter: formatDateShort, width: 110 },
+	{ field: "fy", headerName: "FY", description: "Fiscal year", type: "number", width: 80, valueFormatter: (p) => (p.value == null ? "" : String(p.value)) },
+	{ field: "otCode", headerName: "Code", description: "Overtime code", type: "number", width: 80 },
+];
+
 export const functionMapping = {
 	detail_record: withIdentity("detail_record", detail_record_columns()),
 	crime_incident: withIdentity("crime_incident", crime_incident_columns()),
@@ -2175,6 +2186,7 @@ export const functionMapping = {
 	traffic_stop: withIdentity("traffic_stop", traffic_stop_columns()),
 	traffic_unattributed: traffic_unattributed_columns(),
 	ir_fall_2025: withIdentity("ir_fall_2025", ir_fall_2025_columns()),
+	overtime: overtime_columns(),
 };
 
 // THE BELOW TABLE DEFINITIONS ARE DEPRECATED BUT **may be helpful** later

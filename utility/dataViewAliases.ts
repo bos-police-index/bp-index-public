@@ -15,6 +15,7 @@ export const boston_arrest_alias_name = "allVwBostonArrests";
 export const traffic_stop_alias_name = "allVwTrafficStopsFall2025S";
 export const traffic_unattributed_alias_name = "allVwTrafficUnattributeds";
 export const ir_fall_2025_alias_name = "allVwIrFall2025S";
+export const overtime_alias_name = "allVwV2Overtimes";
 
 // PROFILE PAGE
 export const homepage_alias_name = "allHomepages";
@@ -43,6 +44,7 @@ export const v2_incident_alias_name              = "allVwV2Incidents";
 export const v2_separation_alias_name            = "allVwV2OfficerSeparations";
 export const v2_academy_alias_name               = "allVwV2OfficerAcademies";
 export const v2_court_overtime_alias_name        = "allVwV2CourtOvertimes";
+export const v2_overtime_by_category_alias_name  = "allVwV2OvertimeByCategories";
 
 // Use in `[table_name].tsx`
 export const table_name_to_alias_map = {
@@ -56,6 +58,7 @@ export const table_name_to_alias_map = {
 	traffic_stop: traffic_stop_alias_name,
 	traffic_unattributed: traffic_unattributed_alias_name,
 	ir_fall_2025: ir_fall_2025_alias_name,
+	overtime: overtime_alias_name,
 };
 
 
