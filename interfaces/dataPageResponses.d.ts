@@ -229,6 +229,8 @@ declare global {
 		currentUnit: string | null;
 		startDate: string | null;
 		residenceZip: string | null;
+		residencePlace: string | null;
+		residenceState: string | null;
 		numOfFio: number | null;
 		numOfIncident: number | null;
 		numOfMvc: number | null;

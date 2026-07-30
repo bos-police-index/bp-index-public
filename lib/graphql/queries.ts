@@ -775,6 +775,8 @@ export const GET_NEXT_PAGE_EMPLOYEE: DocumentNode = (() => {
 						numOfMvc
 						overtimePay
 						courtOtHours
+						residencePlace
+						residenceState
 					}
 				}
 			}

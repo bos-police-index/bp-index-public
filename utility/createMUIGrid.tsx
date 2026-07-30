@@ -1543,10 +1543,22 @@ const employee_columns = () => {
 		},
 		{
 			field: "residenceZip",
-			headerName: "Residence (ZIP)",
-			description: "Residence ZIP code from the employee earnings report (latest year), matched by name",
+			headerName: "Residence",
+			description: "Officer's home town/neighborhood and state, derived from the residence ZIP code on the employee earnings report (latest year), matched by name",
 			type: "string",
-			width: 140,
+			width: 190,
+			renderCell: (params) => {
+				const place = params.row.residencePlace;
+				const state = params.row.residenceState;
+				const zip = params.value;
+				if (!place && !zip) return <span style={{ color: "#9CA3AF" }}>—</span>;
+				return (
+					<span>
+						{place ? <span style={{ fontWeight: 500 }}>{place}{state ? `, ${state}` : ""}</span> : null}
+						{zip ? <span style={{ color: "#9CA3AF", marginLeft: place ? 6 : 0 }}>{zip}</span> : null}
+					</span>
+				);
+			},
 		},
 		{
 			field: "race",
