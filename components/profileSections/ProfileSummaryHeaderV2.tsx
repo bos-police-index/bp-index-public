@@ -2,7 +2,7 @@ import React from "react";
 import LocalPoliceIcon from "@mui/icons-material/LocalPolice";
 import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
 import { bpi_deep_green, bpi_light_green } from "@styles/theme/lightTheme";
-import { formatMoneyNoCents } from "@utility/textFormatHelpers";
+import { formatMoneyNoCents, composeOfficerName } from "@utility/textFormatHelpers";
 
 interface Props {
 	profile: V2OfficerProfile | null;
@@ -56,7 +56,7 @@ function Stat({ label, value, accent, targetId }: { label: string; value: string
 export default function ProfileSummaryHeaderV2({ profile, earnings = [], misconduct = [], fio = [], paidDetail = [], traffic = [], incidents = [] }: Props) {
 	if (!profile) return null;
 
-	const name = [profile.firstName, profile.middleName, profile.lastName].filter(Boolean).join(" ") || "Unnamed Officer";
+	const name = composeOfficerName(profile.firstName, profile.middleName, profile.lastName) || "Unnamed Officer";
 	const latestEarn = [...earnings].sort((a, b) => (b.year ?? 0) - (a.year ?? 0))[0];
 	const totalPay = latestEarn?.totalPay ?? null;
 	const confirmed = profile.identityConfidence === "confirmed";
@@ -106,8 +106,7 @@ export default function ProfileSummaryHeaderV2({ profile, earnings = [], miscond
 					<Stat label="FIO" value={fio.length.toLocaleString()} targetId="sec-fio" />
 					<Stat label="Paid details" value={paidDetail.length.toLocaleString()} targetId="sec-paid-details" />
 					<Stat label="MVCs" value={traffic.length.toLocaleString()} targetId="sec-traffic" />
-					{/* Incidents tile hidden with the incidents section (sample-only data). void keeps the prop referenced. */}
-					{void incidents}
+					<Stat label="Incidents" value={incidents.length.toLocaleString()} targetId="sec-incidents" />
 				</div>
 			</div>
 		</div>

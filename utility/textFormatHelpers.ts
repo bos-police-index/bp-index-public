@@ -6,6 +6,30 @@ export function yAndNToBoolean(value) {
 	return returnValue;
 }
 
+// Join first + middle + last without doubling the middle initial. Our roster's
+// first_name often already embeds the middle initial (e.g. "Jessica C") while
+// middleName is separately populated ("C." or a full middle name), which would
+// otherwise render "Jessica C C. Anderson". Drop the middle token when first_name
+// already ends in a single-letter initial matching the middle's initial.
+export const composeOfficerName = (
+	first?: string | null,
+	middle?: string | null,
+	last?: string | null,
+): string => {
+	const f = (first || "").trim();
+	const m = (middle || "").trim();
+	const l = (last || "").trim();
+	const parts: string[] = [];
+	if (f) parts.push(f);
+	if (m) {
+		const trailing = f.match(/\s([A-Za-z])$/);
+		const sameInitial = trailing && m[0] && trailing[1].toUpperCase() === m[0].toUpperCase();
+		if (!sameInitial) parts.push(m);
+	}
+	if (l) parts.push(l);
+	return parts.join(" ").replace(/\s+/g, " ").trim();
+};
+
 // Use for names like "Donahue,Ryan" or "Noel,Jacques Junior"
 export const fixNameOrdering = (name) =>{
 	let middleName = ""

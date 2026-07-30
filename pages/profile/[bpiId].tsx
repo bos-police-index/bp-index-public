@@ -18,7 +18,7 @@ import AcademyCardV2 from "@components/profileSections/AcademyCardV2";
 import CourtOvertimeCardV2 from "@components/profileSections/CourtOvertimeCardV2";
 import OvertimeByCategoryCardV2 from "@components/profileSections/OvertimeByCategoryCardV2";
 import TenureCardV2 from "@components/profileSections/TenureCardV2";
-// IncidentJournalTableV2 import removed while the incidents section is hidden (see render note).
+import IncidentJournalTableV2 from "@components/profileSections/IncidentJournalTableV2";
 import { V2_OFFICER_PROFILE, V2_OFFICER_EARNINGS, V2_OFFICER_POST_CERTIFICATIONS, V2_OFFICER_POST_DECERTIFICATIONS, V2_OFFICER_FIO, V2_OFFICER_MISCONDUCT, V2_OFFICER_ASSIGNMENTS, V2_OFFICER_PAID_DETAILS, V2_OFFICER_TRAFFIC, V2_OFFICER_INCIDENTS, V2_OFFICER_SEPARATION, V2_OFFICER_ACADEMY, V2_OFFICER_COURT_OVERTIME, V2_OFFICER_OVERTIME_BY_CATEGORY } from "@lib/graphql/queries";
 import { v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name, v2_court_overtime_alias_name, v2_overtime_by_category_alias_name } from "@utility/dataViewAliases";
 import { getOfficerProfileData } from "../../services/profile/data_fetchers";
@@ -113,9 +113,7 @@ export default function OfficerProfile(props: InferGetServerSidePropsType<typeof
 						decertifications={p.v2PostDecertRows ?? []}
 					/>
 					<div id="sec-fio" className="scroll-mt-4"><FioTableV2 rows={p.v2FioRows ?? []} /></div>
-					{/* Incident Journal hidden until a fuller officer-linked source exists (public crime-incident
-					    data has no officer field; current data is only a Dec2020–Jan2021 sample). Restore: re-add
-					    <div id="sec-incidents"><IncidentJournalTableV2 rows={p.v2IncidentRows ?? []} /></div> + its import + the header tile. */}
+					<div id="sec-incidents" className="scroll-mt-4"><IncidentJournalTableV2 rows={p.v2IncidentRows ?? []} /></div>
 					<div id="sec-traffic" className="scroll-mt-4"><TrafficCitationTableV2 rows={p.v2TrafficRows ?? []} /></div>
 					<div id="sec-earnings" className="scroll-mt-4"><EarningsByYearTableV2 rows={p.v2EarningsRows ?? []} /></div>
 					<div id="sec-overtime" className="scroll-mt-4"><OvertimeByCategoryCardV2 rows={p.v2OvertimeCatRows ?? []} /></div>

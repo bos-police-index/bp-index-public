@@ -62,7 +62,7 @@ export default function IncidentJournalTableV2({ rows }: Props) {
 					<MissingData
 						variant="card"
 						title="No incident-journal records (v2)"
-						message="This officer is not the journaling officer on any incident in the loaded window (Dec 2020 – Jan 2021)."
+						message="This officer is not the journaling officer on any incident in the loaded window (2012–2020)."
 					/>
 				) : (
 					<DataGrid

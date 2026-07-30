@@ -2,6 +2,7 @@ import React from "react";
 import LocalPoliceIcon from "@mui/icons-material/LocalPolice";
 import MissingData from "@components/MissingData";
 import { bpi_deep_green, bpi_light_green } from "@styles/theme/lightTheme";
+import { composeOfficerName } from "@utility/textFormatHelpers";
 
 interface IdentityCardV2Props {
 	profile: V2OfficerProfile | null;
@@ -9,8 +10,7 @@ interface IdentityCardV2Props {
 
 function fullName(p: V2OfficerProfile | null): string | null {
 	if (!p) return null;
-	const parts = [p.firstName, p.middleName, p.lastName].filter(Boolean);
-	return parts.length ? parts.join(" ") : null;
+	return composeOfficerName(p.firstName, p.middleName, p.lastName) || null;
 }
 
 const ROSTER_SOURCE_LABELS: Record<string, string> = {

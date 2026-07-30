@@ -369,7 +369,7 @@ export const V2_OFFICER_TRAFFIC = (bpiId: string) => gql`
 
 export const V2_OFFICER_INCIDENTS = (bpiId: string) => gql`
 	query MyQuery {
-		${v2_incident_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: OCCURRED_ON_DATE_DESC) {
+		${v2_incident_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: OCCURRED_ON_DATE_DESC, first: 1000) {
 			nodes {
 				bpiId
 				incidentNumber
