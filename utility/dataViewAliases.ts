@@ -45,6 +45,7 @@ export const v2_separation_alias_name            = "allVwV2OfficerSeparations";
 export const v2_academy_alias_name               = "allVwV2OfficerAcademies";
 export const v2_court_overtime_alias_name        = "allVwV2CourtOvertimes";
 export const v2_overtime_by_category_alias_name  = "allVwV2OvertimeByCategories";
+export const v2_officer_arroyo_alias_name        = "allVwV2OfficerArroyos";
 
 // Use in `[table_name].tsx`
 export const table_name_to_alias_map = {

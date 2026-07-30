@@ -5,6 +5,7 @@ interface Props {
 	academy: V2AcademyRow[];
 	separation: V2SeparationRow[];
 	profile: V2OfficerProfile | null;
+	arroyo?: V2OfficerArroyoRow | null;
 }
 
 function fmtDate(s: string | null): string {
@@ -33,10 +34,26 @@ function statusClass(active: boolean, type: string | null): string {
 	return "bg-slate-100 text-slate-700 border border-slate-200";
 }
 
-export default function TenureCardV2({ academy, separation, profile }: Props) {
-	// Start = earliest academy graduation (proxy for start of service; not the official hire date).
+export default function TenureCardV2({ academy, separation, profile, arroyo }: Props) {
+	// Start signal, best-available first:
+	//   1) academy graduation date (MPTC)        — a dated start proxy
+	//   2) appointment/grade date (Arroyo 2010)   — a dated appointment proxy
+	//   3) "serving since ≥ YYYY" (Arroyo roster) — a year-only lower bound
 	const gradDates = academy.map((a) => a.classEndDate).filter(Boolean) as string[];
-	const start = gradDates.length ? gradDates.slice().sort()[0] : null;
+	const academyStart = gradDates.length ? gradDates.slice().sort()[0] : null;
+	const apptDate = arroyo?.appointmentDate || null;
+	const servingSince = arroyo?.servingSince ?? null;
+
+	let start: string | null = null;   // a real date, used for span math
+	let startLabel = "";
+	let startApprox = false;
+	if (academyStart) {
+		start = academyStart; startLabel = "Academy graduation (MPTC)";
+	} else if (apptDate) {
+		start = apptDate; startLabel = "Appointed (grade date)";
+	} else if (servingSince) {
+		start = `${servingSince}-01-01`; startLabel = `On the roster by ${servingSince}`; startApprox = true;
+	}
 
 	// End/status = separation record if present; else treated as active.
 	const sep = (separation || []).find((s) => s.separationDate) || separation?.[0] || null;
@@ -79,8 +96,8 @@ export default function TenureCardV2({ academy, separation, profile }: Props) {
 							{/* Start */}
 							<div>
 								<div className="text-[10px] uppercase tracking-wide text-gray-400">Start</div>
-								<div className="text-sm font-semibold text-gray-900">{start ? fmtDate(start) : "Unknown"}</div>
-								<div className="text-[11px] text-gray-500">{start ? "Academy graduation (MPTC)" : "no academy record"}</div>
+								<div className="text-sm font-semibold text-gray-900">{start ? (startApprox ? `≥ ${servingSince}` : fmtDate(start)) : "Unknown"}</div>
+								<div className="text-[11px] text-gray-500">{start ? startLabel : "no start record"}</div>
 							</div>
 
 							<svg className="w-5 h-5 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
@@ -102,14 +119,14 @@ export default function TenureCardV2({ academy, separation, profile }: Props) {
 								<div className="ml-auto text-right">
 									<div className="text-[10px] uppercase tracking-wide text-gray-400">Span</div>
 									<div className="text-sm font-semibold text-gray-900">
-										{yearsBetween(start, end || new Date().toISOString().slice(0, 10)) || "—"}
+										{startApprox ? "≥ " : ""}{yearsBetween(start, end || new Date().toISOString().slice(0, 10)) || "—"}
 										{!separated && <span className="text-[11px] text-gray-500 font-normal"> (ongoing)</span>}
 									</div>
 								</div>
 							)}
 						</div>
 						<p className="mt-4 text-[11px] text-gray-400 italic">
-							Start is the MPTC academy graduation date (a proxy for entry into service), not the official BPD date of hire — available only for officers in the academy dataset (2020+ classes). Status/end come from MA POST separation records.
+							Start is the best available proxy for entry into service, not the official BPD date of hire: the MPTC academy graduation date where known, else the appointment/grade date or the earliest year the officer appears on the annual BPD roster (2010–2022). Status/end come from MA POST separation records.
 						</p>
 					</>
 				)}

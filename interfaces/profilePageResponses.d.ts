@@ -100,6 +100,17 @@ declare global {
 		asOf: string;
 	}
 
+	interface V2OfficerArroyoRow {
+		bpiId: string | null;
+		servingSince: number | null;
+		lastSeenYear: number | null;
+		appointmentDate: string | null;
+		race: string | null;
+		residenceCity: string | null;
+		residenceState: string | null;
+		latestRank: string | null;
+	}
+
 	interface V2OvertimeCategoryRow {
 		bpiId: string | null;
 		categoryLabel: string | null;

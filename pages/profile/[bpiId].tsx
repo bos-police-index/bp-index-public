@@ -19,8 +19,8 @@ import CourtOvertimeCardV2 from "@components/profileSections/CourtOvertimeCardV2
 import OvertimeByCategoryCardV2 from "@components/profileSections/OvertimeByCategoryCardV2";
 import TenureCardV2 from "@components/profileSections/TenureCardV2";
 import IncidentJournalTableV2 from "@components/profileSections/IncidentJournalTableV2";
-import { V2_OFFICER_PROFILE, V2_OFFICER_EARNINGS, V2_OFFICER_POST_CERTIFICATIONS, V2_OFFICER_POST_DECERTIFICATIONS, V2_OFFICER_FIO, V2_OFFICER_MISCONDUCT, V2_OFFICER_ASSIGNMENTS, V2_OFFICER_PAID_DETAILS, V2_OFFICER_TRAFFIC, V2_OFFICER_INCIDENTS, V2_OFFICER_SEPARATION, V2_OFFICER_ACADEMY, V2_OFFICER_COURT_OVERTIME, V2_OFFICER_OVERTIME_BY_CATEGORY } from "@lib/graphql/queries";
-import { v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name, v2_court_overtime_alias_name, v2_overtime_by_category_alias_name } from "@utility/dataViewAliases";
+import { V2_OFFICER_PROFILE, V2_OFFICER_EARNINGS, V2_OFFICER_POST_CERTIFICATIONS, V2_OFFICER_POST_DECERTIFICATIONS, V2_OFFICER_FIO, V2_OFFICER_MISCONDUCT, V2_OFFICER_ASSIGNMENTS, V2_OFFICER_PAID_DETAILS, V2_OFFICER_TRAFFIC, V2_OFFICER_INCIDENTS, V2_OFFICER_SEPARATION, V2_OFFICER_ACADEMY, V2_OFFICER_COURT_OVERTIME, V2_OFFICER_OVERTIME_BY_CATEGORY, V2_OFFICER_ARROYO } from "@lib/graphql/queries";
+import { v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name, v2_court_overtime_alias_name, v2_overtime_by_category_alias_name, v2_officer_arroyo_alias_name } from "@utility/dataViewAliases";
 import { getOfficerProfileData } from "../../services/profile/data_fetchers";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -45,6 +45,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	const v2_academy_rows      = await getOfficerProfileData(V2_OFFICER_ACADEMY(bpiId),               v2_academy_alias_name);
 	const v2_court_ot_rows     = await getOfficerProfileData(V2_OFFICER_COURT_OVERTIME(bpiId),        v2_court_overtime_alias_name);
 	const v2_overtime_cat_rows = await getOfficerProfileData(V2_OFFICER_OVERTIME_BY_CATEGORY(bpiId),  v2_overtime_by_category_alias_name);
+	const v2_arroyo_rows       = await getOfficerProfileData(V2_OFFICER_ARROYO(bpiId),                v2_officer_arroyo_alias_name);
 	const v2_profile: V2OfficerProfile | null = v2_profile_rows && v2_profile_rows.length > 0 ? v2_profile_rows[0] : null;
 
 	return {
@@ -63,6 +64,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 			v2AcademyRows: v2_academy_rows,
 			v2CourtOtRows: v2_court_ot_rows,
 			v2OvertimeCatRows: v2_overtime_cat_rows,
+			v2Arroyo: v2_arroyo_rows && v2_arroyo_rows.length > 0 ? v2_arroyo_rows[0] : null,
 		},
 	};
 };
@@ -104,7 +106,7 @@ export default function OfficerProfile(props: InferGetServerSidePropsType<typeof
 					/>
 					{/* Section order follows the design-review spec (docs/review-backlog.md, Epic 1).
 					    Tenure + split-overtime sections are pending (data work); Incidents stays hidden. */}
-					<TenureCardV2 academy={p.v2AcademyRows ?? []} separation={p.v2SeparationRows ?? []} profile={v2Profile} />
+					<TenureCardV2 academy={p.v2AcademyRows ?? []} separation={p.v2SeparationRows ?? []} profile={v2Profile} arroyo={p.v2Arroyo ?? null} />
 					<IdentityCardV2 profile={v2Profile} />
 					<OrganizationCardV2 rows={p.v2AssignmentRows ?? []} />
 					<div id="sec-ia" className="scroll-mt-4"><OfficerMisconductTableV2 rows={p.v2MisconductRows ?? []} /></div>
