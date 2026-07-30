@@ -35,7 +35,7 @@ const tablesFromWokeWindows = ["crime_incident"];
 
 // Date ranges for specific tables
 export const tableDateRanges = {
-    "crime_incident": "1930 - 2021",
+    "crime_incident": "2016 – 2021",
     "employee": "Roster: Fall 2025 · Earnings & activity: 2020–2025",
     // Add more fixed date ranges for other tables here as needed
 };
@@ -69,11 +69,11 @@ const rawTableDefinitions = [
 			"The Police Overtime dataset captures sworn-officer overtime, line item by line item, with each entry classified into an overtime category: Special Events, Court, Extended Tours, Replacement Personnel, or Additional Tour / Call-out. Each record includes the officer, date, category, a description of the activity, the fiscal year, and the number of overtime hours paid (the dataset reports hours, not dollars). It covers fiscal years 2023 through 2026 (year-to-date) and is matched to officers by employee id, enabling analysis of how overtime is used across the department and by individual officers.",
 	},
 	{
-		table: "Crime Incident",
+		table: "Crime Incidents (2016–2021)",
 		query: "crime_incident",
 		image: { component: <IconWrapper Icon={EventNoteIcon} />, src: EventNoteIcon },
 		isFake: false,
-		shortDescription: "Records from the crime incident report system, focusing on the type, time, and location of the crime incidents",
+		shortDescription: "Public crime-incident report system (via WokeWindows, 2016–2021) — the type, time, and location of crime incidents.",
 		longDescription:
 			"The Crime Incident Records dataset offers a comprehensive view of crime reports logged in the  crime incident report system. It includes a reduced but essential set of fields designed to capture the type of crime, as well as the time and location of each incident. This streamlined dataset is essential for analyzing crime patterns, trends, and hot spots within the city.",
 	},
@@ -125,7 +125,7 @@ const rawTableDefinitions = [
 	},
 
 	{
-		table: "Boston Arrests",
+		table: "Arrests",
 		query: "boston_arrest",
 		image: { component: <IconWrapper Icon={HandcuffsIcon} />, src: HandcuffsIcon },
 		isFake: false,
@@ -144,11 +144,11 @@ const rawTableDefinitions = [
 			"The Court Cases dataset will capture court cases involving the Boston Police Department and its officers, including civil suits, criminal matters, and related litigation. This dataset is not yet available; it is planned for a future release.",
 	},
 	{
-		table: "Incident Report",
+		table: "Incident Reports (2024)",
 		query: "ir_fall_2025",
 		image: { component: <IconWrapper Icon={EventNoteIcon} />, src: EventNoteIcon },
 		isFake: false,
-		shortDescription: "Records of incident reports including officer information, location details, charges, and suspect information",
+		shortDescription: "BPD officer-filed incident reports (2024 records request) — reporting officer, charges, locations, and suspect information.",
 		longDescription:
 			"The Incident Report dataset provides comprehensive records of incidents reported by Boston Police Department officers. This dataset includes detailed information about the reporting officer, badge numbers, event and offense locations with geographic coordinates, dates and times, charges filed, suspect counts, and information about weapon force involvement and shootings. It offers insights into the nature and scope of police-reported incidents, including the locations where events occurred and where offenses took place, helping to understand incident patterns and law enforcement responses.",
 	},
