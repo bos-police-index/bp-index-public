@@ -106,7 +106,7 @@ export default function EarningsByYearTableV2({ rows, relative = [] }: Props) {
 					<EarningsTrendChartV2 rows={rows} />
 					<NameMatchNotice rows={rows} />
 					<DataGrid
-						rows={rows.map((r, i) => ({ id: i, ...r }))}
+						rows={rows.map((r, i) => ({ id: i, ...r, peer: peerByYear.get(r.year) }))}
 						columns={columns}
 						autoHeight
 						disableRowSelectionOnClick

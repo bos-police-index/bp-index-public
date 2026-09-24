@@ -116,7 +116,8 @@ interface TableToolbarProps {
 	onDensityChange: (d: GridDensity) => void;
 	fileName: string;
 	matchingCount: number | null;
-	exportMatching: () => Promise<void> | void;
+	/** Client grids get the rows in the grid's current filter + sort order. */
+	exportMatching: (sortedRows?: any[]) => Promise<void> | void;
 	extraExports?: ExportAction[];
 	filterable: boolean;
 }
@@ -241,7 +242,10 @@ function TableToolbar(props: TableToolbarProps) {
 							secondary="Visible columns only"
 						/>
 					</MenuItem>
-					<MenuItem onClick={() => run("matching", exportMatching)} disabled={!!busy || matchingCount === 0}>
+					<MenuItem
+						onClick={() => run("matching", () => exportMatching(gridFilteredSortedRowIdsSelector(apiRef).map((id) => apiRef.current.getRow(id)).filter(Boolean)))}
+						disabled={!!busy || matchingCount === 0}
+					>
 						<ListItemIcon>{busy === "matching" ? <CircularProgress size={18} /> : <CsvIcon fontSize="small" />}</ListItemIcon>
 						<ListItemText
 							primary={`All ${activeFilters.length > 0 ? "matching " : ""}rows${matchingCount != null ? ` (${matchingCount.toLocaleString()})` : ""}`}
@@ -450,7 +454,7 @@ function ClientGrid(
 		onDensityChange: props.setDensity,
 		fileName,
 		matchingCount: rows.length,
-		exportMatching: () => downloadCsv(rowsToCsv(rows, cols), Object.keys(filters).length ? `${fileName}_filtered` : fileName),
+		exportMatching: (sortedRows) => downloadCsv(rowsToCsv(sortedRows?.length ? sortedRows : rows, cols), Object.keys(filters).length ? `${fileName}_filtered` : fileName),
 		extraExports: props.extraExports,
 		filterable: props.filterable,
 	};

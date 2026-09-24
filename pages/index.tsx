@@ -569,9 +569,16 @@ export default function Home() {
 							</div>
 							<div className="mb-4 text-sm text-gray-600 space-y-0.5">
 								<p>
+									{years.length > 0 && !yearsLoaded ? (
+										<>Loading {scope}… </>
+									) : (
+										<>
 									Showing <span className="font-semibold text-gray-900">{searchResData.length.toLocaleString()}</span> of {allData.length.toLocaleString()} officers
 									{scope ? <> with data in <span className="font-semibold text-gray-900">{scope}</span></> : null}
-									{currentRosterOnly ? " on the current roster" : ""}. {sortExplanation} Click any column header to sort by it instead.
+									{currentRosterOnly ? " on the current roster" : ""}.{" "}
+										</>
+									)}
+									{sortExplanation} Click any column header to sort by it instead.
 								</p>
 								<p className="text-xs text-gray-500">
 									{scope
