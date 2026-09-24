@@ -1,30 +1,12 @@
 import React, { useMemo, useState } from "react";
+import Link from "next/link";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import MissingData from "@components/MissingData";
 import SourceBadgeV2 from "@components/SourceBadgeV2";
 import NameMatchNotice from "@components/profileSections/NameMatchNotice";
 
-interface V2MisconductRow {
-	bpiId: string | null;
-	caseNumber: string | null;
-	incidentType: string | null;
-	allegation: string | null;
-	finding: string | null;
-	actionTaken: string | null;
-	receivedDate: string | null;
-	completedDate: string | null;
-	source: string;
-	asOf: string;
-	linkMethod?: string;
-	confirmed?: boolean;
-	narrative?: string | null;
-	disposition?: string | null;
-	priority?: string | null;
-	occurredDate?: string | null;
-}
-
 interface Props {
-	rows: V2MisconductRow[];
+	rows: V2IaCaseRow[];
 }
 
 function fmtDate(s: string | null | undefined): string {
@@ -38,9 +20,8 @@ function fmtDate(s: string | null | undefined): string {
 
 function findingClass(finding: string | null): string {
 	const s = (finding || "").toLowerCase();
-	if (s.includes("sustained b")) return "bg-red-100 text-red-800 border border-red-200";
-	if (s === "sustained" || s.includes("sustained")) return "bg-red-100 text-red-800 border border-red-200";
 	if (s.includes("not sustained")) return "bg-orange-100 text-orange-800 border border-orange-200";
+	if (s.includes("sustained")) return "bg-red-100 text-red-800 border border-red-200";
 	if (s.includes("unfounded")) return "bg-blue-100 text-blue-800 border border-blue-200";
 	if (s.includes("exonerated")) return "bg-green-100 text-green-800 border border-green-200";
 	if (s.includes("pending")) return "bg-yellow-100 text-yellow-800 border border-yellow-200";
@@ -48,33 +29,81 @@ function findingClass(finding: string | null): string {
 	return "bg-gray-100 text-gray-800 border border-gray-200";
 }
 
+export function allegationsOf(r: V2IaCaseRow): V2IaAllegation[] {
+	if (!r.allegationDetails) return [];
+	if (Array.isArray(r.allegationDetails)) return r.allegationDetails;
+	try {
+		return JSON.parse(r.allegationDetails);
+	} catch {
+		return [];
+	}
+}
+
+const OUTCOMES = ["Sustained", "Not Sustained", "Exonerated", "Unfounded", "Pending", "Filed/Withdrawn"];
+
+/**
+ * Internal Affairs cases for one officer — one row per CASE (review round 2: "Split each IA
+ * into a single record for each officer"). Each row lists that officer's allegations in the
+ * case with their findings; Outcome is the most serious finding among them.
+ */
 export default function OfficerMisconductTableV2({ rows }: Props) {
 	const [showSustainedOnly, setShowSustainedOnly] = useState(false);
-	const [openRow, setOpenRow] = useState<V2MisconductRow | null>(null);
+	const [openRow, setOpenRow] = useState<V2IaCaseRow | null>(null);
 	const latest = rows && rows.length > 0 ? rows[0] : null;
 
 	const columns: GridColDef[] = useMemo(() => [
-		{ field: "caseNumber", headerName: "IA #", width: 130, valueFormatter: (p) => p.value || "—" },
+		{
+			field: "caseNumber",
+			headerName: "IA #",
+			width: 130,
+			renderCell: (p) =>
+				p.value ? (
+					<Link href={{ pathname: "/ia/[iaNumber]", query: { iaNumber: p.value } }} className="text-red-700 hover:underline">
+						{p.value}
+					</Link>
+				) : (
+					"—"
+				),
+		},
 		{ field: "receivedDate", headerName: "Received", width: 120, valueFormatter: (p) => fmtDate(p.value as string | null) },
 		{ field: "incidentType", headerName: "Type", width: 150, valueFormatter: (p) => p.value || "—" },
-		{ field: "allegation", headerName: "Allegation", flex: 1, minWidth: 200, valueFormatter: (p) => p.value || "—" },
 		{
-			field: "finding",
-			headerName: "Finding",
-			width: 140,
+			field: "outcome",
+			headerName: "Outcome",
+			width: 130,
 			renderCell: (p) => (
 				<span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${findingClass(p.value as string | null)}`}>
 					{p.value || "—"}
 				</span>
 			),
 		},
-		{ field: "disposition", headerName: "Disposition", width: 150, valueFormatter: (p) => p.value || "—" },
-		{ field: "actionTaken", headerName: "Action Taken", width: 160, valueFormatter: (p) => p.value || "—" },
+		{
+			field: "allegations",
+			headerName: "Allegations & findings",
+			flex: 1.4,
+			minWidth: 280,
+			sortable: false,
+			renderCell: (p) => {
+				const list = allegationsOf(p.row as V2IaCaseRow);
+				if (list.length === 0) return <span className="text-gray-300">—</span>;
+				return (
+					<ul className="py-1 space-y-1">
+						{list.map((a, i) => (
+							<li key={i} className="text-xs leading-snug">
+								<span className="text-gray-800">{a.allegation || "—"}</span>
+								<span className={`ml-1.5 inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${findingClass(a.finding)}`}>{a.finding || "—"}</span>
+							</li>
+						))}
+					</ul>
+				);
+			},
+		},
+		{ field: "actionsTaken", headerName: "Action Taken", width: 170, valueFormatter: (p) => p.value || "—" },
 		{
 			field: "narrative",
 			headerName: "Summary",
-			flex: 1.1,
-			minWidth: 240,
+			flex: 1,
+			minWidth: 220,
 			sortable: false,
 			renderCell: (p) => {
 				const v = p.value as string | null;
@@ -83,7 +112,7 @@ export default function OfficerMisconductTableV2({ rows }: Props) {
 				return (
 					<button
 						type="button"
-						onClick={() => setOpenRow(p.row as V2MisconductRow)}
+						onClick={() => setOpenRow(p.row as V2IaCaseRow)}
 						title="Read full summary"
 						className="text-left text-xs text-gray-700 hover:text-red-700 leading-snug w-full"
 						style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
@@ -97,20 +126,17 @@ export default function OfficerMisconductTableV2({ rows }: Props) {
 
 	const visibleRows = useMemo(() => {
 		if (!showSustainedOnly) return rows;
-		return rows.filter((r) => /^sustained/i.test(r.finding || ""));
+		return rows.filter((r) => (r.numSustained ?? 0) > 0);
 	}, [rows, showSustainedOnly]);
 
 	const counts = useMemo(() => {
-		const c = { total: rows.length, sustained: 0, notSustained: 0, exonerated: 0, unfounded: 0, pending: 0 };
+		const byOutcome: Record<string, number> = {};
+		let allegations = 0;
 		for (const r of rows) {
-			const f = (r.finding || "").toLowerCase();
-			if (f.startsWith("sustained")) c.sustained++;
-			else if (f.includes("not sustained")) c.notSustained++;
-			else if (f.includes("exonerated")) c.exonerated++;
-			else if (f.includes("unfounded")) c.unfounded++;
-			else if (f.includes("pending")) c.pending++;
+			allegations += r.numAllegations ?? 0;
+			if (r.outcome) byOutcome[r.outcome] = (byOutcome[r.outcome] ?? 0) + 1;
 		}
-		return c;
+		return { cases: rows.length, allegations, byOutcome };
 	}, [rows]);
 
 	const withNarrative = useMemo(() => rows.filter((r) => r.narrative && r.narrative !== "[redacted]").length, [rows]);
@@ -130,41 +156,23 @@ export default function OfficerMisconductTableV2({ rows }: Props) {
 								<h2 className="text-base sm:text-lg font-semibold text-gray-900">Internal Affairs Cases</h2>
 								<span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] sm:text-xs font-semibold border border-emerald-200">v2</span>
 							</div>
-							<p className="text-xs sm:text-sm text-gray-600">BPD-internal IAD complaints (one row per allegation)</p>
+							<p className="text-xs sm:text-sm text-gray-600">BPD-internal IAD complaints (one row per case, with each allegation&apos;s finding)</p>
 						</div>
 					</div>
-					{latest && <SourceBadgeV2 source={latest.source} asOf={latest.asOf} />}
+					{latest && <SourceBadgeV2 source={latest.sources?.split(", ")[0] ?? ""} asOf={latest.asOf} />}
 				</div>
 			</div>
 
 			<div className="px-4 sm:px-6 py-3 border-b border-gray-100 bg-gray-50">
 				<div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm">
-					<span className="font-medium text-gray-700">{counts.total} allegation{counts.total === 1 ? "" : "s"}</span>
-					{counts.sustained > 0 && (
-						<span className="inline-flex items-center px-2 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-200 text-xs font-medium">
-							{counts.sustained} Sustained
+					<span className="font-medium text-gray-700">
+						{counts.cases} case{counts.cases === 1 ? "" : "s"} · {counts.allegations} allegation{counts.allegations === 1 ? "" : "s"}
+					</span>
+					{OUTCOMES.filter((o) => counts.byOutcome[o]).map((o) => (
+						<span key={o} className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${findingClass(o)}`} title={`Cases whose most serious finding is ${o}`}>
+							{counts.byOutcome[o]} {o}
 						</span>
-					)}
-					{counts.notSustained > 0 && (
-						<span className="inline-flex items-center px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 border border-orange-200 text-xs font-medium">
-							{counts.notSustained} Not Sustained
-						</span>
-					)}
-					{counts.exonerated > 0 && (
-						<span className="inline-flex items-center px-2 py-0.5 rounded-full bg-green-100 text-green-800 border border-green-200 text-xs font-medium">
-							{counts.exonerated} Exonerated
-						</span>
-					)}
-					{counts.unfounded > 0 && (
-						<span className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 text-xs font-medium">
-							{counts.unfounded} Unfounded
-						</span>
-					)}
-					{counts.pending > 0 && (
-						<span className="inline-flex items-center px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200 text-xs font-medium">
-							{counts.pending} Pending
-						</span>
-					)}
+					))}
 					{withNarrative > 0 && (
 						<span className="inline-flex items-center gap-1 text-xs text-gray-500" title="Complaint summaries available — click a Summary cell to read">
 							<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
@@ -178,7 +186,7 @@ export default function OfficerMisconductTableV2({ rows }: Props) {
 							onChange={(e) => setShowSustainedOnly(e.target.checked)}
 							className="rounded border-gray-300 text-red-600 focus:ring-red-500"
 						/>
-						<span className="text-xs text-gray-600">Sustained only</span>
+						<span className="text-xs text-gray-600">Cases with a sustained allegation</span>
 					</label>
 				</div>
 			</div>
@@ -188,11 +196,11 @@ export default function OfficerMisconductTableV2({ rows }: Props) {
 					<MissingData
 						variant="card"
 						title="No IA cases on file (v2)"
-						message="This officer has no BPD Internal Affairs cases in the v2 dataset. They may not have been the subject of a complaint, or this officer pre-dates the loaded IAD records (currently 2011 onward)."
+						message="This officer has no BPD Internal Affairs cases in the v2 dataset. They may not have been the subject of a complaint, or this officer pre-dates the loaded IAD records."
 					/>
 				) : visibleRows.length === 0 ? (
 					<div className="text-sm text-gray-500 italic py-6 text-center">
-						{counts.total} allegation{counts.total === 1 ? "" : "s"} on file, none Sustained.
+						{counts.cases} case{counts.cases === 1 ? "" : "s"} on file, none with a sustained allegation.
 					</div>
 				) : (
 					<>
@@ -237,15 +245,15 @@ export default function OfficerMisconductTableV2({ rows }: Props) {
 							<div>
 								<div className="flex items-center gap-2 flex-wrap">
 									<span className="font-semibold text-gray-900">{openRow.caseNumber || "IA case"}</span>
-									{openRow.finding && (
-										<span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${findingClass(openRow.finding)}`}>{openRow.finding}</span>
+									{openRow.outcome && (
+										<span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${findingClass(openRow.outcome)}`}>{openRow.outcome}</span>
 									)}
 									{openRow.linkMethod === "name" && !openRow.confirmed && (
 										<span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 text-[10px] font-semibold">matched by name — unconfirmed</span>
 									)}
 								</div>
 								<div className="text-xs text-gray-600 mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
-									{openRow.allegation && <span><span className="text-gray-400">Allegation:</span> {openRow.allegation}</span>}
+									{openRow.allegations && <span><span className="text-gray-400">Allegations:</span> {openRow.allegations}</span>}
 									{openRow.disposition && <span><span className="text-gray-400">Disposition:</span> {openRow.disposition}</span>}
 									<span><span className="text-gray-400">Received:</span> {fmtDate(openRow.receivedDate)}</span>
 									{openRow.occurredDate && <span><span className="text-gray-400">Occurred:</span> {fmtDate(openRow.occurredDate)}</span>}

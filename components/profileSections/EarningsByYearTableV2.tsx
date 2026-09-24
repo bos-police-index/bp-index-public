@@ -9,6 +9,8 @@ import { bpi_deep_green, bpi_light_green } from "@styles/theme/lightTheme";
 
 interface Props {
 	rows: V2EarningsRow[];
+	/** Total-pay rank vs sworn (or civilian) peers per year, from vw_v2_pay_relative. */
+	relative?: V2PayRelativeRow[];
 }
 
 const moneyCell = (v: number | null) => (v == null ? "—" : `$${formatMoneyNoCents(v)}`);
@@ -41,11 +43,20 @@ const columns: GridColDef[] = [
 	},
 	{
 		field: "payRank",
-		headerName: "Rank (of BPD)",
-		width: 170,
+		headerName: "Rank vs. peers",
+		width: 200,
 		sortable: false,
 		renderCell: (p) => {
-			const r = p.row as V2EarningsRow;
+			const r = p.row as V2EarningsRow & { peer?: V2PayRelativeRow };
+			if (r.peer) {
+				const top = Math.max(1, 100 - r.peer.percentile);
+				return (
+					<span className="text-xs text-gray-700" title={`Total pay rank among ${r.peer.peerGroup === "civilian" ? "civilian BPD employees" : "sworn officers"} paid in ${r.year}`}>
+						#{r.peer.rank.toLocaleString()} of {r.peer.peers.toLocaleString()} {r.peer.peerGroup === "civilian" ? "civilians" : "sworn"}
+						<span className="ml-1 text-emerald-700 font-medium">· top {top}%</span>
+					</span>
+				);
+			}
 			if (r.payRank == null || r.payPop == null) return <span className="text-gray-300">—</span>;
 			const pct = r.payPercentile;
 			return (
@@ -58,7 +69,8 @@ const columns: GridColDef[] = [
 	},
 ];
 
-export default function EarningsByYearTableV2({ rows }: Props) {
+export default function EarningsByYearTableV2({ rows, relative = [] }: Props) {
+	const peerByYear = new Map(relative.filter((r) => r.category === "total").map((r) => [r.year, r]));
 	const latest = rows && rows.length > 0 ? rows[0] : null;
 
 	return (

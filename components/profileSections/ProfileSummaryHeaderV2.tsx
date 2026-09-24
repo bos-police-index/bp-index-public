@@ -7,7 +7,8 @@ import { formatMoneyNoCents, composeOfficerName } from "@utility/textFormatHelpe
 interface Props {
 	profile: V2OfficerProfile | null;
 	earnings?: V2EarningsRow[];
-	misconduct?: V2MisconductRow[];
+	/** One row per IA case (vw_v2_officer_ia_case). */
+	misconduct?: V2IaCaseRow[];
 	fio?: V2FioRow[];
 	paidDetail?: V2PaidDetailRow[];
 	traffic?: V2TrafficCitationRow[];

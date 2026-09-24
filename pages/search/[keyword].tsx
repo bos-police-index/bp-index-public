@@ -107,16 +107,13 @@ export default function SearchResult(): FunctionComponentElement<{}> {
 		//TO DO: Add Gender
 		//BLOCKER: data in raw form
 		{
-			field: "numOfIa",
-			headerName: "No. of IA",
+			field: "numOfIaCases",
+			headerName: "IA Cases",
 			width: 100,
 			type: "number",
-			renderCell: (params) => {
-				const { row } = params;
-				return `${row.numOfIa}`;
-			},
+			valueGetter: (params) => Number(params.row.numOfIaCases ?? 0),
 			renderHeader: (params) => (
-				<Tooltip title="The cumulative number of Internal Affairs complaints linked to the officer">
+				<Tooltip title="Internal Affairs cases linked to the officer, all years (one per case, even when a case has several allegations)">
 					<span className="font-semibold">{params.colDef.headerName}</span>
 				</Tooltip>
 			),

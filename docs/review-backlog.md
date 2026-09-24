@@ -94,3 +94,52 @@ tables = (view join where missing) + prepend the standard identity columns in fu
 - [ ] Officer start/hire date source (for Tenure)
 - [ ] More IAD/incident narrative + incident-# sources (internal journal exports)
 - [ ] Media-report curation approach
+
+---
+
+# Review round 2 (client notes, Sep 2026)
+
+Phases 1–4 implemented on branch `feature/review-phases-1-4`. DB migrations `2026_09_23_1`…`_4`
+are applied (additive: new views/functions + appended columns only).
+
+**Defaults chosen pending client answers** (easy to change):
+- Home default sort = **last name A–Z**, with a "Sort by" menu (Last name / Most IA cases /
+  Highest total pay / Most data on file) and a one-line explanation of the current order.
+- Year filter = **pick any number of years**; pay AND activity counts switch to those years
+  (summed when several). No year picked = latest pay year on file + all-time counts.
+- Multi-select = **both** several values per filter (OR) and several filters at once (AND).
+- IA split = **one record per officer per case**, allegations + findings listed inside it;
+  IA counts everywhere = distinct cases.
+- Relative pay = compared with **sworn officers** paid the same year (civilian titles are
+  compared with other civilian employees); measures = rank, percentile ("Top X%"), peer
+  average/median, × average — for every pay category.
+
+## Phase 1 — quick fixes
+- [x] Profile opens at the top after picking an officer (reset the `#wrapper` scroller on navigation)
+- [x] Remove "Boston" from Boston Arrests (last user-facing string was the table description)
+- [x] Home export fixed: This page / All matching rows / Entire database (4,994 officers)
+- [x] Record counts on every /data card and a "Records" box (+ "N match your filters") on each table page
+- [x] Home ranking explained + real default sort (see defaults above)
+
+## Phase 2 — years + filters
+- [x] Home: filter by individual year(s) (replaces the "Active 2020–2025" chip, which never checked the range)
+- [x] Year column on every /data table (Employees: Pay Year); Time Period box now computed from real years
+- [x] Multi-select filters on home + all /data tables (server-side `explore_*` functions; year, text, number and date ranges)
+- [x] /data dates no longer show one day early (date-only values were parsed as UTC)
+
+## Phase 3 — IA records
+- [x] One record per officer per case (profile, /data table, `/ia/[iaNumber]` lists every officer on the case)
+- [x] /data IA table now full history (6,922 officer-case records, 1993–2025) instead of the 626-row 2022+ extract
+- [x] #127: home, search and profile all count distinct cases (e.g. John Conway 15 allegations → 13 cases)
+
+## Phase 4 — relative measures
+- [x] Profile "Pay Compared with Other Officers": every pay category vs sworn peers that year (rank, Top X%, avg, median, × avg)
+- [x] Earnings by Year "Rank vs. peers" (sworn/civilian instead of whole payroll)
+- [x] Home: Pay Rank (Top X%) + vs. Avg columns, for the latest year or the selected year(s)
+
+## Phase 5 — data pipelines + bulk export (not started)
+- [ ] Pick a scheduler (n8n instance vs GitHub Actions cron) and restart the stalled jobs (POST last ran 2026-07-07)
+- [ ] POST current agency for officers who left BPD (Officer Data CSV, match on MPTC ID; keep monthly snapshots)
+- [ ] Arrests automation from the BPD Crime Hub API (append-only; the feed looks like a rolling window)
+- [ ] Civilian Review Board case reports (Google Sheet → profile section + /data table; PDF automation with human review)
+- [ ] Bulk download of the whole database + data dictionary (server-generated files; SCHEMA.md/glossary refresh)

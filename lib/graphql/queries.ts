@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, employee_alias_name, fio_record_alias_name, homepage_alias_name, officer_search_alias_name, ir_fall_2025_alias_name, officer_financial_alias_name, officer_ia_alias_name, officer_year_history_alias_name, traffic_stop_alias_name, traffic_unattributed_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map, v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name, v2_court_overtime_alias_name, overtime_alias_name, v2_overtime_by_category_alias_name, v2_officer_arroyo_alias_name } from "@utility/dataViewAliases";
+import { boston_arrest_alias_name, court_overtime_alias_name, crime_incident_alias_name, detail_alias_name, employee_alias_name, fio_record_alias_name, homepage_alias_name, officer_search_alias_name, ir_fall_2025_alias_name, officer_financial_alias_name, officer_ia_alias_name, officer_year_history_alias_name, traffic_stop_alias_name, traffic_unattributed_alias_name, removeAllPrefix, removePluralSuffix, table_name_to_alias_map, v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name, v2_court_overtime_alias_name, overtime_alias_name, v2_overtime_by_category_alias_name, v2_officer_arroyo_alias_name, officer_year_list_alias_name, officer_year_stats_alias_name, v2_officer_ia_case_alias_name, v2_pay_relative_alias_name } from "@utility/dataViewAliases";
 import { DocumentNode } from "graphql";
 
 export const DATA_PAGE_SIZE = 25;
@@ -34,7 +34,60 @@ export const GET_HOMEPAGE_DATA = gql`
 					startDate
 					postId
 					isCurrentRoster
+					firstName
+					lastName
+					numOfIaCases
+					payPeerGroup
+					payRank
+					payPeers
+					payPercentile
+					payPeerAvg
+					payRatioToAvg
 				}
+			}
+		}
+	}
+`;
+
+// Home year filter: which years have data, and per-officer stats for one year
+// (production.vw_v2_officer_year_list / vw_v2_officer_year_stats).
+export const GET_OFFICER_YEAR_LIST = gql`
+	query OfficerYearList {
+		${officer_year_list_alias_name}(orderBy: YEAR_DESC) {
+			nodes {
+				year
+				officers
+				officersWithPay
+			}
+		}
+	}
+`;
+
+export const GET_OFFICER_YEAR_STATS = gql`
+	query OfficerYearStats($year: Int!) {
+		${officer_year_stats_alias_name}(condition: { year: $year }, first: 10000) {
+			nodes {
+				bpiId
+				year
+				title
+				peerGroup
+				totalPay
+				regularPay
+				retroPay
+				otherPay
+				overtimePay
+				injuredPay
+				detailPay
+				quinnPay
+				payRank
+				payPeers
+				payPercentile
+				payPeerAvg
+				payRatioToAvg
+				numOfIaCases
+				numOfDetail
+				numOfFio
+				numOfMvc
 			}
 		}
 	}
@@ -297,6 +350,58 @@ export const V2_OFFICER_MISCONDUCT = (bpiId: string) => gql`
 				disposition
 				priority
 				occurredDate
+			}
+		}
+	}
+`;
+
+// One row per IA case for this officer (allegations rolled up) — production.vw_v2_officer_ia_case.
+export const V2_OFFICER_IA_CASES = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_officer_ia_case_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: RECEIVED_DATE_DESC) {
+			nodes {
+				bpiId
+				caseNumber
+				receivedDate
+				occurredDate
+				completedDate
+				incidentType
+				numAllegations
+				numSustained
+				outcome
+				allegations
+				findings
+				actionsTaken
+				daysHoursSuspended
+				disposition
+				narrative
+				allegationDetails
+				sources
+				linkMethod
+				confirmed
+				asOf
+			}
+		}
+	}
+`;
+
+// Pay by category vs. sworn (or civilian) peers each year — production.vw_v2_pay_relative.
+export const V2_OFFICER_PAY_RELATIVE = (bpiId: string) => gql`
+	query MyQuery {
+		${v2_pay_relative_alias_name}(condition: {bpiId: "${bpiId}"}, orderBy: [YEAR_DESC, SORT_ORDER_ASC]) {
+			nodes {
+				year
+				title
+				peerGroup
+				category
+				categoryLabel
+				amount
+				rank
+				peers
+				percentile
+				peerAvg
+				peerMedian
+				ratioToAvg
 			}
 		}
 	}
@@ -946,36 +1051,6 @@ export const GET_NEXT_PAGE_IR_FALL_2025: DocumentNode = gql`
 	}
 `;
 
-export const GET_IA_CASE_BY_NUMBER = (iaNumber: string) => {
-	return gql`
-		query MyQuery($filters: ${removePluralSuffix(removeAllPrefix(officer_ia_alias_name))}Condition) {
-			${officer_ia_alias_name}(first: 1, condition: $filters) {
-				edges {
-					node {
-						bpiId
-						employeeId
-						badgeNo
-						firstName
-						lastName
-						titleRank
-						race
-						sex
-						iaNumber
-						incidentType
-						receivedDate
-						allegation
-						finding
-						actionTaken
-						daysHoursSuspended
-					}
-				}
-				totalCount
-			}
-		}
-	`;
-};
-
-// Get Year range of the dataset
 export const GET_YEAR_RANGE_OF_DATASET = (table_name: string, date_column_name: string, offset: number, queryEarliest: boolean, queryLatest: boolean): DocumentNode => {
 	const query_source = table_name_to_alias_map[table_name];
 	

@@ -1605,10 +1605,18 @@ const employee_columns = () => {
 		{
 			field: "overtimePay",
 			headerName: "Overtime ($)",
-			description: "Total overtime earnings for the latest year on file",
+			description: "Total overtime earnings for the latest year on file (see Pay Year)",
 			type: "number",
 			width: 130,
 			valueFormatter: (params) => (params.value == null ? "—" : `$${Number(params.value).toLocaleString()}`),
+		},
+		{
+			field: "payYear",
+			headerName: "Pay Year",
+			description: "The year the Overtime ($) figure comes from (the officer's latest year of earnings on file)",
+			type: "number",
+			width: 100,
+			valueFormatter: (params) => (params.value == null ? "—" : String(params.value)),
 		},
 		{
 			field: "courtOtHours",
@@ -2148,7 +2156,6 @@ const IDENTITY_CONFIG: Record<string, { drop?: string[]; relabel?: Record<string
 	crime_incident: { drop: ["key"], relabel: { incidentNumber: "Incident #" } },
 	fio_record: {},
 	traffic_stop: {},
-	officer_misconduct: { drop: ["badgeNo", "officerName"] },
 	ir_fall_2025: { drop: ["badgeNo", "officerName"] },
 };
 
@@ -2173,20 +2180,97 @@ const overtime_columns = (): GridColDef[] => [
 	{ field: "otCode", headerName: "Code", description: "Overtime code", type: "number", width: 80 },
 ];
 
+// "Data visible by year": every /data table shows a Year column (from each table's main
+// date, see db/migrations/2026_09_23_1_explorer_filters.sql), right after the identity block.
+const yearColumn = (description: string): GridColDef => ({
+	field: "year",
+	headerName: "Year",
+	description,
+	type: "number",
+	width: 80,
+	valueFormatter: (p) => (p.value == null ? "" : String(p.value)),
+});
+
+const withYear = (cols: GridColDef[], description: string): GridColDef[] => {
+	const existing = cols.find((c) => c.field === "year");
+	const year = existing ? { ...existing, hideable: false, filterable: true, description: existing.description || description } : yearColumn(description);
+	const rest = cols.filter((c) => c.field !== "year");
+	const identityCount = rest.findIndex((c) => !IDENTITY_FIELDS.has(c.field));
+	const at = identityCount < 0 ? rest.length : identityCount;
+	return [...rest.slice(0, at), year, ...rest.slice(at)];
+};
+
+const IDENTITY_FIELDS = new Set(["id", "officerName", "officerBadgeNo", "officerPostId", "officerEmployeeId", "officerRank", "officerCurrentUnit"]);
+
+const IA_OUTCOME_CLASS: Record<string, string> = {
+	Sustained: "bg-red-100 text-red-800 border-red-200",
+	"Not Sustained": "bg-orange-100 text-orange-800 border-orange-200",
+	Unfounded: "bg-blue-100 text-blue-800 border-blue-200",
+	Exonerated: "bg-green-100 text-green-800 border-green-200",
+	Pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+	"Filed/Withdrawn": "bg-gray-100 text-gray-700 border-gray-200",
+};
+
+// Internal Affairs Cases — one row per officer per case (vw_explore_ia_cases). A case with
+// several officers appears once for each of them; their allegations are rolled into the row.
+const ia_case_columns = (): GridColDef[] => [
+	...identityColumns(),
+	{
+		field: "iaNumber",
+		headerName: "IA #",
+		description: "Internal Affairs (IA) case number",
+		type: "string",
+		width: 140,
+		renderCell: (params) => (
+			<Link
+				href={{ pathname: "/ia/[iaNumber]", query: { iaNumber: params.value } }}
+				style={{ color: bpi_light_green, textDecoration: "none" }}
+				onClick={(e) => e.stopPropagation()}
+			>
+				{params.value}
+			</Link>
+		),
+	},
+	{ field: "receivedDate", headerName: "Date Received", description: "Date the complaint was received", type: "date", valueFormatter: formatDateShort, width: 130 },
+	yearColumn("Year the complaint was received"),
+	{
+		field: "outcome",
+		headerName: "Outcome",
+		description: "Most serious finding on this officer's allegations in the case (Sustained > Pending > Not Sustained > Unfounded > Exonerated > Filed/Withdrawn)",
+		type: "string",
+		width: 140,
+		renderCell: (params) =>
+			params.value ? (
+				<span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${IA_OUTCOME_CLASS[params.value] ?? "bg-gray-100 text-gray-800 border-gray-200"}`}>{params.value}</span>
+			) : (
+				"—"
+			),
+	},
+	{ field: "numAllegations", headerName: "Allegations", description: "Number of allegations against this officer in the case", type: "number", width: 110 },
+	{ field: "numSustained", headerName: "Sustained", description: "How many of those allegations were sustained", type: "number", width: 100 },
+	{ field: "allegations", headerName: "Allegation(s)", description: "Allegations against this officer in the case", type: "string", minWidth: 260, flex: 1, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "findings", headerName: "Finding(s)", description: "Findings on those allegations", type: "string", width: 180, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "actionsTaken", headerName: "Action Taken", description: "Discipline or other action taken", type: "string", width: 220, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "daysHoursSuspended", headerName: "Days/Hours Suspended", description: "Length of suspension, where recorded", type: "string", width: 120, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "incidentType", headerName: "Incident Type", description: "How the complaint was filed or classified (e.g. citizen complaint, internal investigation)", type: "string", width: 180, valueFormatter: (p) => p.value ?? "—" },
+	{ field: "officerMatch", headerName: "Officer Match", description: "How this case was linked to the officer: by employee ID (hard match), by name (unconfirmed), or not matched", type: "string", width: 170 },
+	{ field: "source", headerName: "Source", description: "Which IA extract(s) the case comes from", type: "string", width: 180, hideable: true },
+];
+
 export const functionMapping = {
-	detail_record: withIdentity("detail_record", detail_record_columns()),
-	crime_incident: withIdentity("crime_incident", crime_incident_columns()),
+	detail_record: withYear(withIdentity("detail_record", detail_record_columns()), "Year the detail was worked"),
+	crime_incident: withYear(withIdentity("crime_incident", crime_incident_columns()), "Year the incident occurred"),
 	officer_ia: officer_ia_columns(),
 	police_financial: police_financial_columns(),
-	court_overtime: withIdentity("court_overtime", court_overtime_columns()),
-	officer_misconduct: withIdentity("officer_misconduct", officer_misconduct_columns()),
-	fio_record: withIdentity("fio_record", fio_record_columns()),
-	boston_arrest: boston_arrest_columns(),
+	court_overtime: withYear(withIdentity("court_overtime", court_overtime_columns()), "Year of the court overtime"),
+	officer_misconduct: ia_case_columns(),
+	fio_record: withYear(withIdentity("fio_record", fio_record_columns()), "Year of the field contact"),
+	boston_arrest: withYear(boston_arrest_columns(), "Year of the arrest"),
 	employee: employee_columns(),
-	traffic_stop: withIdentity("traffic_stop", traffic_stop_columns()),
-	traffic_unattributed: traffic_unattributed_columns(),
-	ir_fall_2025: withIdentity("ir_fall_2025", ir_fall_2025_columns()),
-	overtime: overtime_columns(),
+	traffic_stop: withYear(withIdentity("traffic_stop", traffic_stop_columns()), "Year the citation was issued"),
+	traffic_unattributed: withYear(traffic_unattributed_columns(), "Year the citation was issued"),
+	ir_fall_2025: withYear(withIdentity("ir_fall_2025", ir_fall_2025_columns()), "Year of the incident report"),
+	overtime: withYear(overtime_columns(), "Calendar year of the overtime (FY is the fiscal year)"),
 };
 
 // THE BELOW TABLE DEFINITIONS ARE DEPRECATED BUT **may be helpful** later

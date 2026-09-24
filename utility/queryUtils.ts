@@ -1,8 +1,12 @@
 import apolloClient from "@lib/apollo-client";
 import { GET_NEXT_PAGE_BOSTON_ARRESTS, GET_NEXT_PAGE_COURT_OVERTIMES, GET_NEXT_PAGE_CRIME_INCIDENTS, GET_NEXT_PAGE_DETAIL_RECORDS, GET_NEXT_PAGE_EMPLOYEE, GET_NEXT_PAGE_FIO_RECORDS, GET_NEXT_PAGE_IR_FALL_2025, GET_NEXT_PAGE_OFFICER_IA, GET_NEXT_PAGE_OVERTIME, GET_NEXT_PAGE_TRAFFIC_STOPS, GET_NEXT_PAGE_TRAFFIC_UNATTRIBUTED } from "@lib/graphql/queries";
 import { table_name_to_alias_map } from "./dataViewAliases";
+import { buildExploreQuery } from "./exploreTables";
 
 export const handleQuery = (table_name) => {
+	// /data tables read the filterable explore_<table>() functions (see utility/exploreTables.ts).
+	const explore = buildExploreQuery(table_name);
+	if (explore) return explore;
 	let query;
 	// ADDING NEW DATA? Add switch statement for each new data table
 	switch (table_name) {

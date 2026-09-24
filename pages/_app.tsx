@@ -67,13 +67,22 @@ const Application: FunctionComponent<ApplicationAppProps> = (props) => {
 			NProgress.done();
 		};
 
+		// The page scrolls inside #wrapper, not the window, so Next's built-in
+		// scroll-to-top on navigation never reaches it. Reset it ourselves on every
+		// real page change (hash-only changes fire hashChangeComplete instead; shallow
+		// query updates keep their position).
+		const handleComplete = (_url: string, { shallow }: { shallow: boolean }) => {
+			handleStop();
+			if (!shallow) document.getElementById("wrapper")?.scrollTo({ top: 0 });
+		};
+
 		router.events.on("routeChangeStart", handleStart);
-		router.events.on("routeChangeComplete", handleStop);
+		router.events.on("routeChangeComplete", handleComplete);
 		router.events.on("routeChangeError", handleStop);
 
 		return () => {
 			router.events.off("routeChangeStart", handleStart);
-			router.events.off("routeChangeComplete", handleStop);
+			router.events.off("routeChangeComplete", handleComplete);
 			router.events.off("routeChangeError", handleStop);
 		};
 	}, [router]);

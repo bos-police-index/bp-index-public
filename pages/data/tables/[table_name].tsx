@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { Button } from "antd";
 
 import apolloClient from "@lib/apollo-client";
-import { GET_YEAR_RANGE_OF_DATASET } from "@lib/graphql/queries";
 import { functionMapping } from "@utility/createMUIGrid";
 import IconWrapper, { tableDefinitions, tableDateRanges } from "@utility/tableDefinitions";
 import getHeaderWithDescription from "@utility/columnDefinitions";
-import { getYearFromAnyFormat, getYearFromDate } from "@utility/textFormatHelpers";
+import { getYearFromDate } from "@utility/textFormatHelpers";
+import { EXPLORE_DISTINCT, exploreTables, tableCountQuery, timePeriodColumn } from "@utility/exploreTables";
 import { table_name_to_alias_map } from "@utility/dataViewAliases";
 import { tableDateColumnMap, handleQuery } from "@utility/queryUtils";
 import ScreenOverlay from "@components/ScreenOverlay";
@@ -77,49 +77,38 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 		};
 	}
 
-	let dates = { earliest: "", latest: "" };
-	let earliestNeeded = true;
-	let latestNeeded = true;
-	if (tableDateColumnMap[table_name] && tableDateColumnMap[table_name] != "") {
-		let offset = 0;
-		while (earliestNeeded || latestNeeded) {
-			const dateRange = await apolloClient.query({ query: GET_YEAR_RANGE_OF_DATASET(table_name, tableDateColumnMap[table_name], offset, earliestNeeded, latestNeeded) });
-
-			// Handle both nodes and edges.node structures
-			const getDateValue = (data, field) => {
-				let value = null;
-				if (data?.nodes?.[0]) {
-					value = data.nodes[0][field];
-				} else if (data?.edges?.[0]?.node) {
-					value = data.edges[0].node[field];
-				}
-				// Return null if value is null, undefined, or empty string
-				return value && value.trim ? value.trim() : value;
-			};
-
-			if (earliestNeeded) {
-				const earliestDate = getDateValue(dateRange.data.earliest, tableDateColumnMap[table_name]);
-				if (earliestDate && earliestDate !== "Invalid Date") {
-					dates.earliest = earliestDate;
-					earliestNeeded = false;
-				}
-			}
-			if (latestNeeded) {
-				const latestDate = getDateValue(dateRange.data.latest, tableDateColumnMap[table_name]);
-				if (latestDate && latestDate !== "Invalid Date") {
-					dates.latest = latestDate;
-					latestNeeded = false;
-				}
-			}
-			offset == 0 ? (offset += 2) : (offset *= 2);
-		}
-	}
+	// Time Period = years that hold a meaningful share of rows (ignores a handful of stray
+	// bad dates, e.g. 1930 in the 2016–2021 crime-incident extract). Record count for the header.
+	let timePeriod = "";
+	let totalCount: number | null = null;
+	const periodCol = timePeriodColumn(table_name);
+	const countQuery = tableCountQuery(table_name);
+	await Promise.all([
+		periodCol
+			? apolloClient
+					.query({ query: EXPLORE_DISTINCT, variables: { view: exploreTables[table_name].view, column: periodCol.column, limit: 1000 } })
+					.then(({ data }) => {
+						const years = (data?.exploreDistinct?.nodes ?? []).map((n) => ({ y: Number(n.value), n: Number(n.n) })).filter((x) => !isNaN(x.y));
+						const total = years.reduce((a, x) => a + x.n, 0);
+						const kept = years.filter((x) => x.n >= Math.max(5, total * 0.001)).map((x) => x.y);
+						if (kept.length) timePeriod = `${periodCol.prefix}${Math.min(...kept)} – ${periodCol.prefix}${Math.max(...kept)}`;
+					})
+					.catch((e) => console.error("time period query failed", e))
+			: Promise.resolve(),
+		countQuery
+			? apolloClient
+					.query({ query: countQuery })
+					.then(({ data }) => (totalCount = data?.count?.totalCount ?? null))
+					.catch((e) => console.error("count query failed", e))
+			: Promise.resolve(),
+	]);
 
 	return {
 		props: {
 			table_name: table_name,
 			columns: getHeaderWithDescription(functionMapping[table_name]),
-			dataYearRange: dates,
+			timePeriod,
+			totalCount,
 		},
 	};
 };
@@ -128,6 +117,8 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 	const router = useRouter();
 	const tableDef = tableDefinitions.find((tableDef) => tableDef.query === props.table_name);
 	const [currentOverlay, setCurrentOverlay] = useState({ table: null, title: null });
+	const [matchingCount, setMatchingCount] = useState<number | null>(null);
+	const onTotalCountChange = useCallback((n: number) => setMatchingCount(n), []);
 	const viewName = table_name_to_alias_map[props.table_name];
 
 	const handleRowClick = (params) => {
@@ -196,7 +187,7 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 			</div>
 
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 -mt-2 sm:mt-0">
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
 					<div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
 						<div className="flex items-center justify-between mb-3 sm:mb-4">
 							<h2 className="text-lg sm:text-xl font-semibold text-gray-900">Data Sources</h2>
@@ -221,21 +212,24 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 							</div>
 						</div>
 						<div>
-							<p className="text-gray-700 font-medium">
-								{tableDateRanges[props.table_name] || 
-									(props.dataYearRange.earliest === "" || props.dataYearRange.latest === ""
-										? "" 
-										: (() => {
-											const earliestYear = getYearFromAnyFormat(props.dataYearRange.earliest);
-											const latestYear = getYearFromAnyFormat(props.dataYearRange.latest);
-											if (earliestYear === "Invalid Date" || latestYear === "Invalid Date") {
-												return "";
-											}
-											return `${earliestYear} - ${latestYear}`;
-										})())
-								}
-							</p>
+							<p className="text-gray-700 font-medium">{tableDateRanges[props.table_name] || props.timePeriod || "—"}</p>
 						</div>
+					</div>
+					<div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
+						<div className="flex items-center justify-between mb-3 sm:mb-4">
+							<h2 className="text-lg sm:text-xl font-semibold text-gray-900">Records</h2>
+							<div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${bpi_light_green}30` }}>
+								<svg className="w-4 h-4" style={{ color: bpi_deep_green }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7C5 4 4 5 4 7zm0 5h16M9 4v16" />
+								</svg>
+							</div>
+						</div>
+						<p className="text-gray-700 font-medium">
+							{props.totalCount != null ? `${Number(props.totalCount).toLocaleString()} ${props.table_name === "officer_misconduct" ? "officer-case records" : "records"}` : "—"}
+						</p>
+						{matchingCount != null && props.totalCount != null && matchingCount !== Number(props.totalCount) && (
+							<p className="text-sm text-gray-500 mt-1">{matchingCount.toLocaleString()} match your filters</p>
+						)}
 					</div>
 				</div>
 				<div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300">
@@ -296,6 +290,7 @@ export default function Table(props: InferGetServerSidePropsType<typeof getServe
 								query={handleQuery(props.table_name)}
 								className="w-full bg-transparent"
 								onRowClick={handleRowClick}
+								onTotalCountChange={onTotalCountChange}
 							/>						</div>
 					</div>
 				</div>

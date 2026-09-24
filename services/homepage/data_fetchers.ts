@@ -11,35 +11,11 @@ async function fetchHomepageData(): Promise<SearchResponseData[]> {
 
 	for (const { node } of data[officer_search_alias_name].edges) {
 		if (rows.has(node.bpiId) && isUUID(node.bpiId)) {
+			// Same officer twice: keep the first non-empty value of every field.
 			const existing = rows.get(node.bpiId);
-			const mergedEmployee: SearchResponseData = {
-				bpiId: existing.bpiId,
-				badge_no: existing.badge_no || node.badge_no,
-				badgeNo: existing.badgeNo || node.badgeNo,
-				employeeId: existing.employeeId || node.employeeId,
-				rank: existing.rank || node.rank,
-				postId: existing.postId || node.postId,
-				startDate: existing.startDate || node.startDate,
-				year: existing.year || node.year,
-				fullName: existing.fullName || node.fullName,
-				org: existing.org || node.org,
-				totalPay: existing.totalPay || node.totalPay,
-				overtimePay: existing.overtimePay || node.overtimePay,
-				detailPay: existing.detailPay || node.detailPay,
-				otherPay: existing.otherPay || node.otherPay,
-				regularPay: existing.regularPay || node.regularPay,
-				retroPay: existing.retroPay || node.retroPay,
-				injuredPay: existing.injuredPay || node.injuredPay,
-				quinnPay: existing.quinnPay || node.quinnPay,
-				numOfIa: existing.numOfIa || node.numOfIa,
-				numOfDetail: existing.numOfDetail || node.numOfDetail,
-				numOfFio: existing.numOfFio || node.numOfFio,
-				numOfMvc: existing.numOfMvc || node.numOfMvc,
-				race: existing.race || node.race,
-				sex: existing.sex || node.sex,
-				isCurrentRoster: existing.isCurrentRoster || node.isCurrentRoster,
-			};
-			rows.set(node.bpiId, mergedEmployee);
+			const merged = { ...existing };
+			for (const [k, v] of Object.entries(node)) if (merged[k] == null || merged[k] === "") merged[k] = v;
+			rows.set(node.bpiId, merged as SearchResponseData);
 		} else {
 			rows.set(node.bpiId, node);
 		}

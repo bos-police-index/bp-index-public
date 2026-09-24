@@ -72,6 +72,11 @@ export function properCaseName(name) {
 }
 
 export function formatDateShort(params: GridValueFormatterParams) {
+	// Date-only values ("2025-01-01") are calendar dates: new Date() would read them as UTC
+	// midnight and show the previous day in US time zones.
+	const s = params.value == null ? "" : String(params.value);
+	if (s === "") return "";
+	if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
 	const date = new Date(params.value as string);
 	const year = date.getFullYear();
 	const month = date.getMonth() + 1;

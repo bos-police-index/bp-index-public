@@ -46,6 +46,41 @@ declare global {
 		race: string | null;
 		sex: string | null;
 		isCurrentRoster: boolean | null;
+		firstName?: string | null;
+		lastName?: string | null;
+		/** Distinct IA cases (numOfIa counts allegation rows). */
+		numOfIaCases?: number | null;
+		payPeerGroup?: "sworn" | "civilian" | null;
+		payRank?: number | null;
+		payPeers?: number | null;
+		payPercentile?: number | null;
+		payPeerAvg?: number | string | null;
+		payRatioToAvg?: number | string | null;
+	}
+
+	/** One officer × year from vw_v2_officer_year_stats (home year filter). */
+	interface OfficerYearStats {
+		bpiId: string;
+		year: number;
+		title: string | null;
+		peerGroup: "sworn" | "civilian" | null;
+		totalPay: number | string | null;
+		regularPay: number | string | null;
+		retroPay: number | string | null;
+		otherPay: number | string | null;
+		overtimePay: number | string | null;
+		injuredPay: number | string | null;
+		detailPay: number | string | null;
+		quinnPay: number | string | null;
+		payRank: number | null;
+		payPeers: number | null;
+		payPercentile: number | null;
+		payPeerAvg: number | string | null;
+		payRatioToAvg: number | string | null;
+		numOfIaCases: number;
+		numOfDetail: number;
+		numOfFio: number;
+		numOfMvc: number;
 	}
 
 	type HomepageData = {

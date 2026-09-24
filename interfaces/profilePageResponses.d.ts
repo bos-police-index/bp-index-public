@@ -154,6 +154,55 @@ declare global {
 		occurredDate: string | null;
 	}
 
+	/** One IA case for one officer, allegations rolled up (production.vw_v2_officer_ia_case). */
+	interface V2IaCaseRow {
+		bpiId: string | null;
+		caseNumber: string;
+		receivedDate: string | null;
+		occurredDate: string | null;
+		completedDate: string | null;
+		incidentType: string | null;
+		numAllegations: number;
+		numSustained: number;
+		outcome: string | null;
+		allegations: string | null;
+		findings: string | null;
+		actionsTaken: string | null;
+		daysHoursSuspended: string | null;
+		disposition: string | null;
+		narrative: string | null;
+		/** JSON (string from PostGraphile): [{allegation, finding, actionTaken, daysHoursSuspended, source}] */
+		allegationDetails: string | V2IaAllegation[] | null;
+		sources: string | null;
+		linkMethod?: V2LinkMethod;
+		confirmed?: boolean;
+		asOf: string | null;
+	}
+
+	interface V2IaAllegation {
+		allegation: string | null;
+		finding: string | null;
+		actionTaken: string | null;
+		daysHoursSuspended: string | null;
+		source: string | null;
+	}
+
+	/** Pay for one category/year vs sworn (or civilian) peers (production.vw_v2_pay_relative). */
+	interface V2PayRelativeRow {
+		year: number;
+		title: string | null;
+		peerGroup: "sworn" | "civilian";
+		category: string;
+		categoryLabel: string;
+		amount: number | string;
+		rank: number;
+		peers: number;
+		percentile: number;
+		peerAvg: number | string;
+		peerMedian: number | string;
+		ratioToAvg: number | string | null;
+	}
+
 	interface V2FioRow {
 		bpiId: string | null;
 		fcNum: string | null;

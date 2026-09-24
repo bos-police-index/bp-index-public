@@ -2,13 +2,30 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { GetStaticProps } from "next";
 import { Card } from "antd";
+import apolloClient from "@lib/apollo-client";
+import { GET_ALL_TABLE_COUNTS } from "@utility/exploreTables";
 import { tableDefinitions } from "@utility/tableDefinitions";
 import { bpi_deep_green, bpi_light_green } from "@styles/theme/lightTheme";
 import GlossaryTotal from "@components/GlossaryTotal";
 import ScreenOverlay from "@components/ScreenOverlay";
 
-export default function Home() {
+// Record counts per dataset, refreshed at most hourly (ISR) so the page stays fast.
+export const getStaticProps: GetStaticProps = async () => {
+	let counts: Record<string, number> = {};
+	try {
+		const { data } = await apolloClient.query({ query: GET_ALL_TABLE_COUNTS, fetchPolicy: "no-cache" });
+		counts = Object.fromEntries(Object.entries(data ?? {}).map(([k, v]: [string, any]) => [k, Number(v?.totalCount ?? 0)]));
+	} catch (e) {
+		console.error("Failed to load table counts", e);
+	}
+	return { props: { counts }, revalidate: 3600 };
+};
+
+const countLabel = (table: string, n?: number) => (n == null ? null : `${n.toLocaleString()} ${table === "officer_misconduct" ? "officer-case records" : "records"}`);
+
+export default function Home({ counts = {} }: { counts?: Record<string, number> }) {
 	const [cardFlipped, setCardFlipped] = useState<any>(null);
 	const [currentOverlay, setCurrentOverlay] = useState({ table: null, title: null });
 
@@ -120,6 +137,9 @@ export default function Home() {
 												>
 													{table.table}
 												</div>
+												{countLabel(table.query, counts[table.query]) && (
+													<div className="text-xs text-gray-500 -mt-3">{countLabel(table.query, counts[table.query])}</div>
+												)}
 											</div>
 										)}
 									</div>

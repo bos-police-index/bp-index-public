@@ -46,6 +46,12 @@ export const v2_academy_alias_name               = "allVwV2OfficerAcademies";
 export const v2_court_overtime_alias_name        = "allVwV2CourtOvertimes";
 export const v2_overtime_by_category_alias_name  = "allVwV2OvertimeByCategories";
 export const v2_officer_arroyo_alias_name        = "allVwV2OfficerArroyos";
+export const v2_officer_ia_case_alias_name       = "allVwV2OfficerIaCases";
+export const v2_pay_relative_alias_name          = "allVwV2PayRelatives";
+
+// HOME PAGE — year filter
+export const officer_year_list_alias_name  = "allVwV2OfficerYearLists";
+export const officer_year_stats_alias_name = "allVwV2OfficerYearStats";
 
 // Use in `[table_name].tsx`
 export const table_name_to_alias_map = {

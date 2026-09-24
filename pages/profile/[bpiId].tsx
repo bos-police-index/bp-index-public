@@ -19,8 +19,9 @@ import CourtOvertimeCardV2 from "@components/profileSections/CourtOvertimeCardV2
 import OvertimeByCategoryCardV2 from "@components/profileSections/OvertimeByCategoryCardV2";
 import TenureCardV2 from "@components/profileSections/TenureCardV2";
 import IncidentJournalTableV2 from "@components/profileSections/IncidentJournalTableV2";
-import { V2_OFFICER_PROFILE, V2_OFFICER_EARNINGS, V2_OFFICER_POST_CERTIFICATIONS, V2_OFFICER_POST_DECERTIFICATIONS, V2_OFFICER_FIO, V2_OFFICER_MISCONDUCT, V2_OFFICER_ASSIGNMENTS, V2_OFFICER_PAID_DETAILS, V2_OFFICER_TRAFFIC, V2_OFFICER_INCIDENTS, V2_OFFICER_SEPARATION, V2_OFFICER_ACADEMY, V2_OFFICER_COURT_OVERTIME, V2_OFFICER_OVERTIME_BY_CATEGORY, V2_OFFICER_ARROYO } from "@lib/graphql/queries";
-import { v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_misconduct_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name, v2_court_overtime_alias_name, v2_overtime_by_category_alias_name, v2_officer_arroyo_alias_name } from "@utility/dataViewAliases";
+import PayComparisonCardV2 from "@components/profileSections/PayComparisonCardV2";
+import { V2_OFFICER_PROFILE, V2_OFFICER_EARNINGS, V2_OFFICER_POST_CERTIFICATIONS, V2_OFFICER_POST_DECERTIFICATIONS, V2_OFFICER_FIO, V2_OFFICER_IA_CASES, V2_OFFICER_PAY_RELATIVE, V2_OFFICER_ASSIGNMENTS, V2_OFFICER_PAID_DETAILS, V2_OFFICER_TRAFFIC, V2_OFFICER_INCIDENTS, V2_OFFICER_SEPARATION, V2_OFFICER_ACADEMY, V2_OFFICER_COURT_OVERTIME, V2_OFFICER_OVERTIME_BY_CATEGORY, V2_OFFICER_ARROYO } from "@lib/graphql/queries";
+import { v2_officer_profile_alias_name, v2_earnings_by_year_alias_name, v2_post_certification_alias_name, v2_post_decertification_alias_name, v2_fio_alias_name, v2_officer_ia_case_alias_name, v2_pay_relative_alias_name, v2_officer_assignment_alias_name, v2_paid_detail_alias_name, v2_traffic_alias_name, v2_incident_alias_name, v2_separation_alias_name, v2_academy_alias_name, v2_court_overtime_alias_name, v2_overtime_by_category_alias_name, v2_officer_arroyo_alias_name } from "@utility/dataViewAliases";
 import { getOfficerProfileData } from "../../services/profile/data_fetchers";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -36,7 +37,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	const v2_post_cert_rows    = await getOfficerProfileData(V2_OFFICER_POST_CERTIFICATIONS(bpiId),   v2_post_certification_alias_name);
 	const v2_post_decert_rows  = await getOfficerProfileData(V2_OFFICER_POST_DECERTIFICATIONS(bpiId), v2_post_decertification_alias_name);
 	const v2_fio_rows          = await getOfficerProfileData(V2_OFFICER_FIO(bpiId),                   v2_fio_alias_name);
-	const v2_misconduct_rows   = await getOfficerProfileData(V2_OFFICER_MISCONDUCT(bpiId),            v2_officer_misconduct_alias_name);
+	const v2_ia_case_rows      = await getOfficerProfileData(V2_OFFICER_IA_CASES(bpiId),              v2_officer_ia_case_alias_name);
+	const v2_pay_relative_rows = await getOfficerProfileData(V2_OFFICER_PAY_RELATIVE(bpiId),          v2_pay_relative_alias_name);
 	const v2_paid_detail_rows  = await getOfficerProfileData(V2_OFFICER_PAID_DETAILS(bpiId),          v2_paid_detail_alias_name);
 	const v2_traffic_rows      = await getOfficerProfileData(V2_OFFICER_TRAFFIC(bpiId),               v2_traffic_alias_name);
 	const v2_incident_rows     = await getOfficerProfileData(V2_OFFICER_INCIDENTS(bpiId),             v2_incident_alias_name);
@@ -55,7 +57,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 			v2PostCertRows: v2_post_cert_rows,
 			v2PostDecertRows: v2_post_decert_rows,
 			v2FioRows: v2_fio_rows,
-			v2MisconductRows: v2_misconduct_rows,
+			v2IaCaseRows: v2_ia_case_rows,
+			v2PayRelativeRows: v2_pay_relative_rows,
 			v2PaidDetailRows: v2_paid_detail_rows,
 			v2TrafficRows: v2_traffic_rows,
 			v2IncidentRows: v2_incident_rows,
@@ -98,7 +101,7 @@ export default function OfficerProfile(props: InferGetServerSidePropsType<typeof
 					<ProfileSummaryHeaderV2
 						profile={v2Profile}
 						earnings={p.v2EarningsRows ?? []}
-						misconduct={p.v2MisconductRows ?? []}
+						misconduct={p.v2IaCaseRows ?? []}
 						fio={p.v2FioRows ?? []}
 						paidDetail={p.v2PaidDetailRows ?? []}
 						traffic={p.v2TrafficRows ?? []}
@@ -109,7 +112,7 @@ export default function OfficerProfile(props: InferGetServerSidePropsType<typeof
 					<TenureCardV2 academy={p.v2AcademyRows ?? []} separation={p.v2SeparationRows ?? []} profile={v2Profile} arroyo={p.v2Arroyo ?? null} />
 					<IdentityCardV2 profile={v2Profile} />
 					<OrganizationCardV2 rows={p.v2AssignmentRows ?? []} />
-					<div id="sec-ia" className="scroll-mt-4"><OfficerMisconductTableV2 rows={p.v2MisconductRows ?? []} /></div>
+					<div id="sec-ia" className="scroll-mt-4"><OfficerMisconductTableV2 rows={p.v2IaCaseRows ?? []} /></div>
 					<PostStatusCardV2
 						certifications={p.v2PostCertRows ?? []}
 						decertifications={p.v2PostDecertRows ?? []}
@@ -117,7 +120,8 @@ export default function OfficerProfile(props: InferGetServerSidePropsType<typeof
 					<div id="sec-fio" className="scroll-mt-4"><FioTableV2 rows={p.v2FioRows ?? []} /></div>
 					<div id="sec-incidents" className="scroll-mt-4"><IncidentJournalTableV2 rows={p.v2IncidentRows ?? []} /></div>
 					<div id="sec-traffic" className="scroll-mt-4"><TrafficCitationTableV2 rows={p.v2TrafficRows ?? []} /></div>
-					<div id="sec-earnings" className="scroll-mt-4"><EarningsByYearTableV2 rows={p.v2EarningsRows ?? []} /></div>
+					<div id="sec-earnings" className="scroll-mt-4"><EarningsByYearTableV2 rows={p.v2EarningsRows ?? []} relative={p.v2PayRelativeRows ?? []} /></div>
+					<PayComparisonCardV2 rows={p.v2PayRelativeRows ?? []} />
 					<div id="sec-overtime" className="scroll-mt-4"><OvertimeByCategoryCardV2 rows={p.v2OvertimeCatRows ?? []} /></div>
 					<CourtOvertimeCardV2 rows={p.v2CourtOtRows ?? []} />
 					<div id="sec-paid-details" className="scroll-mt-4"><PaidDetailTableV2 rows={p.v2PaidDetailRows ?? []} /></div>

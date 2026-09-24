@@ -119,9 +119,9 @@ const rawTableDefinitions = [
 		query: "officer_misconduct",
 		image: { component: <IconWrapper Icon={ReportProblemIcon} />, src: ReportProblemIcon },
 		isFake: false,
-		shortDescription: "Records of internal affair complaints against Boston Police Department officers, detailing allegation types and final dispositions",
+		shortDescription: "Internal Affairs cases against BPD officers — one record per officer per case, with that officer's allegations, findings and discipline.",
 		longDescription:
-			"The Officer Misconduct (IAs) dataset provides detailed records of all internal affair complaints filed against officers of the Boston Police Department. It includes information on the types of allegations made, the investigative process, and the final disposition of each complaint. This dataset is crucial for transparency and accountability, offering insights into the nature and outcomes of misconduct allegations within the police force.",
+			"The Internal Affairs Cases dataset lists BPD Internal Affairs Division (IAD) complaints, with one record for each officer named in each case. A case with several officers appears once for each of them; each record rolls up that officer's allegations, the finding on each, the most serious outcome (Sustained, Pending, Not Sustained, Unfounded, Exonerated, Filed/Withdrawn) and any action taken. It combines the BPD internal IAD extract, the 2011–2024 IAD file obtained by the National Lawyers Guild, the 2020 IAD complaint records, and the 2022–2025 records request. Officer Match shows whether a record is tied to the officer by employee ID or only by name.",
 	},
 
 	{
@@ -131,7 +131,7 @@ const rawTableDefinitions = [
 		isFake: false,
 		shortDescription: "Records of arrests made by Boston Police Department officers, including suspect information and charges filed",
 		longDescription:
-			"The Boston Arrests dataset provides comprehensive records of arrests made by officers of the Boston Police Department. It includes detailed information about the suspect demographics, charges filed, arrest location and time, and case details. This dataset offers insights into arrest patterns, charge types, and law enforcement practices within the Boston Police Department, helping to understand crime trends and judicial outcomes.",
+			"The Arrests dataset provides comprehensive records of arrests made by officers of the Boston Police Department. It includes detailed information about the suspect demographics, charges filed, arrest location and time, and case details. This dataset offers insights into arrest patterns, charge types, and law enforcement practices within the Boston Police Department, helping to understand crime trends and judicial outcomes.",
 	},
 
 	{
